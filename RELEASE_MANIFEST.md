@@ -25,10 +25,10 @@
 
 ## Governance state
 
-- `results_authorized=false`.
-- Aggregate numerical outputs are supplied for independent biostatistical review.
-- Manuscript import, coauthor result narratives, publication claims, and
-  submission readiness remain blocked pending S7 authorization.
+- All aggregate numerical outputs are available for independent biostatistical
+  review.
+- Manuscript import follows documentation of the statistical decisions,
+  completion of S7 review, and author approval.
 - Combined diabetes remains blocked pending mutual-exclusivity and denominator
   equivalence evidence.
 

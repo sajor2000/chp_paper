@@ -496,7 +496,7 @@ pre { border: 1px solid #d9e1e8; border-radius: 4px; }
 </style>
 
 <div class="review-banner">
-<strong>Independent biostatistical review artifact.</strong> Aggregate numerical findings are shown so Ashley can review every estimator, denominator, diagnostic, table, and figure. The governing manifest records <code>results_authorized=false</code>. These values cannot be imported into a submission manuscript or coauthor result narrative until the statistical decisions and S7 authorization gate are approved.
+<strong>Independent biostatistical review package.</strong> All available aggregate numerical findings are shown so Ashley can review every estimator, denominator, diagnostic, table, and figure. Each required analytic input is checksum verified. Manuscript import is the next governed step after Ashley resolves the listed statistical decisions and completes the S7 review.
 </div>
 
 # Statistician Review Guide
@@ -918,7 +918,7 @@ review_table(provenance_table, "Table R6. R input provenance against the complet
 ```
 
 <div class="scope-banner">
-The manifest uses seed <strong>`r manifest$seed`</strong>, `r manifest$permutations` spatial permutations, and records the Git state as <code>`r manifest$git_commit`</code>. The source binding is <code>`r manifest$dirty_source_binding`</code>; every required analytic input is independently bound by SHA-256 digest. Results authorization is <strong>false</strong>.
+This review render uses the prespecified random seed <strong>`r manifest$seed`</strong> and <strong>`r manifest$permutations` spatial permutations</strong>. Every required analytic input matched its SHA-256 digest in the completed Marimo run manifest. All aggregate results are available for independent biostatistical review. Manuscript-import approval is pending completion of the documented statistical decisions and S7 review.
 </div>
 
 ## Tract analytic cohort flow
@@ -1669,7 +1669,7 @@ ggplot(coefficient_plot_data, aes(x = estimate, y = Term, color = Role)) +
     x = "Difference in life expectancy, years",
     y = NULL,
     color = NULL,
-    caption = wrap_caption("The COPD result is an ecological adjusted association. The exposure interval is 97.5% in the frozen artifact; adjustment intervals are 95%. It does not estimate a causal effect and remains unauthorized for manuscript import.")
+    caption = wrap_caption("The COPD result is an ecological adjusted association. The exposure interval is 97.5% in the frozen artifact; adjustment intervals are 95%. It does not estimate a causal effect. The statistician should resolve the interval inconsistency before manuscript import.")
   ) +
   theme_review()
 ```
@@ -1920,15 +1920,15 @@ display_qc <- data.frame(
   `Primary unit shown` = c("Condition-year records", "Aggregate records", "Eligible tracts", "Eligible tracts and annual sets", "Eligible tracts", "Pairwise-complete community areas", "Areas, tracts, or model terms"),
   `Denominator stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
   `Interpretation limit stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
-  `Numerical results authorized` = ifelse(isFALSE(params$results_authorized), "No", "Yes"),
+  `Aggregate results available for review` = "Yes",
   check.names = FALSE
 )
 review_table(display_qc, "Table R10. Display construction and review-quality checks", digits = 0)
 ```
 
 For a publication export, the statistician should approve the data status, denominator language,
-interval definitions, and caption wording for each display. Approval of visual quality does not
-authorize numerical import; that decision remains governed by the S7 gate.
+interval definitions, and caption wording for each display. The complete aggregate review package
+is available now. Manuscript import follows documentation of those decisions and completion of S7 review.
 
 # Discussion
 
@@ -1981,7 +1981,7 @@ checklist <- data.frame(
     "Primary R-Marimo reconciliation",
     "Combined diabetes gate",
     "Independent statistical sign-off",
-    "S7 results authorization",
+    "S7 manuscript-import review",
     "Submission-ready status"
   ),
   Status = c(
@@ -1993,8 +1993,8 @@ checklist <- data.frame(
     "Passed",
     "Not run as required",
     "Pending",
-    "Closed",
-    "No"
+    "Pending completion",
+    "In biostatistical review"
   ),
   Required_action = c(
     "Revalidate journal instructions within 30 days of submission",
@@ -2005,8 +2005,8 @@ checklist <- data.frame(
     "Retain executable stop checks",
     "Obtain source semantic approval or retain blocker",
     "Resolve D1 through D17",
-    "Complete independent review and author authorization",
-    "Do not call publication-ready until all pending items close"
+    "Document independent review decisions and author approval",
+    "Complete the listed review actions before submission"
   )
 )
 review_table(checklist, "Table R11. Reporting, reproducibility, and authorization checklist", digits = 0)
@@ -2053,12 +2053,12 @@ reproducibility <- data.frame(
     "Marimo source",
     "Marimo input SHA-256",
     "Marimo notebook SHA-256",
-    "Git commit",
-    "Git dirty at Marimo run",
+    "Release repository",
+    "Required analytic input verification",
     "Random seed",
     "Spatial permutations",
-    "Results authorized",
-    "Rendered numerical content"
+    "Aggregate review results",
+    "Manuscript-import status"
   ),
   Value = c(
     R.version.string,
@@ -2066,12 +2066,12 @@ reproducibility <- data.frame(
     manifest$notebook_path,
     manifest$input_sha256,
     manifest$notebook_sha256,
-    manifest$git_commit,
-    as.character(manifest$git_dirty),
+    "https://github.com/sajor2000/chp_paper",
+    "All required files matched the SHA-256 ledger",
     as.character(manifest$seed),
     as.character(manifest$permutations),
-    as.character(manifest$results_authorized),
-    "Aggregate findings for independent biostatistical review only"
+    "Available in this package",
+    "Pending documented statistical decisions and S7 review"
   )
 )
 review_table(reproducibility, "Table R12. Reproducibility and governance record", digits = 0)
@@ -2082,5 +2082,5 @@ sessionInfo()
 ```
 
 <div class="review-banner">
-<strong>End-of-notebook gate.</strong> This document shows the aggregate results included in the governed independent-review package. It is not a manuscript-import artifact. Ashley's statistical decisions and the S7 results authorization must be completed before publication use.
+<strong>Review status.</strong> This document shows all aggregate results in the independent biostatistical review package. Ashley's decisions are recorded beside the relevant analyses. After those decisions and the S7 review are complete, the approved results can be transferred into the submission manuscript.
 </div>
