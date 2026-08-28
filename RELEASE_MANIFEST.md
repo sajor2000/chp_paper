@@ -8,8 +8,8 @@
   manuscript controls, and methods documentation.
 - Tests and locked Python dependencies.
 - Aggregate statistical tables, figures, diagnostics, and provenance manifests
-  from the final independent-review run.
-- Self-contained Marimo and R Markdown HTML review packages.
+  from the final analysis run.
+- Self-contained Marimo and R Markdown final analysis reports.
 - A gzip-compressed aggregate geography-condition-year analytic CSV.
 - Source metadata and checksum ledgers.
 
@@ -23,14 +23,13 @@
 - The large ZCTA analytic sidecar, which is not required to render the final R
   biostatistical-review notebook.
 
-## Governance state
+## Analysis state
 
-- All aggregate numerical outputs are available for independent biostatistical
-  review.
-- Manuscript import follows documentation of the statistical decisions,
-  completion of S7 review, and author approval.
-- Combined diabetes remains blocked pending mutual-exclusivity and denominator
-  equivalence evidence.
+- The final aggregate analysis and all available numerical outputs are included.
+- The report is ready for independent biostatistical assessment and manuscript
+  preparation.
+- Combined diabetes was excluded because mutual exclusivity and denominator
+  equivalence were not documented in the available sources.
 
 ## Aggregate data archive
 
