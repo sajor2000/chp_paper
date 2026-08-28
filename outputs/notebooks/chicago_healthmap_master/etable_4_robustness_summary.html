@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+</head>
+<body>
+<div id="etable_4_robustness_summary" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#etable_4_robustness_summary table {
+          font-family: Arial, Helvetica, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#etable_4_robustness_summary thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#etable_4_robustness_summary p { margin: 0; padding: 0; }
+ #etable_4_robustness_summary .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 12px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #etable_4_robustness_summary .gt_title { color: #333333; font-size: 14px; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #etable_4_robustness_summary .gt_subtitle { color: #333333; font-size: 11px; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #etable_4_robustness_summary .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_col_heading { color: #333333; background-color: #E8EEF5; font-size: 100%; font-weight: bold; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #etable_4_robustness_summary .gt_column_spanner_outer { color: #333333; background-color: #E8EEF5; font-size: 100%; font-weight: bold; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #etable_4_robustness_summary .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #etable_4_robustness_summary .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #etable_4_robustness_summary .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #etable_4_robustness_summary .gt_spanner_row { border-bottom-style: hidden; }
+ #etable_4_robustness_summary .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #F5F7FA; font-size: 100%; font-weight: bold; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #etable_4_robustness_summary .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #F5F7FA; font-size: 100%; font-weight: bold; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #etable_4_robustness_summary .gt_from_md> :first-child { margin-top: 0; }
+ #etable_4_robustness_summary .gt_from_md> :last-child { margin-bottom: 0; }
+ #etable_4_robustness_summary .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D9E2EC; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #etable_4_robustness_summary .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #etable_4_robustness_summary .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #etable_4_robustness_summary .gt_row_group_first td { border-top-width: 2px; }
+ #etable_4_robustness_summary .gt_row_group_first th { border-top-width: 2px; }
+ #etable_4_robustness_summary .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #etable_4_robustness_summary .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #etable_4_robustness_summary .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #etable_4_robustness_summary .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_sourcenote { font-size: 10px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #etable_4_robustness_summary .gt_left { text-align: left; }
+ #etable_4_robustness_summary .gt_center { text-align: center; }
+ #etable_4_robustness_summary .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #etable_4_robustness_summary .gt_font_normal { font-weight: normal; }
+ #etable_4_robustness_summary .gt_font_bold { font-weight: bold; }
+ #etable_4_robustness_summary .gt_font_italic { font-style: italic; }
+ #etable_4_robustness_summary .gt_super { font-size: 65%; }
+ #etable_4_robustness_summary .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #etable_4_robustness_summary .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #etable_4_robustness_summary .gt_sourcenote { font-size: 10px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #etable_4_robustness_summary .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #etable_4_robustness_summary .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="26" class="gt_heading gt_title gt_font_normal">eTable 4. Robustness and alternative spatial weights</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-model">model</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-estimand">estimand</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-variant">variant</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-target_population">target_population</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-estimate">estimate</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-ci_low">ci_low</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-ci_high">ci_high</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-eligible_n">eligible_n</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-direction_stability">direction_stability</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-absolute_percentage_change">absolute_percentage_change</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-ci_overlap">ci_overlap</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-threshold_crossed">threshold_crossed</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-analysis_status">analysis_status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-authorization_status">authorization_status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-primary_estimand_executed">primary_estimand_executed</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-results_authorized">results_authorized</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-percentage_change_reason">percentage_change_reason</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-estimator">estimator</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-covariance_type">covariance_type</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-adjustment_set">adjustment_set</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-capture_cut_points">capture_cut_points</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-excluded_geography_id">excluded_geography_id</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-flagged_area_count">flagged_area_count</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-omitted_year">omitted_year</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-included_years">included_years</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_4_robustness_summary-temporal_adjustment_covariates">temporal_adjustment_covariates</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td class="gt_row gt_left">C1</td>
+    <td class="gt_row gt_left">C1</td>
+    <td class="gt_row gt_left">continuous_capture_reference</td>
+    <td class="gt_row gt_left">not_run</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">0</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">not_run_insufficient_complete_areas</td>
+    <td class="gt_row gt_left">not_run_combined_diabetes_semantics_unapproved</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C1|C2</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">exclude_crosswalk_derived_disease_estimates</td>
+    <td class="gt_row gt_left">governed_community_area_population</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">not_applicable:chm_disease_values_are_direct_exports</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C1|C2</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">implausible_ratio_exclusion</td>
+    <td class="gt_row gt_left">governed_community_area_population</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">not_applicable:no_current_community_area_flagged</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C1|C2</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">multiple_imputation</td>
+    <td class="gt_row gt_left">governed_community_area_population</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">not_applicable:adjustment_covariates_complete</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C1|C2</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">precision_weighting</td>
+    <td class="gt_row gt_left">governed_community_area_population</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">not_applicable:life_expectancy_uncertainty_unavailable</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">not_applicable</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">continuous_capture_reference</td>
+    <td class="gt_row gt_left">distribution_of_eligible_community_areas</td>
+    <td class="gt_row gt_right">-2.604618932826945</td>
+    <td class="gt_row gt_right">-4.834587169242277</td>
+    <td class="gt_row gt_right">-0.37465069641161275</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.0</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">exclude_all_prespecified_flagged_areas</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_all_prespecified_flags</td>
+    <td class="gt_row gt_right">-3.1021934599115233</td>
+    <td class="gt_row gt_right">-5.869596117560992</td>
+    <td class="gt_row gt_right">-0.3347908022620545</td>
+    <td class="gt_row gt_right">67</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">19.10354412361319</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">9.0</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">frozen_capture_quartiles</td>
+    <td class="gt_row gt_left">distribution_of_eligible_community_areas</td>
+    <td class="gt_row gt_right">-2.917977798586751</td>
+    <td class="gt_row gt_right">-5.104688743007159</td>
+    <td class="gt_row gt_right">-0.7312668541663427</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">12.030891037857097</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3_capture_quartiles</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">0.051875|0.07475|0.113425</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:01</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6264132702113745</td>
+    <td class="gt_row gt_right">-4.853002657798882</td>
+    <td class="gt_row gt_right">-0.3998238826238665</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.836757235760969</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">01</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:02</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.552865713338834</td>
+    <td class="gt_row gt_right">-4.789144759033752</td>
+    <td class="gt_row gt_right">-0.31658666764391663</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.9869785493703747</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">02</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:03</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.630142205021607</td>
+    <td class="gt_row gt_right">-4.871887094952465</td>
+    <td class="gt_row gt_right">-0.38839731509074893</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.9799234687647843</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">03</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:04</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6776792533443494</td>
+    <td class="gt_row gt_right">-4.942793861401252</td>
+    <td class="gt_row gt_right">-0.4125646452874472</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.80502915787792</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">04</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:05</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.582661125287519</td>
+    <td class="gt_row gt_right">-4.854495051197446</td>
+    <td class="gt_row gt_right">-0.31082719937759107</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.8430333997301445</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">05</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:06</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.569668804462693</td>
+    <td class="gt_row gt_right">-4.838961495622475</td>
+    <td class="gt_row gt_right">-0.30037611330291103</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.3418518894938123</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">06</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:07</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5711501099820646</td>
+    <td class="gt_row gt_right">-4.806547666809175</td>
+    <td class="gt_row gt_right">-0.3357525531549541</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.2849796345661444</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">07</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:08</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.4971143301739662</td>
+    <td class="gt_row gt_right">-4.74148173744265</td>
+    <td class="gt_row gt_right">-0.2527469229052821</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">4.127459925060809</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">08</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:09</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.592711566615177</td>
+    <td class="gt_row gt_right">-4.821872511122512</td>
+    <td class="gt_row gt_right">-0.36355062210784217</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.45716346685862996</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">09</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:10</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5853471251197053</td>
+    <td class="gt_row gt_right">-4.842182547245321</td>
+    <td class="gt_row gt_right">-0.3285117029940894</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.7399089158245025</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">10</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:11</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.599514731111913</td>
+    <td class="gt_row gt_right">-4.896867513218882</td>
+    <td class="gt_row gt_right">-0.30216194900494386</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.19596731217384344</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">11</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:12</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5867710551771577</td>
+    <td class="gt_row gt_right">-4.842558202796569</td>
+    <td class="gt_row gt_right">-0.33098390755774654</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.685239496067699</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">12</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:13</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.447788403358335</td>
+    <td class="gt_row gt_right">-4.67012175472603</td>
+    <td class="gt_row gt_right">-0.22545505199063953</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">6.021246620456404</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">13</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:14</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.675527174126138</td>
+    <td class="gt_row gt_right">-4.945873895576579</td>
+    <td class="gt_row gt_right">-0.4051804526756979</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.722403665484855</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">14</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:15</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.598429607551741</td>
+    <td class="gt_row gt_right">-4.82850825073151</td>
+    <td class="gt_row gt_right">-0.36835096437197246</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.23762882152156012</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">15</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:16</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6106617860338845</td>
+    <td class="gt_row gt_right">-4.852000408436769</td>
+    <td class="gt_row gt_right">-0.36932316363099993</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.23200527074342447</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">16</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:17</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.7595587170166436</td>
+    <td class="gt_row gt_right">-5.128377708901315</td>
+    <td class="gt_row gt_right">-0.39073972513197264</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">5.948654608815788</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">17</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:18</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.765249890660108</td>
+    <td class="gt_row gt_right">-5.083732809238578</td>
+    <td class="gt_row gt_right">-0.4467669720816385</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">6.167157729242993</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">18</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:19</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.604044676762264</td>
+    <td class="gt_row gt_right">-4.833376383953808</td>
+    <td class="gt_row gt_right">-0.3747129695707203</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.022047603871849054</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">19</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:20</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.657440464678219</td>
+    <td class="gt_row gt_right">-4.9100791524215</td>
+    <td class="gt_row gt_right">-0.4048017769349377</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.0279946208462682</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">20</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:21</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6362326652733685</td>
+    <td class="gt_row gt_right">-4.906173336932527</td>
+    <td class="gt_row gt_right">-0.36629199361420994</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.2137565325961674</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">21</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:22</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6835756325247253</td>
+    <td class="gt_row gt_right">-4.961496754195625</td>
+    <td class="gt_row gt_right">-0.40565451085382565</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.031410802657573</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">22</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:23</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.575984551298969</td>
+    <td class="gt_row gt_right">-4.84853212563591</td>
+    <td class="gt_row gt_right">-0.3034369769620282</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.0993693229779735</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">23</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:24</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6151782183638463</td>
+    <td class="gt_row gt_right">-4.8610286507731715</td>
+    <td class="gt_row gt_right">-0.36932778595452165</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.405406157646287</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">24</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:25</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.454616603269944</td>
+    <td class="gt_row gt_right">-4.714969544374053</td>
+    <td class="gt_row gt_right">-0.19426366216583402</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">5.759089272771073</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">25</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:26</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.41667574409367</td>
+    <td class="gt_row gt_right">-4.640649794387151</td>
+    <td class="gt_row gt_right">-0.19270169380018887</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">7.215765283917723</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">26</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:27</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6129606447442306</td>
+    <td class="gt_row gt_right">-4.855831485952997</td>
+    <td class="gt_row gt_right">-0.37008980353546406</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.3202661169414128</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">27</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:28</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6298925924057173</td>
+    <td class="gt_row gt_right">-4.861021078430197</td>
+    <td class="gt_row gt_right">-0.3987641063812384</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.9703400086761018</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">28</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:29</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.347462314442751</td>
+    <td class="gt_row gt_right">-4.610515886830834</td>
+    <td class="gt_row gt_right">-0.08440874205466775</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">9.87309948273649</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">29</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:30</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.585847936596611</td>
+    <td class="gt_row gt_right">-4.839809861037422</td>
+    <td class="gt_row gt_right">-0.33188601215580116</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.7206810944110154</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">30</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:31</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5664061204491766</td>
+    <td class="gt_row gt_right">-4.78967802803923</td>
+    <td class="gt_row gt_right">-0.3431342128591228</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.4671172007604854</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">31</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:32</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.536556371879147</td>
+    <td class="gt_row gt_right">-4.728234706130152</td>
+    <td class="gt_row gt_right">-0.3448780376281415</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.613148514355824</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">32</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:33</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6104534590060844</td>
+    <td class="gt_row gt_right">-4.876848310517606</td>
+    <td class="gt_row gt_right">-0.34405860749456263</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.22400690195425005</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">33</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:34</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-3.1287568665495264</td>
+    <td class="gt_row gt_right">-5.2243828395160214</td>
+    <td class="gt_row gt_right">-1.033130893583032</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">20.123401819616817</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">34</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:35</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.650825348236431</td>
+    <td class="gt_row gt_right">-4.9437498744268105</td>
+    <td class="gt_row gt_right">-0.357900822046052</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.774018257608824</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">35</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:36</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.549947310385793</td>
+    <td class="gt_row gt_right">-4.798118580517642</td>
+    <td class="gt_row gt_right">-0.30177604025394444</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.099025763504436</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">36</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:37</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.732173078175581</td>
+    <td class="gt_row gt_right">-5.031374298040988</td>
+    <td class="gt_row gt_right">-0.43297185831017426</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">4.897228678676393</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">37</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:38</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.602340778102466</td>
+    <td class="gt_row gt_right">-4.833050483559521</td>
+    <td class="gt_row gt_right">-0.3716310726454104</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.08746595119027238</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">38</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:39</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.3648287878944103</td>
+    <td class="gt_row gt_right">-4.605107904043448</td>
+    <td class="gt_row gt_right">-0.12454967174537179</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">9.206342697980634</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">39</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:40</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.607107405493622</td>
+    <td class="gt_row gt_right">-4.850703831370888</td>
+    <td class="gt_row gt_right">-0.36351097961635537</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.09554075781734685</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">40</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:41</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.617477783808873</td>
+    <td class="gt_row gt_right">-4.86756726341334</td>
+    <td class="gt_row gt_right">-0.36738830420440616</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.4936941377436587</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">41</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:42</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.602663795507702</td>
+    <td class="gt_row gt_right">-4.82743449767364</td>
+    <td class="gt_row gt_right">-0.3778930933417639</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.07506423663751725</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">42</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:43</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.569875459527559</td>
+    <td class="gt_row gt_right">-4.798246566470382</td>
+    <td class="gt_row gt_right">-0.34150435258473477</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.3339177129330384</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">43</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:44</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5698850503428012</td>
+    <td class="gt_row gt_right">-4.803821776024025</td>
+    <td class="gt_row gt_right">-0.33594832466157776</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.333549489577155</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">44</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:45</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.570219127587489</td>
+    <td class="gt_row gt_right">-4.782255920391119</td>
+    <td class="gt_row gt_right">-0.3581823347838591</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.32072315093402</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">45</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:46</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.68160623836863</td>
+    <td class="gt_row gt_right">-4.870404428594347</td>
+    <td class="gt_row gt_right">-0.4928080481429129</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.955799198546345</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">46</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:47</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5557042970170833</td>
+    <td class="gt_row gt_right">-4.8040328082395</td>
+    <td class="gt_row gt_right">-0.30737578579466707</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.8779958631711107</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">47</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:48</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.4082864537214412</td>
+    <td class="gt_row gt_right">-4.834969930655051</td>
+    <td class="gt_row gt_right">0.018397023212167962</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">7.537858096286376</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">48</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:49</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5203079255579297</td>
+    <td class="gt_row gt_right">-4.730036790499869</td>
+    <td class="gt_row gt_right">-0.31057906061599017</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.236980512059303</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">49</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:50</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5950041361001936</td>
+    <td class="gt_row gt_right">-4.817211379889039</td>
+    <td class="gt_row gt_right">-0.3727968923113485</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.3691440849781335</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">50</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:51</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.7063747145763166</td>
+    <td class="gt_row gt_right">-4.886333716046599</td>
+    <td class="gt_row gt_right">-0.5264157131060339</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.906743534223267</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">51</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:52</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6378363766645947</td>
+    <td class="gt_row gt_right">-4.8598129269562325</td>
+    <td class="gt_row gt_right">-0.41585982637295693</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.2753283568278821</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">52</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:53</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.411053291146551</td>
+    <td class="gt_row gt_right">-4.635158502196629</td>
+    <td class="gt_row gt_right">-0.18694808009647357</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">7.431629987819585</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">53</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:54</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.8472612043102927</td>
+    <td class="gt_row gt_right">-4.993548670250618</td>
+    <td class="gt_row gt_right">-0.7009737383699677</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">9.315845340185485</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">54</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:55</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.8461287398922224</td>
+    <td class="gt_row gt_right">-5.176022058094588</td>
+    <td class="gt_row gt_right">-0.5162354216898559</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">9.2723662575528</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">55</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:56</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5496421523283104</td>
+    <td class="gt_row gt_right">-4.77973507310449</td>
+    <td class="gt_row gt_right">-0.31954923155213066</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.1107417981856185</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">56</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:57</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.8087984087540363</td>
+    <td class="gt_row gt_right">-5.080857463065826</td>
+    <td class="gt_row gt_right">-0.5367393544422465</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">7.839130452203367</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">57</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:58</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.604306142016423</td>
+    <td class="gt_row gt_right">-4.83107725782793</td>
+    <td class="gt_row gt_right">-0.3775350262049151</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.012009081504393254</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">58</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:59</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.610723572304167</td>
+    <td class="gt_row gt_right">-4.844342899504305</td>
+    <td class="gt_row gt_right">-0.3771042451040283</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.23437745154513753</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">59</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:60</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.8134964257493067</td>
+    <td class="gt_row gt_right">-5.032291876087593</td>
+    <td class="gt_row gt_right">-0.59470097541102</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">8.019502979487863</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">60</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:61</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.568513733359243</td>
+    <td class="gt_row gt_right">-4.827000990873907</td>
+    <td class="gt_row gt_right">-0.3100264758445781</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.3861989181087186</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">61</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:62</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.717353243927903</td>
+    <td class="gt_row gt_right">-4.998128401047201</td>
+    <td class="gt_row gt_right">-0.43657808680860466</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">4.32824585892881</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">62</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:63</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.523393778335162</td>
+    <td class="gt_row gt_right">-4.769354366945449</td>
+    <td class="gt_row gt_right">-0.2774331897248752</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.1185043411945257</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">63</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:64</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5138961733749774</td>
+    <td class="gt_row gt_right">-4.781326805667591</td>
+    <td class="gt_row gt_right">-0.24646554108236352</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.4831490437451746</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">64</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:65</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.592723204790474</td>
+    <td class="gt_row gt_right">-4.825548299008931</td>
+    <td class="gt_row gt_right">-0.35989811057201626</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.4567166385280003</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">65</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:66</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.616136236688707</td>
+    <td class="gt_row gt_right">-4.843403302355675</td>
+    <td class="gt_row gt_right">-0.38886917102173824</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.4421876734675184</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">66</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:67</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.730403598879466</td>
+    <td class="gt_row gt_right">-4.933026804965276</td>
+    <td class="gt_row gt_right">-0.5277803927936562</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">4.829292472200515</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">67</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:68</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.522176160970563</td>
+    <td class="gt_row gt_right">-4.756939482906473</td>
+    <td class="gt_row gt_right">-0.2874128390346531</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.165252729192975</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">68</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:69</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5759720908319537</td>
+    <td class="gt_row gt_right">-4.830007627470956</td>
+    <td class="gt_row gt_right">-0.3219365541929511</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.0998477218277434</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">69</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:70</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.4938268732434246</td>
+    <td class="gt_row gt_right">-4.7351498617686865</td>
+    <td class="gt_row gt_right">-0.25250388471816265</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">4.253676351160945</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">70</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:71</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.594336332144243</td>
+    <td class="gt_row gt_right">-4.8183382862331605</td>
+    <td class="gt_row gt_right">-0.3703343780553259</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.3947833041181813</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">71</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:72</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.5911002903738467</td>
+    <td class="gt_row gt_right">-4.846515006317334</td>
+    <td class="gt_row gt_right">-0.33568557443035907</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.5190257308936023</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">72</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:73</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.541847052328162</td>
+    <td class="gt_row gt_right">-4.751835742608703</td>
+    <td class="gt_row gt_right">-0.3318583620476203</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">2.4100216621958177</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">73</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:74</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.68703420538732</td>
+    <td class="gt_row gt_right">-5.334482677084991</td>
+    <td class="gt_row gt_right">-0.03958573368964924</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.1641969395855223</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">74</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:75</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.6228839410014633</td>
+    <td class="gt_row gt_right">-4.952846122067801</td>
+    <td class="gt_row gt_right">-0.29292175993512526</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">0.701254526883681</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_area_out:77</td>
+    <td class="gt_row gt_left">eligible_community_areas_excluding_one</td>
+    <td class="gt_row gt_right">-2.563508885511931</td>
+    <td class="gt_row gt_right">-4.803235171292792</td>
+    <td class="gt_row gt_right">-0.3237825997310697</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">1.5783517042316342</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">77</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_primary_year_out:2022</td>
+    <td class="gt_row gt_left">pooled_2022_2024_eligible_community_areas</td>
+    <td class="gt_row gt_right">-2.5103682386272865</td>
+    <td class="gt_row gt_right">-4.4677347862333985</td>
+    <td class="gt_row gt_right">-0.5530016910211741</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">3.6185982145705737</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3_adjusted_temporal</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">2022</td>
+    <td class="gt_row gt_left">2023|2024</td>
+    <td class="gt_row gt_left">compatible_pooled_acs_covariates_plus_period_capture</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_primary_year_out:2023</td>
+    <td class="gt_row gt_left">pooled_2022_2024_eligible_community_areas</td>
+    <td class="gt_row gt_right">-2.9984189841190645</td>
+    <td class="gt_row gt_right">-5.661697163792191</td>
+    <td class="gt_row gt_right">-0.33514080444593874</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">15.11929619833961</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3_adjusted_temporal</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">2023</td>
+    <td class="gt_row gt_left">2022|2024</td>
+    <td class="gt_row gt_left">compatible_pooled_acs_covariates_plus_period_capture</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">leave_one_primary_year_out:2024</td>
+    <td class="gt_row gt_left">pooled_2022_2024_eligible_community_areas</td>
+    <td class="gt_row gt_right">-2.090352259697859</td>
+    <td class="gt_row gt_right">-4.395162054403912</td>
+    <td class="gt_row gt_right">0.21445753500819364</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">19.74441123219931</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">not_crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">unweighted_ols_hc3_adjusted_temporal</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">2024</td>
+    <td class="gt_row gt_left">2022|2023</td>
+    <td class="gt_row gt_left">compatible_pooled_acs_covariates_plus_period_capture</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">C2</td>
+    <td class="gt_row gt_left">population_weighted_ols</td>
+    <td class="gt_row gt_left">population_weighted_community_area_adult_population</td>
+    <td class="gt_row gt_right">-3.9743059603969364</td>
+    <td class="gt_row gt_right">-6.7761596295168935</td>
+    <td class="gt_row gt_right">-1.1724522912769788</td>
+    <td class="gt_row gt_right">76</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_right">52.586849089797184</td>
+    <td class="gt_row gt_right">True</td>
+    <td class="gt_row gt_left">crossed:sign_change_or_absolute_percentage_change_gt_30</td>
+    <td class="gt_row gt_left">freeze_candidate_primary_model_unsecured</td>
+    <td class="gt_row gt_left">results_not_authorized</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">available</td>
+    <td class="gt_row gt_left">population_weighted_ols_hc3</td>
+    <td class="gt_row gt_left">HC3</td>
+    <td class="gt_row gt_left">pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_right">—</td>
+    <td class="gt_row gt_left">—</td>
+    <td class="gt_row gt_left">—</td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

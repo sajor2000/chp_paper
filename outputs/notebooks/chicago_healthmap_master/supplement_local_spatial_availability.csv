@@ -1,0 +1,3 @@
+condition_id,status,eligible_areas,required_areas
+copd,not_run_incomplete_77_area_topology,76,77
+hypertension,run_complete_topology,77,77

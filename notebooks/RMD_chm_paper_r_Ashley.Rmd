@@ -1,0 +1,2086 @@
+---
+title: "Chicago Health Map: Statistical Analysis Plan and Biostatistical Review"
+subtitle: "R companion to Marimo_notebook_research_provenance for Ashley"
+author: "Chicago Health Map study team"
+date: "August 27, 2026"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+    df_print: paged
+    theme: cosmo
+    highlight: tango
+    # Equations are rendered as HTML below so the delivered file has no
+    # network dependency on MathJax or any other runtime asset.
+    mathjax: null
+params:
+  results_authorized: false
+---
+
+```{r setup, include=FALSE}
+options(stringsAsFactors = FALSE, scipen = 999, width = 100)
+set.seed(20260715)
+
+required_packages <- c("digest", "dplyr", "ggplot2", "jsonlite", "knitr", "patchwork", "ragg", "scales")
+missing_packages <- required_packages[!vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_packages) > 0) {
+  stop("Missing required installed packages: ", paste(missing_packages, collapse = ", "))
+}
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+})
+
+find_project_root <- function(start = getwd()) {
+  path <- normalizePath(start, mustWork = TRUE)
+  repeat {
+    if (file.exists(file.path(path, "pyproject.toml")) && dir.exists(file.path(path, "notebooks"))) {
+      return(path)
+    }
+    parent <- dirname(path)
+    if (identical(parent, path)) {
+      stop("Could not locate the ChicagoHealthMap project root from ", start)
+    }
+    path <- parent
+  }
+}
+
+current_input <- knitr::current_input(dir = TRUE)
+root_start <- if (is.null(current_input)) {
+  getwd()
+} else {
+  dirname(normalizePath(current_input, mustWork = FALSE))
+}
+project_root <- find_project_root(root_start)
+artifact_dir <- file.path(project_root, "outputs", "notebooks", "chicago_healthmap_master")
+if (!dir.exists(artifact_dir)) {
+  stop("Run the master Marimo notebook first. Missing artifact directory: ", artifact_dir)
+}
+
+read_artifact <- function(name) {
+  path <- file.path(artifact_dir, name)
+  if (!file.exists(path)) stop("Missing governed artifact: ", path)
+  read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
+}
+
+require_columns <- function(data, artifact_name, columns) {
+  missing <- setdiff(columns, names(data))
+  if (length(missing) > 0) {
+    stop("Missing required columns in ", artifact_name, ": ", paste(missing, collapse = ", "))
+  }
+  invisible(data)
+}
+
+as_flag <- function(x) tolower(as.character(x)) == "true"
+percent <- function(x, digits = 1) scales::percent(x, accuracy = 10^(-digits))
+condition_name <- function(x) ifelse(x == "copd", "COPD", tools::toTitleCase(x))
+wrap_caption <- function(text, width = 125) paste(strwrap(text, width = width), collapse = "\n")
+
+parse_count <- function(x) {
+  parsed <- suppressWarnings(as.numeric(gsub("[^0-9.-]", "", as.character(x))))
+  if (anyNA(parsed)) {
+    stop("A count field contains a value that cannot be parsed: ", paste(x[is.na(parsed)], collapse = ", "))
+  }
+  parsed
+}
+
+review_table <- function(data, caption, digits = 3, align = NULL) {
+  data <- as.data.frame(data, stringsAsFactors = FALSE)
+  data[] <- lapply(data, function(column) {
+    if (is.character(column)) {
+      column[column %in% c("NA", "NaN", "")] <- "Not available"
+    }
+    column
+  })
+  rendered <- knitr::kable(
+    data,
+    format = "html",
+    caption = caption,
+    digits = digits,
+    align = align,
+    escape = TRUE,
+    row.names = FALSE,
+    table.attr = 'class="review-table"'
+  )
+  # knitr::kable renders missing numeric values as literal NA; replace that
+  # token after rendering so a reviewer sees an explicit status in every cell.
+  knitr::asis_output(gsub(">\\s*NA\\s*<", ">Not available<", as.character(rendered)))
+}
+
+jama_palette <- c(
+  ink = "#17212B",
+  muted = "#53616B",
+  rule = "#94A1AA",
+  grid = "#DDE3E7",
+  blue = "#0072B2",
+  vermilion = "#D55E00"
+)
+
+theme_review <- function(base_size = 10.5, base_family = "Arial") {
+  theme_classic(base_size = base_size, base_family = base_family) +
+    theme(
+      text = element_text(color = jama_palette[["ink"]]),
+      plot.title.position = "plot",
+      plot.title = element_text(face = "bold", size = rel(1.18), margin = margin(b = 3)),
+      plot.subtitle = element_text(color = jama_palette[["muted"]], margin = margin(b = 9)),
+      plot.caption = element_text(color = jama_palette[["muted"]], hjust = 0, size = rel(0.78), margin = margin(t = 8)),
+      axis.title = element_text(face = "bold", size = rel(1.28), margin = margin(t = 10, r = 10)),
+      axis.text = element_text(color = jama_palette[["ink"]], size = rel(1.16)),
+      axis.line = element_line(color = jama_palette[["rule"]], linewidth = 0.35),
+      axis.ticks = element_line(color = jama_palette[["rule"]], linewidth = 0.35),
+      axis.ticks.length = grid::unit(4, "pt"),
+      panel.grid.major.x = element_line(color = jama_palette[["grid"]], linewidth = 0.3),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.position = "bottom",
+      legend.box.just = "left",
+      legend.title = element_text(face = "bold"),
+      legend.key = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_text(face = "bold", color = jama_palette[["ink"]], size = rel(1.1)),
+      plot.margin = margin(7, 15, 7, 7)
+    )
+}
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE,
+  fig.align = "center",
+  fig.retina = 2,
+  dpi = 300,
+  dev = "ragg_png",
+  out.width = "100%",
+  cache = FALSE
+)
+
+manifest_path <- file.path(artifact_dir, "notebook_run_manifest.json")
+manifest <- jsonlite::fromJSON(manifest_path, simplifyVector = TRUE)
+stopifnot(isFALSE(params$results_authorized), isFALSE(manifest$results_authorized))
+
+required_artifacts <- c(
+  "00_master_analytic_dataset.csv",
+  "00_master_analytic_dataset_manifest.json",
+  "table_1_resource_quality.csv",
+  "table_2_geographic_resolution.csv",
+  "supplement_geographic_main_evidence.csv",
+  "supplement_geographic_consequence_details.csv",
+  "supplement_geographic_resolution_matrix.csv",
+  "supplement_geographic_consequence_transitions.csv",
+  "supplement_geographic_consequence_stability.csv",
+  "supplement_concordance_bootstrap.csv",
+  "supplement_full_coefficient_table.csv",
+  "supplement_adjusted_diagnostic_data.csv",
+  "supplement_model_gate_diagnostics.csv",
+  "supplement_spatial_diagnostics.csv",
+  "supplement_spatial_error_sensitivity.csv",
+  "supplement_robustness_summary.csv",
+  "supplement_tract_cohort_flow.csv",
+  "biostatistical_display_review.csv"
+)
+missing_artifacts <- required_artifacts[!file.exists(file.path(artifact_dir, required_artifacts))]
+if (length(missing_artifacts) > 0) stop("Missing required artifacts: ", paste(missing_artifacts, collapse = ", "))
+
+expected_hashes <- unlist(manifest$output_sha256, use.names = TRUE)
+checked_hashes <- vapply(required_artifacts, function(name) {
+  digest::digest(file = file.path(artifact_dir, name), algo = "sha256", serialize = FALSE)
+}, character(1))
+hash_ok <- checked_hashes == expected_hashes[required_artifacts]
+if (anyNA(hash_ok) || !all(hash_ok)) {
+  stop("At least one R input does not match the completed Marimo manifest: ",
+       paste(required_artifacts[is.na(hash_ok) | !hash_ok], collapse = ", "))
+}
+
+raw_aggregate <- read_artifact("00_master_analytic_dataset.csv")
+dataset_manifest <- jsonlite::fromJSON(
+  file.path(artifact_dir, "00_master_analytic_dataset_manifest.json"),
+  simplifyVector = TRUE
+)
+table_1 <- read_artifact("table_1_resource_quality.csv")
+table_2 <- read_artifact("table_2_geographic_resolution.csv")
+main_evidence <- read_artifact("supplement_geographic_main_evidence.csv")
+detail <- read_artifact("supplement_geographic_consequence_details.csv")
+resolution_matrix <- read_artifact("supplement_geographic_resolution_matrix.csv")
+transitions <- read_artifact("supplement_geographic_consequence_transitions.csv")
+stability <- read_artifact("supplement_geographic_consequence_stability.csv")
+bootstrap_results <- read_artifact("supplement_concordance_bootstrap.csv")
+coefficient_table <- read_artifact("supplement_full_coefficient_table.csv")
+diagnostic_data <- read_artifact("supplement_adjusted_diagnostic_data.csv")
+model_gate <- read_artifact("supplement_model_gate_diagnostics.csv")
+spatial_diagnostics <- read_artifact("supplement_spatial_diagnostics.csv")
+spatial_error <- read_artifact("supplement_spatial_error_sensitivity.csv")
+robustness <- read_artifact("supplement_robustness_summary.csv")
+tract_cohort_flow <- read_artifact("supplement_tract_cohort_flow.csv")
+display_review <- read_artifact("biostatistical_display_review.csv")
+
+# The Healthy Chicago Survey (HCS) triangulation is read from the frozen public
+# source snapshot rather than from a manuscript result artifact. Every source
+# file is verified against the repository checksum ledger before parsing.
+checksum_ledger_path <- file.path(project_root, "sources", "public", "CHECKSUMS.sha256")
+checksum_lines <- readLines(checksum_ledger_path, warn = FALSE)
+checksum_lines <- checksum_lines[grepl("^[0-9a-f]{64}  ", checksum_lines)]
+checksum_ledger <- data.frame(
+  sha256 = sub("  .*", "", checksum_lines),
+  relative_path = sub("^[0-9a-f]{64}  ", "", checksum_lines),
+  stringsAsFactors = FALSE
+)
+
+read_verified_public_json <- function(relative_path) {
+  match_row <- checksum_ledger[checksum_ledger$relative_path == relative_path, , drop = FALSE]
+  if (nrow(match_row) != 1L) stop("Expected one public checksum entry for ", relative_path)
+  absolute_path <- file.path(project_root, relative_path)
+  if (!file.exists(absolute_path)) stop("Missing frozen public source: ", absolute_path)
+  observed <- digest::digest(file = absolute_path, algo = "sha256", serialize = FALSE)
+  if (!identical(observed, match_row$sha256[[1]])) {
+    stop("Frozen public source checksum mismatch: ", relative_path)
+  }
+  jsonlite::fromJSON(absolute_path, simplifyDataFrame = TRUE)
+}
+
+hcs_hypertension_path <- paste0(
+  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/data/",
+  "HCSHYTP/2023-2024.json"
+)
+hcs_diabetes_path <- paste0(
+  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/data/",
+  "HCSDIAP/2023-2024.json"
+)
+hcs_topics_path <- paste0(
+  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/metadata/",
+  "topics.json"
+)
+
+hcs_hypertension_source <- read_verified_public_json(hcs_hypertension_path)$results
+hcs_diabetes_source <- read_verified_public_json(hcs_diabetes_path)$results
+hcs_topics <- read_verified_public_json(hcs_topics_path)$results
+hcs_topic_metadata <- hcs_topics[hcs_topics$key %in% c("HCSHYTP", "HCSDIAP"), , drop = FALSE]
+
+hcs_hypertension <- hcs_hypertension_source |>
+  filter(l == "neighborhood", a == "HCSHYTP", p == "", d == "2023-2024") |>
+  transmute(
+    geography_id = as.character(as.integer(sub("^.*-", "", g))),
+    hcs_estimate = as.numeric(v),
+    hcs_standard_error = as.numeric(se),
+    hcs_ci_low = pmax(0, hcs_estimate - 1.96 * hcs_standard_error),
+    hcs_ci_high = pmin(100, hcs_estimate + 1.96 * hcs_standard_error)
+  )
+
+hcs_diabetes_availability <- hcs_diabetes_source |>
+  filter(l == "neighborhood", a == "HCSDIAP", p == "", d == "2023-2024")
+
+chm_hypertension_2022_2024 <- raw_aggregate |>
+  filter(
+    geography_type == "chicago_community_area",
+    condition_id == "hypertension",
+    time_period %in% 2022:2024,
+    !as_flag(suppression_flag),
+    is.finite(numerator),
+    is.finite(denominator),
+    denominator > 0
+  ) |>
+  mutate(geography_id = as.character(geography_id)) |>
+  group_by(geography_id) |>
+  summarise(
+    chm_numerator = sum(numerator),
+    chm_denominator = sum(denominator),
+    eligible_years = n_distinct(time_period),
+    .groups = "drop"
+  ) |>
+  filter(eligible_years == 3L) |>
+  mutate(chm_estimate = 100 * chm_numerator / chm_denominator)
+
+percentile_rank_r <- function(x) rank(x, ties.method = "average") / length(x)
+rank_quartile_r <- function(x) {
+  as.integer(cut(x, breaks = c(-Inf, 0.25, 0.50, 0.75, Inf), labels = 1:4, right = TRUE))
+}
+
+hcs_chm_hypertension <- inner_join(
+  chm_hypertension_2022_2024,
+  hcs_hypertension,
+  by = "geography_id"
+) |>
+  mutate(
+    chm_rank = percentile_rank_r(chm_estimate),
+    hcs_rank = percentile_rank_r(hcs_estimate),
+    chm_quartile = rank_quartile_r(chm_rank),
+    hcs_quartile = rank_quartile_r(hcs_rank),
+    absolute_rank_gap = abs(chm_rank - hcs_rank),
+    exact_quartile_agreement = chm_quartile == hcs_quartile
+  )
+
+hcs_chm_summary <- data.frame(
+  Measure = c(
+    "Pairwise-complete community areas, No.",
+    "Spearman rank correlation",
+    "Median absolute percentile-rank gap",
+    "Exact quartile agreement, No.",
+    "Exact quartile agreement, %"
+  ),
+  Estimate = c(
+    nrow(hcs_chm_hypertension),
+    cor(hcs_chm_hypertension$chm_estimate, hcs_chm_hypertension$hcs_estimate, method = "spearman"),
+    median(hcs_chm_hypertension$absolute_rank_gap),
+    sum(hcs_chm_hypertension$exact_quartile_agreement),
+    100 * mean(hcs_chm_hypertension$exact_quartile_agreement)
+  ),
+  Interpretation = c(
+    "All 77 direct Chicago community areas were pairwise complete.",
+    "Rank alignment only; neither source is a gold standard.",
+    "Absolute difference between within-source percentile ranks.",
+    "Agreement under average-rank quartiles with fixed 0.25, 0.50, and 0.75 boundaries.",
+    "Descriptive proportion; no joint-source uncertainty interval is available."
+  ),
+  stringsAsFactors = FALSE
+)
+
+chm_available_years <- sort(unique(as.integer(raw_aggregate$time_period)))
+chm_2025_available <- 2025L %in% chm_available_years
+chm_holdout_status <- if (chm_2025_available) {
+  "Detected but not analyzed until phenotype, denominator, suppression, geography, and contributing-system comparability pass the frozen holdout gate."
+} else {
+  "Not present in the frozen CHM aggregate extract; latest available year is 2024."
+}
+
+stopifnot(
+  nrow(hcs_topic_metadata) == 2L,
+  all(hcs_topic_metadata$privacy == "Organization"),
+  nrow(hcs_hypertension) == 77L,
+  nrow(hcs_diabetes_availability) == 74L,
+  nrow(chm_hypertension_2022_2024) == 77L,
+  nrow(hcs_chm_hypertension) == 77L,
+  !anyDuplicated(hcs_chm_hypertension$geography_id),
+  all(is.finite(hcs_chm_hypertension$hcs_estimate)),
+  all(is.finite(hcs_chm_hypertension$hcs_standard_error)),
+  all(hcs_chm_hypertension$hcs_standard_error > 0),
+  all(hcs_chm_hypertension$hcs_estimate >= 0 & hcs_chm_hypertension$hcs_estimate <= 100),
+  identical(chm_available_years, 2019:2024)
+)
+
+display_review <- bind_rows(
+  display_review,
+  data.frame(
+    Display = "Review Figure HCS-1 and Review Table HCS-1",
+    `Review result` = sprintf(
+      "Across 77 community areas, CHM and HCS hypertension ranks had Spearman rho %.3f; %d areas (%.1f%%) had the same within-source quartile.",
+      hcs_chm_summary$Estimate[hcs_chm_summary$Measure == "Spearman rank correlation"],
+      hcs_chm_summary$Estimate[hcs_chm_summary$Measure == "Exact quartile agreement, No."],
+      hcs_chm_summary$Estimate[hcs_chm_summary$Measure == "Exact quartile agreement, %"]
+    ),
+    `Main limitation` = "HCS is self-reported survey data with survey standard errors; CHM is an EHR-diagnosed proportion among observed adults. Periods, denominators, case ascertainment, and source uncertainty differ.",
+    `Needed supplement or decision` = "Confirm Chicago Health Atlas/CDPH publication permission, preserve source-specific denominators, and decide whether the 2023-2024 HCS comparison belongs in the final supplement.",
+    check.names = FALSE
+  )
+)
+
+require_columns(raw_aggregate, "00_master_analytic_dataset.csv", c(
+  "geography_id", "geography_type", "condition_id", "time_period", "disease_value_derivation",
+  "numerator", "denominator", "suppression_flag", "primary_tract_annual_eligible",
+  "primary_tract_annual_exclusion_reason", "city_inclusion_primary_eligible",
+  "city_inclusion_area50_sensitivity_eligible", "city_inclusion_reason"
+))
+require_columns(tract_cohort_flow, "supplement_tract_cohort_flow.csv", c(
+  "condition_id", "time_period", "boundary_eligible_rows", "boundary_eligible_tracts",
+  "denominator_ge_30_rows", "observable_after_suppression_rows", "primary_eligible_rows",
+  "excluded_denominator_lt_30_or_missing_rows",
+  "excluded_suppressed_or_missing_numerator_rows"
+))
+require_columns(detail, "supplement_geographic_consequence_details.csv", c(
+  "geography_id", "condition_id", "comparison_geography_type", "sensitivity_status", "results_authorized",
+  "ehr_percent", "comparison_rank", "tract_quartile", "comparison_quartile", "transition_state"
+))
+require_columns(main_evidence, "supplement_geographic_main_evidence.csv", c(
+  "condition_id", "manuscript_import_allowed", "resolution_eligible_n", "quartile_disagree_count",
+  "q4_movers_n", "within_variance_share"
+))
+require_columns(coefficient_table, "supplement_full_coefficient_table.csv", c(
+  "model_id", "term", "role", "n", "estimate", "ci_low", "ci_high"
+))
+require_columns(spatial_diagnostics, "supplement_spatial_diagnostics.csv", c(
+  "model_id", "n", "observed_i", "expected_i", "permutation_p_value", "permutations", "weights_transformation",
+  "escalation_required"
+))
+require_columns(spatial_error, "supplement_spatial_error_sensitivity.csv", c(
+  "row_type", "model_id", "estimate", "standard_error", "lambda_hat", "ols_estimate",
+  "absolute_magnitude_change_ratio", "direction_changed", "model_sensitivity_status"
+))
+
+c2_n <- unique(coefficient_table$n[coefficient_table$model_id == "C2"])
+if (length(c2_n) != 1L || is.na(c2_n)) stop("C2 coefficient table must contain one nonmissing analytic sample size")
+c2_n <- as.integer(c2_n)
+c2_exposure <- coefficient_table[coefficient_table$model_id == "C2" & coefficient_table$term == "beta_c", , drop = FALSE]
+if (nrow(c2_exposure) != 1L) stop("Expected exactly one C2 exposure coefficient")
+spatial_c2 <- spatial_diagnostics[spatial_diagnostics$model_id == "C2", , drop = FALSE]
+if (nrow(spatial_c2) != 1L) stop("Expected exactly one C2 spatial diagnostic row")
+spatial_direction_changed <- spatial_error$direction_changed[spatial_error$row_type == "spatial_error_contrast"]
+if (length(spatial_direction_changed) != 1L) stop("Expected exactly one spatial-error direction result")
+spatial_direction_text <- if (isTRUE(as_flag(spatial_direction_changed))) {
+  "changed direction"
+} else {
+  "did not change direction"
+}
+
+assert_unauthorized <- function(data, artifact_name) {
+  if ("results_authorized" %in% names(data)) {
+    status <- as.character(data$results_authorized)
+    if (anyNA(status) || any(as_flag(status))) {
+      stop("Governance violation: ", artifact_name, " contains an authorized result")
+    }
+  }
+  invisible(data)
+}
+
+invisible(Map(assert_unauthorized, list(
+  main_evidence, bootstrap_results, coefficient_table, model_gate,
+  spatial_error, robustness
+), c(
+  "supplement_geographic_main_evidence.csv",
+  "supplement_concordance_bootstrap.csv",
+  "supplement_full_coefficient_table.csv",
+  "supplement_model_gate_diagnostics.csv",
+  "supplement_spatial_error_sensitivity.csv",
+  "supplement_robustness_summary.csv"
+)))
+
+primary_detail <- detail |>
+  filter(
+    comparison_geography_type == "chicago_community_area",
+    sensitivity_status == "all_eligible"
+  )
+
+stopifnot(
+  nrow(raw_aggregate) == 20536,
+  ncol(raw_aggregate) == 97,
+  sum(raw_aggregate$geography_type == "census_tract") == 18688,
+  sum(raw_aggregate$geography_type == "chicago_community_area") == 1848,
+  dplyr::n_distinct(raw_aggregate$geography_id[raw_aggregate$geography_type == "census_tract"]) == 782,
+  dataset_manifest$annual_tract_minimum_denominator == 30,
+  dataset_manifest$tract_boundary_audit$any_intersection_tracts == 867,
+  dataset_manifest$tract_boundary_audit$primary_representative_point_tracts == 782,
+  dataset_manifest$tract_boundary_audit$area50_sensitivity_tracts == 779,
+  dataset_manifest$tract_boundary_audit$primary_and_area50_tracts == 777,
+  all(!as_flag(primary_detail$results_authorized)),
+  all(!as_flag(main_evidence$manuscript_import_allowed)),
+  all(!is.na(primary_detail$ehr_percent)),
+  all(!is.na(primary_detail$comparison_rank)),
+  all(!is.na(primary_detail$tract_quartile)),
+  all(!is.na(primary_detail$comparison_quartile)),
+  all(!is.na(primary_detail$transition_state)),
+  all(!is.na(raw_aggregate$suppression_flag))
+)
+```
+
+<style>
+body { color: #17212b; font-family: Arial, Helvetica, sans-serif; line-height: 1.62; }
+h1, h2, h3, h4 { color: #14395b; font-weight: 700; }
+.title { color: #14395b; font-weight: 750; }
+.subtitle { color: #48647c; }
+.review-banner { border-left: 6px solid #b8472d; background: #fff4ef; padding: 14px 18px; margin: 18px 0; }
+.scope-banner { border-left: 6px solid #176c77; background: #edf8f8; padding: 14px 18px; margin: 18px 0; }
+.decision-box { border: 1px solid #b9c8d6; background: #f7fafc; padding: 12px 16px; margin: 14px 0; }
+.review-table { width: 100%; border-collapse: collapse; border-top: 1.5px solid #17212b; border-bottom: 1.5px solid #17212b; margin: 12px 0 24px 0; font-size: 0.91em; }
+.review-table th { background: white; border-bottom: 1px solid #17212b; color: #17212b; text-align: left; padding: 8px; }
+.review-table td { border-bottom: 1px solid #d9e1e8; padding: 7px 8px; vertical-align: top; }
+.review-table tbody tr:last-child td { border-bottom: 0; }
+code { color: #1d5573; }
+pre { border: 1px solid #d9e1e8; border-radius: 4px; }
+.caption { color: #3f4e5e; font-weight: 600; }
+.equation { margin: 1em 0; padding: 0.8em 1em; border-left: 4px solid #176c77; background: #f4f8fa; font-family: Georgia, serif; font-size: 1.05em; line-height: 1.8; }
+</style>
+
+<div class="review-banner">
+<strong>Independent biostatistical review artifact.</strong> Aggregate numerical findings are shown so Ashley can review every estimator, denominator, diagnostic, table, and figure. The governing manifest records <code>results_authorized=false</code>. These values cannot be imported into a submission manuscript or coauthor result narrative until the statistical decisions and S7 authorization gate are approved.
+</div>
+
+# Statistician Review Guide
+
+This R Markdown document is an R companion to `00_master_chicago_healthmap_pipeline.py`. It combines a draft JAMA Health Forum Original Investigation with an executable statistical analysis plan. It does not replace the Marimo pipeline. The R code independently reconstructs the primary descriptive geographic results from checksum-verified aggregate inputs. It imports specialized bootstrap, HC3, and spatial outputs from the completed pipeline and keeps their limitations visible.
+
+The study asks whether direct Chicago Health Map (CHM) tract measures contain geographic information beyond direct CHM community-area labels. A parallel Census ZIP Code Tabulation Area (ZCTA) analysis tests whether findings depend on the selected coarse geography. CDC PLACES comparisons provide secondary cross-source context. Community-area life-expectancy and spatial analyses are supplementary demonstrations.
+
+CHM values are diagnosed proportions among adults observed in participating CAPriCORN health systems. They are not estimates of disease prevalence among all Chicago residents. Public health estimates remain the basis for population inference. Health-system research data may supplement those estimates by showing clinically recorded patterns at smaller geographic scales. They do not replace population surveillance.<sup>1-7</sup>
+
+## Study dossier: scientific rationale, question, and hypotheses
+
+### Why this study is needed
+
+Chicago public-health data are indispensable for describing the health of Chicago residents, prioritizing prevention, and monitoring inequities. Their reporting geographies are necessarily coarse in many products, and population estimates and health-system records answer different questions. CHM contributes a second, explicitly bounded perspective: diagnoses recorded among adults who were observed in participating CAPriCORN health systems and successfully assigned to a small-area geography. The scientific question is therefore not whether CHM reproduces a population-prevalence estimate. It is whether direct tract-level CHM measures retain clinically recorded geographic variation that disappears when the same data source is reported only with a direct, larger-area label.<sup>1-7</sup>
+
+The study treats geographic resolution as an information question. If tract estimates within the same community area are similar, then a community-area label may be an adequate descriptive summary of these EHR observations. If they differ materially, a single community-area label obscures observed local heterogeneity. Neither result identifies individual risk, explains causes, validates a data source, or establishes a public-health intervention priority. The practical contribution is a transparent framework for deciding when health-system research data can generate geographically specific questions to be interpreted alongside, rather than in place of, public-health surveillance.
+
+### Primary research question and falsifiable hypotheses
+
+**Primary question.** Among CHM-eligible Chicago census tracts during 2022 through 2024, do direct tract-level EHR-diagnosed proportions contain geographic information beyond the direct CHM community-area label for the same condition and period?
+
+**Primary hypothesis.** We hypothesize that direct tract measures will show material within-community-area variation. We operationalize that hypothesis with four complementary descriptive estimands: the within-community variance share, absolute tract-to-community percentile-rank gap, exact quartile disagreement, and movement into or out of the highest tract quartile. Evidence against added tract resolution would be near-zero within-area variation, small rank gaps, near-complete quartile agreement, and little or no highest-quartile movement. There is no causal hypothesis and no hypothesis that CHM estimates population disease prevalence.
+
+**Secondary questions.** A direct Census ZCTA comparison tests whether the finding depends on the selected coarser geography. CHM-PLACES agreement describes cross-source alignment, not validity. A checksum-verified Healthy Chicago Survey (HCS) comparison asks whether CHM and an independent Chicago survey similarly rank community areas for hypertension. Leave-one-tract-out area-label AUC describes statistical separability of area labels, not clinical prediction. Community-area life-expectancy models and spatial statistics are supplementary ecological analyses that evaluate association and residual structure, respectively. They do not test the primary geographic-resolution hypothesis.
+
+### Data sources, units, and permitted roles
+
+```{r study-data-sources, echo=FALSE}
+data_sources <- data.frame(
+  Source = c(
+    "Chicago Health Map / CAPriCORN",
+    "American Community Survey (ACS) 5-year",
+    "Chicago community-area and Census tract boundaries",
+    "CDC PLACES",
+    "Healthy Chicago Survey through Chicago Health Atlas",
+    "Chicago Health Atlas life expectancy"
+  ),
+  Period_or_release = c(
+    "CHM records, 2019-2024; primary pool 2022-2024",
+    "2019, 2022, and 2024 releases as linked in governed artifacts",
+    "Versioned tract, community-area, and ZCTA linkage snapshots",
+    "2025 tract GIS-friendly release, pairwise-complete comparison only",
+    "HCS hypertension and diabetes, rolling 2023-2024 community-area release",
+    "Community-area outcome, supplementary ecological analysis"
+  ),
+  Analytic_unit = c(
+    "Geography-condition-year aggregate of source-defined observed adults",
+    "Area-level population-context covariates and adult population",
+    "Spatial membership and topology, not a health measurement",
+    "Tract-level modeled public-health estimate",
+    "Survey-derived community-area estimate among noninstitutionalized Chicago adults",
+    "Community-area aggregate outcome"
+  ),
+  Role_in_this_review = c(
+    "Primary direct EHR-diagnosed proportion; resource, resolution, temporal, and concordance analyses",
+    "Locked adjustment covariates, resident-population context, and population-weight sensitivity only",
+    "Defines direct tract-to-community-area and tract-to-ZCTA comparison relationships",
+    "Secondary cross-source concordance context; never a gold-standard validation",
+    "Secondary community-area hypertension triangulation with source-provided standard errors",
+    "Supplementary outcome for noncausal, area-level HC3 and spatial analyses"
+  ),
+  Not_permitted = c(
+    "Population-prevalence, incidence, individual-risk, or causal interpretation",
+    "Replacement for the CHM EHR denominator or post hoc primary adjustment variables",
+    "Areal interpolation to manufacture a direct community-area health estimate",
+    "Primary geographic-resolution evidence or source-validity claim",
+    "Replacement for CHM, proof of accuracy, level equivalence, or population calibration",
+    "Validation of CHM, individual-level inference, or causal interpretation"
+  ),
+  check.names = FALSE
+)
+review_table(data_sources, "Table R1. Data sources, analysis units, and permitted scientific roles", digits = 0)
+```
+
+The R review receives `r format(nrow(raw_aggregate), big.mark = ",")` aggregate CHM geography-condition-year records with `r ncol(raw_aggregate)` documented fields from the governed analytic extract. It contains `r sum(raw_aggregate$geography_type == "census_tract")` tract records across `r dplyr::n_distinct(raw_aggregate$geography_id[raw_aggregate$geography_type == "census_tract"])` primary-boundary tracts and `r sum(raw_aggregate$geography_type == "chicago_community_area")` community-area records across 77 areas. It receives no patient-level rows, encounters, addresses, dates of service, diagnoses, or identifiers. The only record-level entity in this document is an aggregate geography-condition-year observation. All figures and tables are derived from aggregate artifacts and retain the source-specific eligibility and suppression fields described below.
+
+### Data dictionary: fields actually used or checked
+
+The following field groups make the analysis reconstructable without exposing input rows. Column names are reported exactly as stored in the governed artifacts. A column listed as a **check** is used to validate provenance, eligibility, or interpretation even when it is not an estimator input.
+
+```{r study-data-dictionary, echo=FALSE}
+data_dictionary <- data.frame(
+  Artifact = c(
+    "00_master_analytic_dataset.csv",
+    "00_master_analytic_dataset.csv",
+    "00_master_analytic_dataset.csv",
+    "00_master_analytic_dataset.csv",
+    "00_master_analytic_dataset.csv",
+    "supplement_tract_cohort_flow.csv and 00_master_analytic_dataset_manifest.json",
+    "supplement_geographic_consequence_details.csv",
+    "supplement_geographic_main_evidence.csv",
+    "supplement_concordance_bootstrap.csv",
+    "Chicago Health Atlas HCSHYTP/2023-2024.json and HCSDIAP/2023-2024.json",
+    "supplement_full_coefficient_table.csv and supplement_adjusted_diagnostic_data.csv",
+    "supplement_model_gate_diagnostics.csv, supplement_spatial_diagnostics.csv, supplement_spatial_error_sensitivity.csv, and supplement_robustness_summary.csv"
+  ),
+  Exact_columns_used_or_checked = c(
+    "geography_id; geography_type; time_period; condition_id; disease_value_derivation; tract_vintage",
+    "numerator; denominator; denominator_status; suppression_flag; suppression_reason; published_measure_value; published_measure_unit",
+    "capture_rate; capture_flag; reliability_tier; reliability_flag; equity_alignment_label; combined_reliability_label",
+    "pct_age_65_plus; pct_female; pct_below_fpl; acs_adult_population; census_covariate_uncertainty_status; associated standard-error and MOE fields",
+    "community_area_id; max_community_area_weight; covered_fraction; is_crossing_tract; is_sliver; tract_community_linkage_method; linkage_role",
+    "condition_id; time_period; boundary_eligible_rows; denominator_ge_30_rows; observable_after_suppression_rows; primary_eligible_rows; excluded-row counts; tract_boundary_audit; annual_tract_minimum_denominator",
+    "ehr_percent; numerator; denominator; eligible_years; ehr_rank; comparison_rank; tract_quartile; comparison_quartile; tract_is_high; comparison_is_high; transition_state; sensitivity_status",
+    "within_variance_share; exact_quartile_agreement_pct; quartile_disagree_pct; q4_movers_pct; weighted_kappa; gwet_ac1; vpc_icc; area_label_auc; availability and comparability fields",
+    "condition_id; metric; estimate; ci_low; ci_high; sample_n; bootstrap_mean_sample_n; replicate_count; seed; cluster_unit; bootstrap_interval_method; bootstrap_rank_rule",
+    "g; l; a; p; d; v; se, plus topics.json name; description; units; privacy; team; dataset source metadata",
+    "model_id; term; role; estimate; standard_error; ci_low; ci_high; confidence_level; covariance_type; n; fitted_value; residual; leverage; cooks_distance; externally_studentized_residual",
+    "predictor_vif; design_rank; maximum_absolute_pairwise_correlation; standardized_design_condition_number; observed_i; permutation_p_value; permutations; weights_checksum; lambda_hat; spatial_error_status; sensitivity estimates and status"
+  ),
+  Purpose = c(
+    "Identify the condition, geography, period, measure derivation, and boundary vintage",
+    "Construct and audit the direct EHR-diagnosed proportion and distinguish suppression from a true zero",
+    "Describe measurement completeness and reliability; never interpret capture as a sampling probability",
+    "Use the locked primary adjustment set and document covariate uncertainty; adult population is reserved for weighting or sensitivity work",
+    "Restrict direct geographic comparisons to documented tract relationships and expose crossing or incomplete coverage",
+    "Reconstruct the sequential Chicago-boundary, minimum-denominator, suppression, and final analytic cohort",
+    "Reconstruct direct tract-versus-coarser-area pooled comparisons, ranks, quartiles, and Q4 transitions",
+    "Read the governed primary and secondary evidence summaries and their availability gates",
+    "Read reproducible cluster-bootstrap uncertainty specifications and percentile intervals",
+    "Verify the frozen HCS source checksums, select unstratified 2023-2024 community-area estimates, and retain survey standard errors",
+    "Read HC3 model estimates and diagnostic quantities; model outputs are not recomputed in R",
+    "Read model-design, residual-spatial, spatial-error, and robustness gates"
+  ),
+  Analysis_modules = c(
+    "All modules",
+    "Resource audit and direct geographic estimates",
+    "Resource audit and interpretation limits",
+    "Supplementary outcome models and population-weight sensitivity",
+    "Primary direct comparison and ZCTA sensitivity",
+    "Resource audit and every tract analysis",
+    "Primary A1/A6 geographic-resolution displays",
+    "Main evidence, ordinal concordance, and exploratory separation",
+    "CHM-PLACES uncertainty and bootstrap-stability supplement",
+    "HCS community-area hypertension triangulation; diabetes availability gate only",
+    "Supplementary life-expectancy model and residual diagnostics",
+    "Collinearity, spatial, and robustness supplements"
+  ),
+  check.names = FALSE
+)
+review_table(data_dictionary, "Table R2. Aggregate-data dictionary and analytic use of each column group", digits = 0)
+```
+
+Fields present solely for traceability, including `source_record_id`, `source_geography_id`, `community_area_weights_json`, and `geometry_wkt`, are not used as analysis values and their values are never displayed. The review uses their associated governed linkage and provenance fields only to state the source boundary and to check that direct geography relationships, rather than fabricated areal reallocations, define the comparison.
+
+### Analysis map: question, estimator, uncertainty, and decision rule
+
+```{r study-analysis-map, echo=FALSE}
+analysis_map <- data.frame(
+  Module = c(
+    "R1: resource and eligibility audit",
+    "A1: within-community tract variation",
+    "A6: tract versus direct community-area label",
+    "A6 sensitivity: tract versus direct Census ZCTA label",
+    "A3-A5: CHM-PLACES concordance",
+    "A8: CHM-HCS community-area triangulation",
+    "A2: leave-one-tract-out area-label AUC",
+    "C2: community-area life-expectancy association",
+    "A7: spatial dependence and spatial-error sensitivity"
+  ),
+  Scientific_question = c(
+    "Which aggregate records, denominators, suppression states, and capture strata support interpretation?",
+    "How much observed tract variation remains after grouping tracts within direct community areas?",
+    "Does a direct community-area label change a tract's relative descriptive classification?",
+    "Does the geographic-resolution finding persist for a different coarse Census geography?",
+    "How similarly do CHM and PLACES order pairwise-complete tracts?",
+    "How similarly do CHM and the Healthy Chicago Survey order Chicago community areas for hypertension?",
+    "How separable are community-area labels from the condition profile after holding out one tract?",
+    "Are tract-level CHM proportions associated with a supplementary area-level life-expectancy outcome after prespecified adjustment?",
+    "Do residuals retain spatial dependence, and does an explicitly spatial error model change the supplementary association?"
+  ),
+  Estimator_and_uncertainty = c(
+    "Counts, distributions, and suppression/capture strata; descriptive only",
+    "Observed-scale method-of-moments variance partition; REML mixed model is a pending sensitivity",
+    "Pooled numerator/summed denominator, percentile ranks, fixed quartiles, and Q4 transition counts; cluster bootstrap where specified",
+    "Same direct pooled comparison, restricted to documented dominant tract-ZCTA links",
+    "Spearman rank correlation, exact agreement, quadratic weighted kappa, and Gwet AC1; 1000 community-area cluster bootstraps with percentile 95% intervals",
+    "Spearman rank correlation, median absolute percentile-rank gap, and exact within-source quartile agreement; HCS standard errors displayed without a joint-source interval",
+    "Held-out tract area-label AUC; exploratory, no clinical prediction interval",
+    "OLS with HC3 covariance; normal-versus-t critical value remains a sign-off item",
+    "Row-standardized queen weights, Global Moran I with 9999 permutations, declared local-statistic FDR families, and spatial-error sensitivity"
+  ),
+  Interpretation_boundary = c(
+    "Does not estimate people, prevalence, or care quality",
+    "Describes observed EHR heterogeneity, not causal clustering or population variation",
+    "Shows information lost by a label, not an error by the community area",
+    "Sensitivity only; Census ZCTA is not a USPS ZIP Code",
+    "Cross-source alignment is not validation and unequal denominators remain material",
+    "Triangulation only; HCS and CHM differ in population, ascertainment, period, denominator, and uncertainty",
+    "Separation is not prediction, discrimination of patients, or validation",
+    "Ecological association only; no causal or individual-level conclusion",
+    "Spatial findings diagnose residual structure; they do not establish geographic mechanisms"
+  ),
+  check.names = FALSE
+)
+review_table(analysis_map, "Table R3. Method-by-method statistical map and decision boundary", digits = 0)
+```
+
+### What this R notebook independently reconstructs
+
+The R code recomputes the pooled direct geographic measures from the governed CHM aggregate extract: it sums eligible annual numerators and denominators before division, verifies that this differs from an unweighted annual mean when the denominators differ, and checks analytic-frame, suppression, and authorization constraints. It also independently reads the frozen HCS source files, verifies their public-source checksums, and reconstructs the community-area hypertension rank triangulation. It reads specialized results, including the cluster bootstrap, HC3 models, and spatial analyses, from checksum-verified pipeline artifacts because those procedures are governed by the master Marimo workflow. This division of labor prevents a second, undocumented statistical implementation while leaving every imported estimator, diagnostic, seed, replication count, and status visible for review.
+
+No analytic population can be reconstructed from this document alone if its upstream phenotype definitions, EHR denominator construction, geocoding rules, boundary snapshots, or suppression policy change. Those upstream specifications remain governed review items. This document makes that dependency explicit and reports the fields and artifacts needed for Ashley to test each decision before results authorization.
+
+## Review workflow
+
+1. Confirm the study question, source roles, analytic hierarchy, and open decisions.
+2. Review provenance and the R-to-Marimo reconciliation tests.
+3. Review each statistical analysis module before its results.
+4. Review the 5 main displays in citation order.
+5. Review supplementary uncertainty, model, spatial, and robustness results.
+6. Review the executed HCS triangulation and the fail-closed 2025/external replication gates.
+7. Record sign-off decisions before S7 authorization.
+
+## Evidence hierarchy
+
+```{r evidence-hierarchy, echo=FALSE}
+evidence_hierarchy <- data.frame(
+  Family = c(
+    "Resource audit",
+    "Within-community tract variation",
+    "Direct tract versus community-area labels",
+    "Direct tract versus ZCTA labels",
+    "CHM-PLACES alignment",
+    "CHM-HCS hypertension triangulation",
+    "Area-label separation",
+    "Spatial structure",
+    "Life-expectancy models"
+  ),
+  Population = c(
+    "Geography-condition-year aggregate records",
+    "Primary-boundary tracts with 3 eligible 2022-2024 years, annual denominators at least 30, and dominant links",
+    "Primary-boundary tracts with 3 eligible 2022-2024 years, annual denominators at least 30, and dominant links",
+    "CHM-complete 2022-2024 tracts with dominant ZCTA links",
+    "Pairwise-complete eligible tracts",
+    "All 77 direct community areas with pooled 2022-2024 CHM and 2023-2024 HCS hypertension estimates",
+    "CHM-complete tracts in areas with at least 2 tracts",
+    "Eligible community areas with complete topology",
+    "Eligible community areas"
+  ),
+  Role = c(
+    "Descriptive quality control",
+    "Proposed primary A1",
+    "Proposed primary A6",
+    "Sensitivity A6",
+    "Secondary A3-A5",
+    "Secondary A8",
+    "Exploratory A2",
+    "Supplementary A7",
+    "Supplementary demonstration"
+  )
+)
+review_table(evidence_hierarchy, "Table R4. Analysis hierarchy for independent review", digits = 0)
+```
+
+## Decision log for Ashley
+
+```{r decision-log, echo=FALSE}
+decision_log <- data.frame(
+  ID = paste0("D", 1:19),
+  Decision = c(
+    "Pooled CHM measure",
+    "Primary geographic evidence",
+    "Quartile boundaries",
+    "Analysis populations",
+    "Variance partition",
+    "Cluster bootstrap",
+    "Area-label AUC",
+    "Ordinal agreement",
+    "Capture and reliability",
+    "HC3 outcome models",
+    "Spatial analyses",
+    "Combined diabetes",
+    "ZCTA comparison",
+    "Life expectancy",
+    "Healthy Chicago Survey triangulation",
+    "2025 CHM temporal holdout",
+    "External metropolitan replication",
+    "Chicago tract-boundary definition",
+    "Annual tract eligibility threshold"
+  ),
+  Current_rule = c(
+    "Sum eligible annual numerators and denominators before division. Retain annual means only as a sensitivity.",
+    "Use within-area variance share, absolute percentile-rank gap, exact quartile disagreement, and Q4 movement.",
+    "Q1 <=0.25, Q2 >0.25 to 0.50, Q3 >0.50 to 0.75, Q4 >0.75. Use average ranks for ties.",
+    "Keep CHM-only and CHM-PLACES pairwise-complete frames separate.",
+    "Use observed-scale one-way method-of-moments. Treat mixed-model REML as a sensitivity.",
+    "Resample community areas and retain all member tracts. Recompute ranks inside each replicate. Use 1000 replicates and percentile 2.5th to 97.5th intervals.",
+    "Retain as exploratory separation only. Do not call it prediction or validation.",
+    "Use exact agreement and quadratic weighted kappa. Retain unweighted Gwet AC1 as a nominal sensitivity.",
+    "Report capture and reliability strata. Do not treat capture as a sampling probability.",
+    "Use the locked adjustment set and HC3 covariance. Compare normal and t critical values before final selection.",
+    "Use row-standardized queen weights, 9999 permutations, and declared Benjamini-Hochberg families.",
+    "Do not run until mutual exclusivity, denominator equivalence, phenotype mapping, and period alignment are approved.",
+    "Retain as a sensitivity and call the geography Census ZCTA, not USPS ZIP Code.",
+    "Retain as a supplementary ecological demonstration. Do not use it to validate CHM or infer causality.",
+    "Use 2023-2024 HCS hypertension only as community-area rank triangulation. Display HCS standard errors. Do not compare levels as interchangeable prevalence estimates. Hold diabetes until CHM diabetes semantics pass.",
+    "After a frozen 2025 CHM extract becomes available, rerun the primary metrics with 2025 held out. Require unchanged phenotype, denominator, suppression, geography, contributing-system, and deduplication definitions before calling the result temporal replication.",
+    "Use a second metropolitan EHR network only after a source-role and estimand compatibility audit. Require direct tract and direct coarser-area values to replicate the primary question; tract-only EHR versus PLACES data can replicate cross-source concordance only.",
+    "Use 2024 TIGER tracts whose representative points are covered by the frozen union of 77 Chicago community areas. Prohibit any-intersection eligibility. Retain the 50% tract-area rule as a prespecified alternative definition.",
+    "Require an annual captured-adult denominator of at least 30, a present numerator, and an observable nonsuppressed value. Treat a stored zero as zero-or-suppressed unresolved until the source owner confirms its meaning."
+  ),
+  Sign_off = rep("Pending independent review", 19)
+)
+review_table(decision_log, "Table R5. Controlling statistical decision log", digits = 0)
+```
+
+# Provisional Original Investigation
+
+## Key Points
+
+**Question**  
+Can tract-level health-system EHR data add geographic information beyond Chicago community-area labels while supplementing population-based public health surveillance?
+
+**Findings**  
+Direct tract and community-area quartiles disagreed for `r main_evidence$quartile_disagree_count[main_evidence$condition_id == "hypertension"]` of `r main_evidence$resolution_eligible_n[main_evidence$condition_id == "hypertension"]` hypertension tracts (`r sprintf("%.1f%%", main_evidence$quartile_disagree_pct[main_evidence$condition_id == "hypertension"])`) and `r main_evidence$quartile_disagree_count[main_evidence$condition_id == "copd"]` of `r main_evidence$resolution_eligible_n[main_evidence$condition_id == "copd"]` COPD tracts (`r sprintf("%.1f%%", main_evidence$quartile_disagree_pct[main_evidence$condition_id == "copd"])`). Within-community variation accounted for `r sprintf("%.3f", main_evidence$within_variance_share[main_evidence$condition_id == "hypertension"])` of observed tract variation for hypertension and `r sprintf("%.3f", main_evidence$within_variance_share[main_evidence$condition_id == "copd"])` for COPD.
+
+**Meaning**  
+Health-system EHR data may supplement population-based surveillance by showing within-area clinical variation. Selection into care, health-system capture, coding, geocoding, suppression, and denominator construction prevent population-prevalence interpretation.
+
+## Structured Abstract
+
+### Importance
+
+Population-based public health data remain essential for community inference. Multi-institution EHR data may add a complementary clinical view at smaller geographic scales, but the observed population differs from the resident population.
+
+### Objective
+
+To determine whether direct CHM tract measures retain geographic information beyond direct community-area labels and to define their potential supplementary role alongside public health data.
+
+### Design
+
+Ecological, repeated-period, cross-source descriptive analysis of 2019 through 2024 records. Primary geographic analyses pooled 2022 through 2024 data.
+
+### Setting
+
+Chicago, Illinois.
+
+### Participants
+
+Geography-condition-period records summarizing source-defined eligible, geocoded adults observed in participating CAPriCORN systems. The analytic unit was a geographic aggregate record, not an individual or encounter.
+
+### Exposures
+
+Direct CHM EHR-diagnosed proportions among observed CAPriCORN adults.
+
+### Main Outcomes and Measures
+
+Within-community variance share, absolute tract-community percentile-rank gap, exact quartile disagreement, and movement into or out of the highest quartile. ZCTA comparisons, annual stability, and CHM-PLACES rank alignment were secondary.
+
+### Results
+
+The governed community-area resource contained `r sum(parse_count(table_1[["Condition-year records, No."]]))` condition-year records. `r display_review[["Review result"]][display_review$Display == "Figure 2"]` These are aggregate record counts and small-area estimates. Patient-level demographic characteristics were not available in the review extract.
+
+### Conclusions and Relevance
+
+Direct community-area labels did not retain all observed tract heterogeneity and changed some tract classifications. Tract-level health-system data may help researchers identify within-area clinical patterns that common public reporting units do not show. These data should be used to supplement population surveillance and to generate follow-up questions. They should not replace population estimates or independently determine public health action.
+
+# Methods and Executable Statistical Analysis Plan
+
+## Study design and source roles
+
+This is a repeated cross-sectional ecological study. CHM contributes direct tract and community-area EHR-diagnosed proportions. PLACES contributes modeled population estimates for cross-source comparison. The American Community Survey contributes population context and covariates. Chicago Health Atlas life expectancy contributes a supplementary community-area outcome. City of Chicago and Census boundaries contribute geography.<sup>21-25</sup>
+
+No comparator is a gold standard. Agreement describes how two measurement systems classify the same small areas. It does not establish the validity of either system.<sup>3-5</sup>
+
+Reporting follows STROBE for cross-sectional observational studies, RECORD for routinely collected health data, and the current JAMA Health Forum Original Investigation instructions.<sup>18-20</sup>
+
+## Data hierarchy
+
+The data hierarchy is year within condition within geography. Tracts are clustered within community areas for primary uncertainty analyses. Community-area outcome models contain at most 77 areas. The R input contains geography-condition-year aggregate records. This document never prints the aggregate input rows and contains no patient-level data.
+
+For tract records, the source denominator is the annual number of observed CAPriCORN adults represented in the supplied extract. The read-only source audit showed that this field exactly matched the annual captured-patient count in all 12,124 linked tract-years. The study team reports that the upstream process deduplicates adults across participating systems within each year and defines the denominator as adults with at least 1 of the 39 represented conditions who were observed that year. The aggregate extract supports the annual-count reconciliation. It does not permit independent person-level verification of the deduplication algorithm or eligibility sequence.
+
+Community-area and ZCTA exports have condition-varying denominators and source-published density-weighted values. They are retained as direct coarser-frame comparisons or sensitivities. They are not substituted for the validated tract annual-denominator estimand and are not mathematically reconstructed from tract values.
+
+## Eligibility, exclusions, suppression, and missingness
+
+The provisional primary Chicago frame uses 2024 TIGER tracts whose representative points are covered by the frozen union of the 77 Chicago community areas. Of 867 tracts with any intersection, 782 met this primary rule. Any-intersection eligibility is prohibited because boundary slivers can include tracts with negligible Chicago area. A separate 50% tract-area rule identifies 779 tracts and agrees with the primary rule for 777. The current master analytic file contains the 782 primary-rule tracts. A full 50%-area alternative-frame rerun would also need the 2 area-rule-only tracts from the prefilter source frame.
+
+An annual tract record is eligible for pooled CHM estimation when its numerator and denominator are present, its annual captured-adult denominator is at least 30, and the value is observable after the source suppression rule. A stored zero is excluded because the supplied aggregate tables cannot distinguish a true zero from a suppressed count. The primary pooled period is 2022 through 2024. Tract-only estimands require all 3 annual records and the governed geographic linkage. CHM-PLACES comparisons use a separate pairwise-complete frame. Missing PLACES data cannot remove a tract from a CHM-only estimand.
+
+Suppressed values remain unavailable and are not assigned to the lowest category. A missing geography-condition-year row means not observed, not zero. Missingness is handled by complete-case analysis within each prespecified estimand. The notebook reports the eligible denominator for every result and provides a condition-year cohort-flow table showing boundary eligibility, the denominator threshold, suppression exclusions, and final eligibility.
+
+## Primary adjustment set for supplementary models
+
+The locked adjustment set is percentage aged 65 years or older, percentage female, percentage below the federal poverty level, and `capture_rate_mean_2022_2024`. Adult population is not a primary covariate. It is available only for prespecified weighting or sensitivity analyses.
+
+## Multiplicity and interpretation
+
+The primary geographic statistics answer related but distinct questions and are reported with their denominators. They are not ranked on a single accuracy scale. Spatial local tests use Benjamini-Hochberg false-discovery-rate control within prespecified condition-period-statistic families. All analyses are descriptive or associational. No result is interpreted as a causal effect.
+
+# Statistical Analysis Module 0: Provenance and Data Assembly
+
+## Scientific question and estimand
+
+Does the R notebook use the exact aggregate artifacts produced by the completed Marimo pipeline? The estimand is not a health measure. It is a reproducibility assertion that each required input matches the frozen SHA-256 digest.
+
+## Population and analysis unit
+
+The unit is a governed file. The analytic input contains `r nrow(raw_aggregate)` aggregate geography-condition-year records and `r ncol(raw_aggregate)` fields.
+
+## Variables, mathematical definition, and estimator
+
+For file <em>f</em>, the verification indicator is <em>I{H<sub>R</sub>(f) = H<sub>M</sub>(f)}</em>, where <em>H<sub>R</sub></em> is the SHA-256 digest computed during this R render and <em>H<sub>M</sub></em> is the digest stored in the Marimo run manifest. All required indicators must equal 1.
+
+## Assumptions, diagnostics, missingness, and interpretation
+
+Cryptographic equality establishes byte identity. It does not independently validate source semantics. A missing file or hash mismatch stops rendering. No fallback file is substituted.
+
+```{r provenance-table, echo=FALSE}
+provenance_table <- data.frame(
+  Artifact = required_artifacts,
+  SHA256 = checked_hashes,
+  Matches_manifest = ifelse(hash_ok, "Yes", "No")
+)
+review_table(provenance_table, "Table R6. R input provenance against the completed Marimo manifest", digits = 0)
+```
+
+<div class="scope-banner">
+The manifest uses seed <strong>`r manifest$seed`</strong>, `r manifest$permutations` spatial permutations, and records the Git state as <code>`r manifest$git_commit`</code>. The source binding is <code>`r manifest$dirty_source_binding`</code>; every required analytic input is independently bound by SHA-256 digest. Results authorization is <strong>false</strong>.
+</div>
+
+## Tract analytic cohort flow
+
+The following executable table is the controlling tract cohort accounting. Counts refer to aggregate tract-condition-year records. They do not count unique people. Exclusions are sequential. The denominator threshold is applied before the suppression or unresolved-zero exclusion.
+
+```{r tract-cohort-flow, echo=FALSE}
+tract_cohort_review <- tract_cohort_flow |>
+  mutate(
+    Condition = recode(
+      condition_id,
+      hypertension = "Hypertension",
+      copd = "COPD",
+      diabetes_with_complication = "Diabetes with complication",
+      diabetes_without_complication = "Diabetes without complication"
+    ),
+    Year = as.integer(time_period),
+    `Primary eligible, %` = 100 * primary_eligible_rows / boundary_eligible_rows
+  ) |>
+  transmute(
+    Condition,
+    Year,
+    `Boundary-eligible records, No.` = boundary_eligible_rows,
+    `Denominator >=30, No.` = denominator_ge_30_rows,
+    `Observable after suppression, No.` = observable_after_suppression_rows,
+    `Primary eligible, No.` = primary_eligible_rows,
+    `Primary eligible, %`,
+    `Excluded for denominator, No.` = excluded_denominator_lt_30_or_missing_rows,
+    `Excluded for suppression or missing numerator, No.` = excluded_suppressed_or_missing_numerator_rows
+  )
+
+stopifnot(
+  all(tract_cohort_review$`Primary eligible, No.` <= tract_cohort_review$`Denominator >=30, No.`),
+  all(tract_cohort_review$`Denominator >=30, No.` <= tract_cohort_review$`Boundary-eligible records, No.`),
+  sum(tract_cohort_review$`Primary eligible, No.`) ==
+    sum(as_flag(raw_aggregate$primary_tract_annual_eligible))
+)
+
+review_table(
+  tract_cohort_review,
+  "Table QC-1. Sequential tract analytic cohort flow by condition and year",
+  digits = 1
+)
+```
+
+**Interpretation.** Hypertension retains nearly all primary-boundary tract records because denominators generally exceed 30 and positive counts are observable. COPD has substantially more unresolved zero-or-suppressed records, so its eligible tract population is smaller. This differential eligibility is a measurement limitation and is not evidence that COPD is absent from excluded tracts.
+
+**Statistician sign-off.** Approve the representative-point boundary rule, the denominator threshold of 30, exclusion of unresolved zero-or-suppressed values, and the separate full 50%-area sensitivity population before manuscript authorization.
+
+# Statistical Analysis Module 1: Pooled CHM Proportions
+
+## Scientific question and estimand
+
+What proportion of observed eligible adults had the recorded diagnosis during the pooled 2022 through 2024 period at each geography? The pooled proportion preserves the combined annual denominator.
+
+## Population and analysis unit
+
+The unit is a tract-condition pooled record. The R reconciliation uses hypertension and COPD tracts included in the primary direct tract-community comparison.
+
+## Variables and denominator
+
+The numerator is the sum of annual source numerators. The denominator is the sum of annual captured-adult denominators. Each included tract has all 3 years, and each annual denominator is at least 30. The denominator refers to source-defined observed adults, not the Census population.
+
+## Mathematical definition
+
+For geography <em>g</em> and condition <em>c</em>, the pooled estimator is
+
+<div class="equation" role="math"><em>p̂</em><sub>gc</sub> = 100 × [Σ<sub>t=2022–2024</sub> Y<sub>gct</sub>] / [Σ<sub>t=2022–2024</sub> N<sub>gct</sub>].</div>
+
+The unweighted annual mean, [1/3] × Σ<sub>t</sub> [100 × Y<sub>gct</sub> / N<sub>gct</sub>], is not the primary estimator because it gives equal weight to years with different denominators.
+
+## Estimator, uncertainty, assumptions, and diagnostics
+
+The estimator is the ratio of summed counts. The primary descriptive analysis does not treat source denominators as probability-sample weights and does not calculate binomial intervals because the records are aggregated health-system observations with unresolved dependence and capture semantics.
+
+## Missingness, suppression, sensitivity, and interpretation
+
+Suppressed, unresolved-zero, small-denominator, or incomplete years are excluded before pooling. A complete 3-year history is required for the primary frame. Annual estimates and unweighted annual means remain sensitivity analyses. The pooled estimate is an EHR-diagnosed proportion among observed CAPriCORN adults.
+
+```{r pooled-estimator-check}
+pooled_annual_r <- raw_aggregate |>
+  filter(
+    geography_type == "census_tract",
+    condition_id %in% c("hypertension", "copd"),
+    time_period %in% c(2022, 2023, 2024),
+    disease_value_derivation == "direct_first_party_export_not_interpolated",
+    !is.na(numerator),
+    !is.na(denominator),
+    numerator >= 0,
+    denominator >= 30,
+    !as_flag(suppression_flag),
+    as_flag(primary_tract_annual_eligible)
+  )
+
+stopifnot(!anyDuplicated(pooled_annual_r[c("geography_id", "time_period", "condition_id")]))
+
+pooled_r <- pooled_annual_r |>
+  group_by(geography_id, condition_id) |>
+  summarise(
+    pooled_numerator = sum(numerator),
+    pooled_denominator = sum(denominator),
+    eligible_years_r = n_distinct(time_period),
+    ehr_percent_r = 100 * pooled_numerator / pooled_denominator,
+    annual_mean_percent_r = mean(100 * numerator / denominator),
+    .groups = "drop"
+  )
+
+pooled_check <- primary_detail |>
+  select(geography_id, condition_id, ehr_percent_marimo = ehr_percent) |>
+  inner_join(pooled_r, by = c("geography_id", "condition_id")) |>
+  mutate(
+    absolute_difference = abs(ehr_percent_r - ehr_percent_marimo),
+    differs_from_unweighted_mean = abs(ehr_percent_r - annual_mean_percent_r) > 1e-12
+  )
+
+stopifnot(
+  nrow(pooled_check) == nrow(primary_detail),
+  all(pooled_check$eligible_years_r == 3),
+  max(pooled_check$absolute_difference) < 1e-8
+)
+
+pooled_audit <- pooled_check |>
+  group_by(condition_id) |>
+  summarise(
+    `Eligible tracts, No.` = n(),
+    `Maximum R-Marimo difference, percentage points` = max(absolute_difference),
+    `Tracts where pooled ratio differs from unweighted annual mean, No.` = sum(differs_from_unweighted_mean),
+    .groups = "drop"
+  ) |>
+  mutate(Condition = condition_name(condition_id), .before = 1) |>
+  select(-condition_id)
+
+review_table(pooled_audit, "Table R7. Regression check for the pooled numerator-over-denominator estimator", digits = 10)
+```
+
+**Biostatistical interpretation.** R reproduced every governed pooled tract value within `r format(max(pooled_check$absolute_difference), scientific = TRUE)` percentage points. The explicit comparison prevents silent substitution of an unweighted annual mean.
+
+# Statistical Analysis Module 2: Direct Tract-Community Geographic Information
+
+## Scientific question and estimands
+
+Do direct tract measures contain observed variation and classifications not represented by direct community-area labels? Four primary descriptive estimands answer different parts of this question.
+
+1. Within-community variance share measures the proportion of observed tract-scale variance remaining within community-area groups.
+2. Absolute percentile-rank gap measures the distance between a tract's rank and its linked community area's rank.
+3. Exact quartile disagreement measures whether the tract and area occupy different rank quartiles.
+4. Q4 movement measures whether the community-area label moves a tract into or out of the highest quartile.
+
+## Population and analysis unit
+
+The unit is a primary-boundary 2024 TIGER tract with complete eligible annual data from 2022 through 2024, annual captured-adult denominators of at least 30, and a governed dominant community-area link. Hypertension and COPD are evaluated separately. Combined diabetes is not run.
+
+## Mathematical definitions
+
+Average-tie percentile ranks are classified as Q1 for rank at most 0.25, Q2 for rank greater than 0.25 through 0.50, Q3 for rank greater than 0.50 through 0.75, and Q4 for rank greater than 0.75.
+
+For the one-way unbalanced method-of-moments variance partition,
+
+<div class="equation" role="math"><em>n</em><sub>0</sub> = [N − Σ<sub>j</sub> n<sub>j</sub><sup>2</sup>/N] / (J − 1)<br><em>σ̂</em><sub>B</sub><sup>2</sup> = max{0, (MS<sub>B</sub> − MS<sub>W</sub>) / n<sub>0</sub>}<br><em>VPC</em> = <em>σ̂</em><sub>B</sub><sup>2</sup> / (<em>σ̂</em><sub>B</sub><sup>2</sup> + MS<sub>W</sub>)<br><em>WVS</em> = 1 − <em>VPC</em>.</div>
+
+The within-community variance share is the primary reported complement. It describes observed tract estimates and is not a reliability coefficient for latent individual risk.<sup>10</sup>
+
+## Estimator and uncertainty
+
+Point estimates use the observed-scale method-of-moments partition and empirical ranks. Community-area cluster bootstrap intervals resample areas with replacement, retain all tracts in sampled areas, recompute ranks and categories in each replicate, and use the 2.5th and 97.5th percentiles. The review run uses 1000 replicates.<sup>12</sup>
+
+## Assumptions and diagnostics
+
+The analysis assumes that the direct tract and direct community-area exports have comparable phenotype, period, and denominator semantics. It does not assume that the community-area value is the mathematical aggregation of its tracts. Cluster intervals address within-area dependence but do not fully model spatial dependence between adjacent areas.
+
+## Missingness, suppression, sensitivity, and interpretation
+
+Suppressed, unresolved-zero, small-denominator, and incomplete tracts are excluded. Noncrossing-only and annual analyses are executable sensitivity checks. The 50% tract-area population is specified but cannot be fully executed from the primary-prefiltered analytic file because 2 area-rule-only tracts are absent. The result describes extra geographic information in the direct tract frame. It does not estimate population prevalence, diagnostic accuracy, or literal aggregation loss.
+
+```{r variance-partition-check}
+mom_variance_partition <- function(data, value, group) {
+  x <- data[[value]]
+  g <- as.character(data[[group]])
+  keep <- is.finite(x) & !is.na(g) & nzchar(g)
+  x <- x[keep]
+  g <- g[keep]
+  n_by_group <- table(g)
+  group_means <- tapply(x, g, mean)
+  n <- length(x)
+  groups <- length(n_by_group)
+  grand_mean <- mean(x)
+  ss_between <- sum(as.numeric(n_by_group) * (group_means - grand_mean)^2)
+  ss_within <- sum((x - group_means[g])^2)
+  ms_between <- ss_between / (groups - 1)
+  ms_within <- ss_within / (n - groups)
+  n0 <- (n - sum(as.numeric(n_by_group)^2) / n) / (groups - 1)
+  variance_between <- max(0, (ms_between - ms_within) / n0)
+  vpc <- variance_between / (variance_between + ms_within)
+  data.frame(
+    n = n,
+    groups = groups,
+    ms_between = ms_between,
+    ms_within = ms_within,
+    n0 = n0,
+    vpc = vpc,
+    within_variance_share = 1 - vpc
+  )
+}
+
+quartile_from_rank <- function(rank_value) {
+  cut(
+    rank_value,
+    breaks = c(-Inf, 0.25, 0.50, 0.75, Inf),
+    labels = c(1L, 2L, 3L, 4L),
+    right = TRUE
+  ) |>
+    as.character() |>
+    as.integer()
+}
+
+quartile_check <- primary_detail |>
+  mutate(
+    tract_quartile_r = quartile_from_rank(ehr_rank),
+    comparison_quartile_r = quartile_from_rank(comparison_rank)
+  )
+
+stopifnot(
+  all(quartile_check$tract_quartile_r == quartile_check$tract_quartile),
+  all(quartile_check$comparison_quartile_r == quartile_check$comparison_quartile)
+)
+
+partition_r <- bind_rows(lapply(split(primary_detail, primary_detail$condition_id), function(data) {
+  cbind(condition_id = data$condition_id[1], mom_variance_partition(data, "ehr_percent", "comparison_geography_id"))
+}))
+
+classification_r <- primary_detail |>
+  group_by(condition_id) |>
+  summarise(
+    resolution_eligible_n = n(),
+    exact_quartile_agreement_count = sum(tract_quartile == comparison_quartile),
+    quartile_disagree_count = sum(tract_quartile != comparison_quartile),
+    q4_moves_into_n = sum(transition_state == "moves_into_highest_quartile"),
+    q4_moves_out_n = sum(transition_state == "moves_out_of_highest_quartile"),
+    q4_movers_n = q4_moves_into_n + q4_moves_out_n,
+    .groups = "drop"
+  ) |>
+  mutate(
+    exact_quartile_agreement_pct = 100 * exact_quartile_agreement_count / resolution_eligible_n,
+    quartile_disagree_pct = 100 * quartile_disagree_count / resolution_eligible_n,
+    q4_movers_pct = 100 * q4_movers_n / resolution_eligible_n
+  )
+
+primary_r <- classification_r |>
+  left_join(partition_r, by = "condition_id")
+
+frozen_primary <- main_evidence |>
+  filter(condition_id %in% c("hypertension", "copd"))
+
+primary_check <- primary_r |>
+  inner_join(
+    frozen_primary |>
+      select(
+        condition_id,
+        resolution_eligible_n_frozen = resolution_eligible_n,
+        quartile_disagree_count_frozen = quartile_disagree_count,
+        q4_movers_n_frozen = q4_movers_n,
+        within_variance_share_frozen = within_variance_share
+      ),
+    by = "condition_id"
+  )
+
+stopifnot(
+  all(primary_check$resolution_eligible_n == primary_check$resolution_eligible_n_frozen),
+  all(primary_check$quartile_disagree_count == primary_check$quartile_disagree_count_frozen),
+  all(primary_check$q4_movers_n == primary_check$q4_movers_n_frozen),
+  max(abs(primary_check$within_variance_share - primary_check$within_variance_share_frozen)) < 1e-10
+)
+```
+
+The R reconstruction exactly matches the frozen primary counts and variance partitions.
+
+# Main Results and Displays
+
+## Table 1. Resource quality and denominator context
+
+```{r main-table-1, echo=FALSE}
+review_table(table_1, "Table 1. Community-area Chicago Health Map resource quality", digits = 0)
+```
+
+**Biostatistical interpretation.** Table 1 describes condition-year aggregate records, not unique adults. The denominator is the source-published CHM condition-record denominator. The table shows suppression and capture because each affects the set of observable areas. Capture is metadata and is not a sampling probability.
+
+**Limitation and supplement needed.** Reliability status remains withheld pending approval of the source reliability rule. A patient-deduplicated flow and exact eligibility definition would strengthen representativeness assessment if those data become available. No available supplement can turn these aggregate EHR denominators into population denominators without an explicit sampling or small-area estimation model.
+
+## Figure 1. Coverage and suppression
+
+```{r main-figure-1, fig.width=12, fig.height=6.8, echo=FALSE}
+coverage_plot_data <- raw_aggregate |>
+  mutate(
+    Geography = recode(
+      geography_type,
+      census_tract = "Census tract",
+      chicago_community_area = "Community area"
+    ),
+    Condition = recode(
+      condition_id,
+      hypertension = "Hypertension",
+      copd = "COPD",
+      diabetes_with_complication = "Diabetes with complication",
+      diabetes_without_complication = "Diabetes without complication"
+    ),
+    Status = if_else(as_flag(suppression_flag), "Suppressed", "Available")
+  ) |>
+  count(Geography, Condition, Status, name = "Records") |>
+  group_by(Geography, Condition) |>
+  mutate(Share = Records / sum(Records)) |>
+  ungroup()
+
+suppression_plot_data <- coverage_plot_data |>
+  group_by(Geography, Condition) |>
+  summarise(
+    Total_records = sum(Records),
+    Suppressed_records = sum(Records[Status == "Suppressed"], na.rm = TRUE),
+    Suppressed_share = Suppressed_records / Total_records,
+    .groups = "drop"
+  )
+
+tract_eligibility_plot_data <- tract_cohort_flow |>
+  mutate(
+    Year = as.integer(time_period),
+    Condition = recode(
+      condition_id,
+      hypertension = "Hypertension",
+      copd = "COPD",
+      diabetes_with_complication = "Diabetes with complication",
+      diabetes_without_complication = "Diabetes without complication"
+    ),
+    Eligible_share = primary_eligible_rows / boundary_eligible_rows
+  )
+
+eligibility_plot <- ggplot(
+  tract_eligibility_plot_data,
+  aes(x = Year, y = Eligible_share, color = Condition, shape = Condition)
+) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c(
+    "Hypertension" = jama_palette[["blue"]],
+    "COPD" = jama_palette[["vermilion"]],
+    "Diabetes with complication" = "#009E73",
+    "Diabetes without complication" = "#6A3D9A"
+  )) +
+  scale_x_continuous(breaks = 2019:2024) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::label_percent(accuracy = 1)) +
+  labs(
+    title = "A. Primary tract eligibility by year",
+    subtitle = "Boundary-eligible records retained after denominator and suppression rules",
+    x = "Year",
+    y = "Eligible records, %",
+    color = NULL,
+    shape = NULL
+  ) +
+  theme_review()
+
+suppression_plot <- ggplot(suppression_plot_data, aes(x = Suppressed_share, y = Condition)) +
+  geom_segment(aes(x = 0, xend = Suppressed_share, yend = Condition), color = jama_palette[["grid"]], linewidth = 1.1) +
+  geom_point(color = jama_palette[["vermilion"]], size = 3.5) +
+  geom_text(
+    aes(label = percent(Suppressed_share, 1)),
+    hjust = -0.25,
+    color = jama_palette[["ink"]],
+    family = "Arial",
+    size = 3.2
+  ) +
+  facet_wrap(~Geography, nrow = 1) +
+  scale_x_continuous(
+    limits = c(0, 1),
+    labels = scales::label_percent(accuracy = 1),
+    expand = expansion(mult = c(0, 0.13))
+  ) +
+  labs(
+    title = "B. Source suppression by geography",
+    subtitle = "Suppressed geography-condition-year records, 2019-2024",
+    x = "Source-suppressed share of aggregate records",
+    y = NULL,
+    caption = NULL
+  ) +
+  theme_review()
+
+eligibility_plot + suppression_plot +
+  patchwork::plot_layout(widths = c(1.1, 1)) +
+  patchwork::plot_annotation(
+    title = "Figure 1. Chicago Health Map tract eligibility and suppression",
+    caption = wrap_caption(paste(
+      "Panel A applies the 2024 TIGER representative-point boundary, annual denominator >=30,",
+      "and observable-value rule. Panel B reports source suppression among aggregate records.",
+      "Suppressed or unresolved-zero values are unavailable and are never interpreted as low diagnosed proportion."
+    ))
+  )
+```
+
+**Biostatistical interpretation.** The primary frame includes `r dplyr::n_distinct(raw_aggregate$geography_id[raw_aggregate$geography_type == "census_tract"])` tracts and `r dplyr::n_distinct(raw_aggregate$geography_id[raw_aggregate$geography_type == "chicago_community_area"])` community areas. COPD eligibility is lower because unresolved zero-or-suppressed records are more frequent. Hypertension eligibility remains high. These differences directly change condition-specific analytic denominators.
+
+**Limitation and supplement needed.** Availability does not establish representativeness. The annual denominator is reconciled to the supplied captured-adult count, but this aggregate review cannot independently verify person-level deduplication, contributing-system composition, or geocoding success. The recommended supplement is a governed annual flow of eligible adults, cross-system duplicates removed, geocoding exclusions, and contributing systems.
+
+## Figure 2. Direct tract-community quartile classification
+
+```{r main-figure-2, fig.width=10.5, fig.height=5.8, echo=FALSE}
+matrix_plot <- resolution_matrix |>
+  filter(!as_flag(noncrossing_only)) |>
+  mutate(
+    Condition = condition_name(condition_id),
+    `Community-area quartile` = factor(community_quartile, levels = 4:1),
+    `Tract quartile` = factor(tract_quartile, levels = 1:4),
+    Label = sprintf("%d\n%.1f%%", tract_count, tract_percent)
+  )
+
+ggplot(matrix_plot, aes(x = `Tract quartile`, y = `Community-area quartile`, fill = tract_percent)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = Label), size = 3.4, lineheight = 0.9, fontface = "bold") +
+  facet_wrap(~Condition, nrow = 1) +
+  scale_fill_viridis_c(option = "cividis", direction = -1, labels = scales::label_number(suffix = "%")) +
+  coord_equal() +
+  labs(
+    title = "Figure 2. Direct tract and community-area quartile classifications",
+    subtitle = "Cell labels give tract count and row percentage for pooled 2022-2024 CHM measures",
+    fill = "Row percent",
+    caption = wrap_caption("Diagonal cells indicate exact quartile agreement. Off-diagonal cells indicate cross-frame classification differences. Community-area values are direct exports, not sums of the displayed tract values.")
+  ) +
+  theme_review() +
+  theme(
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.key.width = grid::unit(28, "pt")
+  )
+```
+
+**Biostatistical interpretation.** Exact quartile agreement was `r sprintf("%d of %d (%.1f%%)", primary_r$exact_quartile_agreement_count[primary_r$condition_id == "hypertension"], primary_r$resolution_eligible_n[primary_r$condition_id == "hypertension"], primary_r$exact_quartile_agreement_pct[primary_r$condition_id == "hypertension"])` for hypertension and `r sprintf("%d of %d (%.1f%%)", primary_r$exact_quartile_agreement_count[primary_r$condition_id == "copd"], primary_r$resolution_eligible_n[primary_r$condition_id == "copd"], primary_r$exact_quartile_agreement_pct[primary_r$condition_id == "copd"])` for COPD. The within-community variance shares were `r sprintf("%.3f", primary_r$within_variance_share[primary_r$condition_id == "hypertension"])` and `r sprintf("%.3f", primary_r$within_variance_share[primary_r$condition_id == "copd"])`, respectively.
+
+**Limitation and supplement needed.** Quartiles depend on the eligible distribution and average-tie rule. Disagreement is not error. The recommended supplements are the continuous absolute rank-gap distribution, cluster-bootstrap intervals, annual results, and noncrossing-only results.
+
+## Figure 3. Highest-quartile movement and annual stability
+
+```{r main-figure-3, fig.width=11.5, fig.height=5.5, echo=FALSE}
+transition_plot_data <- transitions |>
+  filter(
+    comparison_geography_type == "chicago_community_area",
+    sensitivity_status == "all_eligible",
+    transition_state %in% c("moves_into_highest_quartile", "moves_out_of_highest_quartile")
+  ) |>
+  mutate(
+    Condition = condition_name(condition_id),
+    Movement = recode(
+      transition_state,
+      moves_into_highest_quartile = "Moved into Q4",
+      moves_out_of_highest_quartile = "Moved out of Q4"
+    )
+  )
+
+transition_plot <- ggplot(transition_plot_data, aes(x = Condition, y = tract_count, fill = Movement)) +
+  geom_col(position = position_dodge(width = 0.72), width = 0.64) +
+  geom_text(aes(label = tract_count), position = position_dodge(width = 0.72), vjust = -0.35, size = 3.5) +
+  scale_fill_manual(values = c("Moved into Q4" = jama_palette[["blue"]], "Moved out of Q4" = jama_palette[["vermilion"]])) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(
+    title = "A. Highest-quartile movement",
+    x = NULL,
+    y = "Tracts, No.",
+    fill = NULL
+  ) +
+  theme_review()
+
+stability_plot_data <- stability |>
+  filter(
+    result_type == "annual_jaccard",
+    comparison_geography_type == "chicago_community_area",
+    sensitivity_status == "all_eligible"
+  ) |>
+  mutate(Condition = condition_name(condition_id))
+
+stability_plot <- ggplot(stability_plot_data, aes(x = as.integer(time_period), y = top_quartile_jaccard, color = Condition, shape = Condition)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c(COPD = jama_palette[["vermilion"]], Hypertension = jama_palette[["blue"]])) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::label_percent(accuracy = 1)) +
+  scale_x_continuous(breaks = sort(unique(as.integer(stability_plot_data$time_period)))) +
+  labs(
+    title = "B. Annual Q4 classification overlap",
+    x = "Year",
+    y = "Jaccard overlap",
+    color = NULL,
+    shape = NULL
+  ) +
+  theme_review()
+
+transition_plot + stability_plot +
+  patchwork::plot_annotation(
+    title = "Figure 3. Consequences and stability of direct community-area labels",
+    subtitle = "Pooled Q4 movement and annual overlap for direct tract versus direct community-area classification",
+    caption = wrap_caption("Q4 movement and annual Jaccard overlap are different estimands. Movement describes pooled cross-frame classification. Jaccard describes annual overlap of the two Q4 tract sets.")
+  )
+```
+
+**Biostatistical interpretation.** Community-area labels moved `r primary_r$q4_movers_n[primary_r$condition_id == "hypertension"]` hypertension tracts and `r primary_r$q4_movers_n[primary_r$condition_id == "copd"]` COPD tracts into or out of Q4. Annual overlap is moderate and varies by condition.
+
+**Limitation and supplement needed.** A Q4 threshold is distribution-dependent and does not define a clinical action threshold. Persistent movement across at least 2 of 3 years and the ZCTA sensitivity should accompany this figure. Unique-person denominators would improve the interpretation of year-to-year stability.
+
+## Table 2. Compact primary geographic evidence
+
+```{r main-table-2, echo=FALSE}
+table_2_review <- table_2 |>
+  mutate(across(where(is.character), ~ifelse(.x == "—", "Not run pending semantic gate", .x)))
+review_table(table_2_review, "Table 2. Direct tract-community geographic-resolution evidence", digits = 3)
+```
+
+**Biostatistical interpretation.** The metrics describe different constructs. The variance share summarizes continuous heterogeneity. Quartile disagreement summarizes ordinal classification. Q4 movement summarizes change in the most extreme category. No metric is an accuracy score.
+
+**Limitation and supplement needed.** The combined diabetes row is intentionally blank. It cannot be analyzed until the 2 diabetes components are shown to be mutually exclusive, denominator-equivalent, phenotype-aligned, and period-aligned.
+
+# Statistical Analysis Module 3: Cross-Source Agreement and Cluster Bootstrap
+
+## Scientific question and estimand
+
+How similarly do CHM and CDC PLACES rank and classify pairwise-complete tracts? The primary cross-source measure is Spearman rank correlation. Exact agreement and quadratic weighted kappa are supportive ordinal summaries. Gwet AC1 is a nominal sensitivity.
+
+## Population and analysis unit
+
+The unit is a tract with an eligible CHM measure and an aligned PLACES estimate for the same condition. This pairwise-complete population is distinct from the CHM-only primary frame.
+
+## Variables, estimator, and uncertainty
+
+Spearman correlation uses average ranks. Quadratic weighted kappa penalizes disagreements by squared category distance. Gwet AC1 treats categories nominally. Community-area cluster bootstrap intervals use 1000 replicates and percentile limits.<sup>8,9,12</sup>
+
+## Assumptions, diagnostics, missingness, and interpretation
+
+Phenotype, period, and denominator differences remain visible. PLACES is not a truth standard. Compatible source-level uncertainty was unavailable, so the agreement analysis does not propagate uncertainty from either source. Cluster resampling addresses tract dependence within areas but not all spatial dependence.
+
+```{r bootstrap-forest, fig.width=10.5, fig.height=8.2, echo=FALSE}
+bootstrap_plot_data <- bootstrap_results |>
+  mutate(
+    Condition = condition_name(condition_id),
+    Metric = recode(
+      metric,
+      spearman_r = "Spearman rank correlation",
+      quadratic_weighted_kappa = "Quadratic weighted kappa",
+      gwet_ac1 = "Gwet AC1",
+      median_absolute_percentile_rank_gap = "Median absolute rank gap"
+    )
+  )
+
+ggplot(bootstrap_plot_data, aes(x = estimate, y = Condition, color = Condition)) +
+  geom_vline(xintercept = 0, color = "#8A8A8A", linewidth = 0.5) +
+  geom_errorbarh(aes(xmin = ci_low, xmax = ci_high), height = 0.16, linewidth = 0.7) +
+  geom_point(size = 2.9) +
+  facet_wrap(~Metric, ncol = 1, scales = "free_x") +
+  scale_color_manual(values = c(COPD = jama_palette[["vermilion"]], Hypertension = jama_palette[["blue"]])) +
+  labs(
+    title = "eFigure 1. Cluster-bootstrap intervals for cross-source agreement",
+    subtitle = "Community-area cluster bootstrap with ranks recomputed in each of 1000 replicates",
+    x = "Estimate and 95% percentile interval",
+    y = NULL,
+    color = NULL,
+    caption = wrap_caption("Each metric has its own horizontal scale because the estimands differ. PLACES is not a gold standard.")
+  ) +
+  theme_review() +
+  theme(legend.position = "none")
+```
+
+```{r bootstrap-table, echo=FALSE}
+bootstrap_review <- bootstrap_plot_data |>
+  transmute(
+    Condition,
+    Metric,
+    Estimate = estimate,
+    `95% CI lower` = ci_low,
+    `95% CI upper` = ci_high,
+    `Eligible tracts, No.` = sample_n,
+    `Replicates, No.` = replicate_count,
+    `Cluster unit` = cluster_unit
+  )
+review_table(bootstrap_review, "eTable R1. Cross-source agreement with cluster-bootstrap intervals", digits = 3)
+```
+
+**Biostatistical interpretation.** The intervals quantify resampling uncertainty under the declared community-area clustering rule. They do not account for PLACES model uncertainty, CHM denominator uncertainty, phenotype mismatch, or dependence across adjacent areas.
+
+**Decision required.** Approve 1000 community-area cluster replicates as the frozen production rule, or prespecify a different count before rerunning. Approve retention of unweighted AC1 or request a weighted AC2 analysis with explicit category, weight, and tie rules.
+
+# Statistical Analysis Module 4: Healthy Chicago Survey Triangulation
+
+## Scientific question and estimand
+
+Do pooled 2022 through 2024 CHM hypertension diagnosed proportions and the independent 2023-2024 Healthy Chicago Survey hypertension estimates similarly order Chicago's 77 community areas? The estimands are Spearman rank correlation, median absolute percentile-rank gap, and exact agreement between within-source quartiles. This analysis strengthens the source-complementarity argument because it compares 2 locally relevant measurement systems at the same named geography while preserving their different population definitions.<sup>26</sup>
+
+## Population, variables, and denominators
+
+The unit is the direct Chicago community area. CHM contributes summed hypertension numerators divided by summed observed-adult denominators over 2022 through 2024. HCS contributes the 2023-2024 survey estimate (`v`) and source-provided standard error (`se`) among noninstitutionalized Chicago adults aged 18 years or older who reported a clinician diagnosis of high blood pressure. The HCS definition excludes borderline hypertension, prehypertension, and hypertension diagnosed only during pregnancy. All 77 community areas were pairwise complete. The HCS source files and topic metadata were verified against the repository's public-source SHA-256 ledger before use.
+
+## Estimator and uncertainty
+
+Each source is ranked separately with average ranks for ties. Percentile rank equals average rank divided by the number of pairwise-complete areas. Quartiles use the same fixed boundaries as the primary analysis: Q1 at or below 0.25, Q2 above 0.25 through 0.50, Q3 above 0.50 through 0.75, and Q4 above 0.75. The pointwise HCS error bars use the transparent normal approximation `estimate ± 1.96 × standard error`, bounded to 0% through 100%. These bars describe HCS sampling uncertainty only. CHM did not provide a compatible standard error, so no joint-source interval or test of equality is reported.
+
+```{r hcs-review-table, echo=FALSE}
+review_table(
+  hcs_chm_summary,
+  "Review Table HCS-1. Community-area rank triangulation of CHM and Healthy Chicago Survey hypertension estimates",
+  digits = 3
+)
+```
+
+```{r hcs-review-figure, fig.width=10.5, fig.height=8.0, echo=FALSE}
+hcs_rho <- hcs_chm_summary$Estimate[hcs_chm_summary$Measure == "Spearman rank correlation"]
+
+ggplot(hcs_chm_hypertension, aes(x = chm_estimate, y = hcs_estimate)) +
+  geom_errorbar(
+    aes(ymin = hcs_ci_low, ymax = hcs_ci_high),
+    width = 0,
+    color = jama_palette[["rule"]],
+    linewidth = 0.45,
+    alpha = 0.65
+  ) +
+  geom_point(
+    shape = 21,
+    size = 3.1,
+    stroke = 0.55,
+    color = jama_palette[["ink"]],
+    fill = jama_palette[["blue"]]
+  ) +
+  annotate(
+    "label",
+    x = Inf,
+    y = -Inf,
+    hjust = 1.08,
+    vjust = -0.75,
+    label = sprintf("Spearman ρ = %.3f\nPairwise-complete areas = %d", hcs_rho, nrow(hcs_chm_hypertension)),
+    size = 4.0,
+    family = "Arial",
+    color = jama_palette[["ink"]],
+    fill = "white",
+    label.size = 0.25
+  ) +
+  scale_x_continuous(labels = scales::label_number(accuracy = 1, suffix = "%")) +
+  scale_y_continuous(labels = scales::label_number(accuracy = 1, suffix = "%")) +
+  labs(
+    title = "Review Figure HCS-1. CHM and survey hypertension estimates by community area",
+    subtitle = "Rank triangulation across 77 Chicago community areas; values are not treated as interchangeable prevalence estimates",
+    x = "CHM diagnosed proportion among observed adults, pooled 2022-2024",
+    y = "Healthy Chicago Survey estimate, 2023-2024",
+    caption = paste0(
+      "Vertical bars are pointwise HCS estimate ± 1.96 SE, bounded to 0%-100%. CHM uncertainty is unavailable.\n",
+      "No identity or fitted line is shown because source populations, ascertainment, periods, and denominators differ."
+    )
+  ) +
+  theme_review(base_size = 11.5)
+```
+
+**Biostatistical interpretation.** The CHM and HCS community-area orderings had Spearman ρ = `r sprintf("%.3f", hcs_rho)`. Exact within-source quartiles agreed for `r sum(hcs_chm_hypertension$exact_quartile_agreement)` of `r nrow(hcs_chm_hypertension)` areas (`r sprintf("%.1f%%", 100 * mean(hcs_chm_hypertension$exact_quartile_agreement))`). The result is evidence of partial rank alignment across 2 distinct local data systems. It is not evidence that their levels are equivalent or that either source validates the other.
+
+**Limitations and supplement needed.** HCS relies on self-report and survey estimation; CHM relies on diagnoses recorded during observed care. The rolling HCS period does not match the 3-year CHM pool exactly. Only HCS sampling standard errors are available. The topic metadata labels these HCS files `Organization`, so the result remains in this independent-review package until the study team confirms publication permission and the preferred source citation. HCS diabetes contains 74 community-area estimates, but the CHM combined-diabetes analysis remains unexecuted until mutual exclusivity and denominator equivalence are documented.
+
+**Decision required.** Approve HCS hypertension as a secondary triangulation analysis, approve average-rank quartiles and the pointwise HCS error-bar display, and decide whether the final supplement should include this figure, its table, or both.
+
+# Statistical Analysis Module 5: Exploratory Area-Label AUC
+
+## Scientific question and estimand
+
+Does a leave-one-tract-out community-area mean distinguish tracts in the empirical CHM Q4 from other eligible tracts? The area under the receiver operating characteristic curve is an exploratory separation statistic.
+
+## Population, estimator, and validation boundary
+
+The unit is a CHM-complete tract in a community area containing at least 2 eligible tracts. For each tract, the predictor is the mean of the other tracts in its linked area. The empirical Q4 threshold is recomputed inside each cluster-bootstrap replicate.
+
+The AUC does not evaluate a deployed prediction model. It has no external validation sample, no patient-level outcome, and no clinical decision threshold. It cannot establish that community-area labels predict tract burden. It remains outside the primary claim.<sup>11</sup>
+
+```{r auc-table, echo=FALSE}
+auc_review <- main_evidence |>
+  filter(condition_id %in% c("hypertension", "copd")) |>
+  transmute(
+    Condition = condition_name(condition_id),
+    `Eligible tracts, No.` = resolution_eligible_n,
+    `Exploratory area-label AUC` = area_label_auc,
+    `Interpretation` = "Leave-one-tract-out separation only. Not prediction or external validation."
+  )
+review_table(auc_review, "eTable R2. Exploratory area-label separation", digits = 3)
+```
+
+# Statistical Analysis Module 6: Supplementary Community-Area Outcome Models
+
+## Scientific question and estimands
+
+The supplementary C2 model estimates the adjusted mean difference in aligned 2022 through 2024 community-area life expectancy associated with a 1-IQR higher pooled COPD diagnosed proportion. The C1 joint hypertension-diabetes model was not run because its semantic and completeness gates failed.
+
+## Population and analysis unit
+
+The C2 unit is an eligible Chicago community area with complete outcome, exposure, and locked covariates. The analytic sample contains `r c2_n` areas. The C1 analytic sample contains 0 complete approved exposure records because the combined diabetes variable was not constructed.
+
+## Model and uncertainty
+
+The principal model is unweighted ordinary least squares with HC3 covariance:<sup>13</sup>
+
+<div class="equation" role="math"><em>LE</em><sub>j</sub> = α + β<sub>C</sub> COPD<sub>j</sub> + γ<sub>1</sub> Age65<sub>j</sub> + γ<sub>2</sub> Female<sub>j</sub> + γ<sub>3</sub> Poverty<sub>j</sub> + γ<sub>4</sub> Capture<sub>j</sub> + ε<sub>j</sub>.</div>
+
+The exposure is scaled to 1 frozen IQR. Covariates are scaled to 1 SD. The displayed candidate interval uses the governed critical-value rule recorded by the pipeline. Normal versus t critical values remain a sign-off decision.
+
+## Assumptions and diagnostics
+
+The model requires full-rank design, adequate exposure variation, variance inflation factors at most 5, absolute pairwise correlations at most 0.80, finite HC3 covariance, inspectable residual behavior, and influence analysis. Residual Moran I triggers a spatial-error sensitivity.
+
+## Missingness, sensitivity, and interpretation
+
+The model uses complete community areas. Multiple imputation was not needed because locked adjustment covariates were complete in the C2 frame. Population weighting changes the estimand and is a sensitivity. Results are ecological associations, not effects.
+
+```{r model-gate-table, echo=FALSE}
+model_gate_review <- model_gate |>
+  group_by(model_id) |>
+  summarise(
+    `Complete areas, No.` = max(n_complete, na.rm = TRUE),
+    `Design rank` = max(design_rank, na.rm = TRUE),
+    `Design columns` = max(design_columns, na.rm = TRUE),
+    `Maximum VIF` = max(maximum_vif, na.rm = TRUE),
+    `Maximum absolute correlation` = max(maximum_absolute_pairwise_correlation, na.rm = TRUE),
+    Status = first(status),
+    Reason = first(reason),
+    .groups = "drop"
+  ) |>
+  mutate(across(where(is.numeric), ~ifelse(is.infinite(.x), NA_real_, .x)))
+review_table(model_gate_review, "eTable R3. Prespecified model-readiness gates", digits = 3)
+```
+
+```{r coefficient-forest, fig.width=9.5, fig.height=5.8, echo=FALSE}
+term_labels <- c(
+  beta_c = "COPD diagnosed proportion, 1 IQR",
+  gamma_age65 = "Age 65 years or older, 1 SD",
+  gamma_female = "Female, 1 SD",
+  gamma_poverty = "Below federal poverty level, 1 SD",
+  gamma_capture = "CHM capture, 1 SD"
+)
+
+coefficient_plot_data <- coefficient_table |>
+  filter(term != "alpha") |>
+  mutate(
+    Term = factor(unname(term_labels[term]), levels = rev(unname(term_labels))),
+    Role = if_else(role %in% c("exposure", "primary_exposure"), "Exposure", "Adjustment covariate")
+  )
+
+ggplot(coefficient_plot_data, aes(x = estimate, y = Term, color = Role)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "#6E6E6E") +
+  geom_errorbarh(aes(xmin = ci_low, xmax = ci_high), height = 0.16, linewidth = 0.75) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c(Exposure = jama_palette[["vermilion"]], `Adjustment covariate` = jama_palette[["blue"]])) +
+  labs(
+    title = "eFigure 2. Candidate C2 coefficient estimates",
+    subtitle = paste0("Unweighted OLS with HC3 covariance among ", c2_n, " community areas"),
+    x = "Difference in life expectancy, years",
+    y = NULL,
+    color = NULL,
+    caption = wrap_caption("The COPD result is an ecological adjusted association. The exposure interval is 97.5% in the frozen artifact; adjustment intervals are 95%. It does not estimate a causal effect and remains unauthorized for manuscript import.")
+  ) +
+  theme_review()
+```
+
+```{r residual-diagnostics, fig.width=11, fig.height=8, echo=FALSE}
+residual_plot <- ggplot(diagnostic_data, aes(x = fitted_value, y = residual)) +
+  geom_hline(yintercept = 0, color = "#6E6E6E") +
+  geom_point(color = jama_palette[["blue"]], alpha = 0.8) +
+  labs(title = "A. Residuals versus fitted values", x = "Fitted life expectancy", y = "Residual") +
+  theme_review()
+
+qq_plot <- ggplot(diagnostic_data, aes(x = qq_theoretical_quantile, y = qq_sample_quantile)) +
+  geom_abline(slope = 1, intercept = 0, color = "#6E6E6E", linetype = "dashed") +
+  geom_point(color = jama_palette[["blue"]], alpha = 0.8) +
+  labs(title = "B. Normal quantile plot", x = "Theoretical quantile", y = "Observed residual quantile") +
+  theme_review()
+
+leverage_plot <- ggplot(diagnostic_data, aes(x = leverage, y = externally_studentized_residual)) +
+  geom_hline(yintercept = c(-3, 3), color = "#6E6E6E", linetype = "dotted") +
+  geom_vline(xintercept = 12 / nrow(diagnostic_data), color = jama_palette[["vermilion"]], linetype = "dashed") +
+  geom_point(color = jama_palette[["blue"]], alpha = 0.8) +
+  labs(title = "C. Leverage and studentized residuals", x = "Leverage", y = "Externally studentized residual") +
+  theme_review()
+
+cook_plot <- diagnostic_data |>
+  mutate(Area_index = row_number()) |>
+  ggplot(aes(x = Area_index, y = cooks_distance)) +
+  geom_hline(yintercept = 4 / nrow(diagnostic_data), color = jama_palette[["vermilion"]], linetype = "dashed") +
+  geom_col(fill = jama_palette[["blue"]], width = 0.7) +
+  labs(title = "D. Cook distance", x = "Community-area index", y = "Cook distance") +
+  theme_review()
+
+(residual_plot + qq_plot) / (leverage_plot + cook_plot) +
+  patchwork::plot_annotation(
+    title = "eFigure 3. C2 residual and influence diagnostics",
+    caption = "Dashed reference lines are screening thresholds, not automatic exclusion rules. Influence findings require clinical and geographic review."
+  )
+```
+
+**Biostatistical interpretation.** The candidate 1-IQR COPD estimate is `r sprintf("%.2f", c2_exposure$estimate)` years with a `r sprintf("%.1f%%", 100 * c2_exposure$confidence_level)` interval from `r sprintf("%.2f", c2_exposure$ci_low)` to `r sprintf("%.2f", c2_exposure$ci_high)`. This result demonstrates a linked ecological analysis. It cannot establish that COPD burden caused life-expectancy differences or that tract resolution improves the outcome model.
+
+**Decision required.** Approve the critical-value rule, the model's supplementary status, and the wording of the ecological interpretation. C1 remains unexecuted.
+
+# Statistical Analysis Module 7: Spatial Diagnostics and Sensitivity
+
+## Scientific question and estimand
+
+Do neighboring community areas show residual spatial dependence after the C2 adjustment model, and do the C2 exposure estimate and direction change under a spatial-error model?
+
+## Population, weights, and estimator
+
+The population is the `r c2_n`-area C2 analytic frame. The primary weights are row-standardized queen contiguity weights restricted to the eligible areas. Global Moran I uses a 2-sided permutation test based on absolute deviation from its expectation with 9999 permutations and add-one correction.<sup>14</sup>
+
+The prespecified trigger activated a concentrated-likelihood spatial-error sensitivity. Local Moran I and Getis-Ord Gi* analyses use separate declared false-discovery-rate families. COPD local statistics were not run because complete 77-area topology was unavailable.<sup>15-17</sup>
+
+## Assumptions, diagnostics, missingness, and interpretation
+
+Results depend on boundary topology, islands, row standardization, and the spatial process assumed by the error model. A significant Moran I identifies residual spatial structure. It does not explain the source of that structure. Local cluster labels are exploratory and do not identify causal neighborhoods or intervention targets.
+
+```{r spatial-table, echo=FALSE}
+spatial_review <- spatial_diagnostics |>
+  transmute(
+    Model = model_id,
+    `Eligible areas, No.` = n,
+    `Observed Moran I` = observed_i,
+    `Expected Moran I` = expected_i,
+    `Permutation P value` = permutation_p_value,
+    `Permutations, No.` = permutations,
+    `Weights transformation` = weights_transformation,
+    `Escalation required` = escalation_required
+  )
+review_table(spatial_review, "eTable R4. Residual spatial autocorrelation", digits = 4)
+```
+
+```{r spatial-sensitivity-table, echo=FALSE}
+spatial_exposure <- spatial_error |>
+  filter(row_type == "spatial_error_contrast") |>
+  transmute(
+    Model = model_id,
+    Term = "COPD diagnosed proportion, 1 IQR",
+    `Spatial-error estimate, years` = estimate,
+    `Standard error` = standard_error,
+    `Lambda estimate` = lambda_hat,
+    `OLS estimate, years` = ols_estimate,
+    `Absolute magnitude change ratio` = absolute_magnitude_change_ratio,
+    `Direction changed` = direction_changed,
+    `Sensitivity status` = model_sensitivity_status
+  )
+review_table(spatial_exposure, "eTable R5. Mandatory spatial-error sensitivity", digits = 3)
+```
+
+**Biostatistical interpretation.** Residual Moran I was `r sprintf("%.3f", spatial_c2$observed_i)` with permutation P = `r sprintf("%.4f", spatial_c2$permutation_p_value)`. The spatial-error exposure estimate was `r sprintf("%.2f", spatial_exposure[["Spatial-error estimate, years"]][1])` years and `r spatial_direction_text`. The residual dependence means the HC3 model does not fully capture spatial structure.
+
+**Decision required.** Approve the weights definition, permutation rule, spatial-error sensitivity, local-test families, and the boundary between supplementary spatial description and the primary geographic claim.
+
+# Sensitivity Analyses
+
+The governed sensitivity plan includes annual estimates, leave-one-year-out analyses, noncrossing-only tract analyses, ZCTA comparisons, capture strata, reliability strata, population weighting, capture quartiles, flagged-area exclusions, leave-one-area-out influence, alternative spatial weights, and spatial-error modeling. Each sensitivity targets a different assumption and cannot substitute for the primary estimand.
+
+```{r sensitivity-table, echo=FALSE}
+sensitivity_review <- robustness |>
+  filter(
+    model == "C2",
+    !grepl("^leave_one_area_out", variant),
+    !is.na(estimate)
+  ) |>
+  transmute(
+    Variant = gsub("_", " ", variant),
+    Estimate = estimate,
+    `CI lower` = ci_low,
+    `CI upper` = ci_high,
+    `Eligible areas, No.` = eligible_n,
+    `Direction stable` = direction_stability,
+    `Absolute change, %` = absolute_percentage_change,
+    `Threshold status` = threshold_crossed
+  )
+review_table(sensitivity_review, "eTable R6. Selected C2 robustness analyses", digits = 3)
+```
+
+**Interpretation boundary.** Stability across sensitivity analyses reduces concern that the candidate result depends on one prespecified modeling choice. It does not eliminate residual confounding, ecological bias, selection into observed care, outcome measurement error, or spatial dependence.
+
+# Temporal Holdout and External Replication Package
+
+The study now contains 3 distinct strengthening strategies. HCS triangulation is executable and reported above. A 2025 CHM temporal holdout and external metropolitan replication are fully specified but cannot be executed from the frozen files currently in the repository. Their unavailable status is a result of an explicit data check, not an omitted analysis.
+
+```{r strengthening-status, echo=FALSE}
+strengthening_status <- data.frame(
+  Addition = c(
+    "Independent Chicago survey triangulation",
+    "Out-of-time CHM stability",
+    "External metropolitan EHR replication"
+  ),
+  Data_found = c(
+    "HCS 2023-2024 hypertension: 77 community areas with estimate and SE; diabetes: 74 areas with estimate and SE",
+    paste0("Frozen CHM years: ", paste(chm_available_years, collapse = ", "), ". ", chm_holdout_status),
+    "MNEHRC/HTAC reports 2025 aggregate EHR data at state, county, ZIP code, city, and Census tract levels; the public-use file requires a data request and is not in this repository"
+  ),
+  Current_status = c(
+    "Executed for hypertension; diabetes remains gated by CHM diabetes semantics",
+    "Protocol ready; not executable because no frozen 2025 CHM extract is present",
+    "Protocol ready; not executable because no approved external aggregate extract is present"
+  ),
+  Valid_claim_if_completed = c(
+    "Partial cross-source rank alignment at the same Chicago community-area geography",
+    "Temporal transportability of the frozen geographic-resolution estimands to a later CHM year",
+    "Geographic transportability to another health-system research network, provided direct tract and direct coarser-area estimates are available"
+  ),
+  Prohibited_claim = c(
+    "Validation, calibration, interchangeable prevalence, or proof that either source is correct",
+    "Prospective prediction, trend causality, or stability if source definitions changed",
+    "External replication if only tract-versus-PLACES concordance can be reproduced"
+  ),
+  check.names = FALSE
+)
+review_table(strengthening_status, "Table R8. Status and claim boundary for 3 paper-strengthening additions", digits = 0)
+```
+
+## Frozen 2025 CHM holdout protocol
+
+The 2025 data must remain outside the 2022-2024 development pool. Before any estimate is computed, the statistician should compare 2025 with the frozen period on condition phenotype, lookback, observed-adult denominator, cross-system deduplication, contributing systems, suppression, reliability, tract vintage, direct community-area export, and linkage. Any change is documented as a measurement discontinuity. It is not silently interpreted as temporal instability.
+
+If the gate passes, the analysis will use the frozen code and decision rules to:
+
+1. construct direct 2025 tract and direct 2025 community-area diagnosed proportions from their source numerators and denominators;
+2. apply the frozen eligible-geography and dominant-link rules without adding 2025 to the primary pool;
+3. recompute within-2025 average ranks and fixed rank-quartile boundaries;
+4. estimate within-community variance share, median absolute rank gap, exact quartile disagreement, and movement into or out of Q4;
+5. use a community-area cluster bootstrap with ranks recomputed within each replicate; and
+6. report a sensitivity that applies the frozen 2022-2024 raw-value quartile cut points to 2025, which answers absolute classification stability rather than within-year relative ordering.
+
+A 2025 result will be labeled **out-of-time temporal replication** only when the comparability gate passes. If it fails, the notebook will report the changed source definitions and treat 2025 as a new measurement regime.
+
+## External metropolitan EHR replication protocol
+
+The Minnesota EHR Consortium's Health Trends Across Communities (HTAC) program is the leading candidate because it reports summary EHR information from 11 health systems, uses privacy-preserving cross-system deduplication, geocodes to census tracts, suppresses small cells, and publishes data at multiple geographic levels. Its 2025 public-use file is available by request rather than anonymous download. Published MNEHRC work already demonstrates tract-level EHR comparisons with Census and PLACES, which makes it strong external context but does not by itself replicate CHM's tract-versus-direct-coarser-label estimand.<sup>4,27,28</sup>
+
+```{r external-replication-contract, echo=FALSE}
+external_replication_contract <- data.frame(
+  Required_element = c(
+    "Network and period",
+    "Conditions",
+    "Direct geographic estimates",
+    "Measure fields",
+    "Eligibility and privacy",
+    "Boundary and linkage",
+    "Primary replicated estimands",
+    "Secondary fallback",
+    "Governance"
+  ),
+  Minimum_acceptable_specification = c(
+    "One frozen metropolitan or statewide multi-system EHR release with a declared reporting year and observation/lookback windows",
+    "Hypertension and COPD preferred to match the CHM primary displays; diabetes may be added only as a separately defined phenotype",
+    "Direct Census tract and direct named coarser-area outputs for the same source, condition, and period",
+    "Geography identifier, condition, numerator, denominator, diagnosed proportion, suppression flag, reliability flag, and reporting period",
+    "Adult inclusion rule, contributing systems, deduplication method, death/residency rules, and small-cell threshold",
+    "Tract vintage, coarser-area vintage, direct-versus-derived status, crossing rule, and linkage source",
+    "Within-area variance share, absolute percentile-rank gap, exact quartile disagreement, and Q4 movement using the frozen CHM definitions",
+    "If direct coarser-area estimates are unavailable, reproduce only tract-level EHR-public comparator concordance and label it contextual replication",
+    "Use aggregate data only; retain the external source's use agreement, citation, suppression, and approval requirements"
+  ),
+  Why_it_matters = c(
+    "Separates transportability from period or data-definition drift",
+    "Prevents a condition change from being mislabeled replication",
+    "Direct-versus-direct values are necessary to answer the primary geographic-resolution question",
+    "Allows exact pooled-estimator and eligibility reconstruction",
+    "Makes the observed population and disclosure boundary auditable",
+    "Prevents silent areal interpolation or incompatible geography joins",
+    "Tests the same scientific construct rather than a convenient substitute",
+    "Preserves a useful but narrower analysis when primary replication is impossible",
+    "Keeps the review package disclosure-safe and source-compliant"
+  ),
+  check.names = FALSE
+)
+review_table(external_replication_contract, "Table R9. Minimum data contract for an external metropolitan EHR replication", digits = 0)
+```
+
+**No external request was submitted.** The package prepares the exact specification the study team can send after deciding the partner and use agreement. Receipt of a public-use file does not authorize automatic pooling with CHM. The external network remains a separate replication cohort with source-specific results.
+
+# Biostatistical Review of Every Numbered Display
+
+The table below is the reviewer-facing index generated by the Marimo pipeline. It states the result, main limitation, and next supplement or decision for every numbered table and figure. It is intentionally more explicit than a manuscript table note.
+
+```{r display-review, echo=FALSE}
+review_table(display_review, "eTable R7. Display-by-display biostatistical review matrix", digits = 0)
+```
+
+## Display quality-control record
+
+This check is deliberately separate from the scientific results. It confirms that each display
+has a stated interpretation limit and a concrete supplement or decision for the independent
+reviewer. The figures use a common colorblind-conscious palette, direct labels where practical,
+explicit denominators, and captions that identify the estimand and data boundary. The HTML keeps
+the source code available for inspection while the rendered tables remain aggregate-only.
+
+```{r display-qc, echo=FALSE}
+required_review_fields <- c("Display", "Review result", "Main limitation", "Needed supplement or decision")
+stopifnot(all(required_review_fields %in% names(display_review)))
+stopifnot(
+  all(nzchar(trimws(as.character(display_review$Display)))),
+  all(nzchar(trimws(as.character(display_review$`Review result`)))),
+  all(nzchar(trimws(as.character(display_review$`Main limitation`)))),
+  all(nzchar(trimws(as.character(display_review$`Needed supplement or decision`))))
+)
+
+display_qc <- data.frame(
+  Display = c("Table 1", "Figure 1", "Figure 2", "Figure 3", "Table 2", "Review Figure/Table HCS-1", "eFigures/eTables"),
+  `Rendered form` = c("HTML table", "Stacked bars", "Quartile matrix", "Two-panel plot", "HTML table", "Scatterplot with HCS error bars and HTML table", "HTML tables and plots"),
+  `Primary unit shown` = c("Condition-year records", "Aggregate records", "Eligible tracts", "Eligible tracts and annual sets", "Eligible tracts", "Pairwise-complete community areas", "Areas, tracts, or model terms"),
+  `Denominator stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
+  `Interpretation limit stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
+  `Numerical results authorized` = ifelse(isFALSE(params$results_authorized), "No", "Yes"),
+  check.names = FALSE
+)
+review_table(display_qc, "Table R10. Display construction and review-quality checks", digits = 0)
+```
+
+For a publication export, the statistician should approve the data status, denominator language,
+interval definitions, and caption wording for each display. Approval of visual quality does not
+authorize numerical import; that decision remains governed by the S7 gate.
+
+# Discussion
+
+## Principal findings
+
+Direct tract and community-area CHM measures did not produce identical geographic descriptions. The observed within-community variance share was larger for COPD than hypertension. Direct community-area labels also changed a larger proportion of COPD tract quartiles and highest-quartile classifications. These results show that the tract frame contains small-area clinical information that a direct community-area label does not fully retain. In the new secondary triangulation, CHM and HCS hypertension estimates showed partial community-area rank alignment despite different absolute levels and measurement systems. That pattern supports using the sources together for interpretation while arguing against treating them as interchangeable.
+
+The scientific contribution is the source-role framework and the explicit measurement comparison. Population-based public health data estimate health across defined resident populations. CHM describes diagnoses recorded among adults observed in participating health systems. Using the sources together can reveal aligned and divergent patterns, identify where a coarse label hides tract heterogeneity, and motivate follow-up surveillance or community assessment.
+
+## What the data can support
+
+The present data can support descriptive small-area comparison, resource-quality accounting, within-area heterogeneity analysis, rank and classification comparison, independent HCS rank triangulation, prespecified sensitivity analyses, and ecological supplementary models. Health systems can use these analyses to generate hypotheses, examine care-observed clinical patterns, and identify places where additional public health assessment may be useful.
+
+## What the data cannot support
+
+The present data cannot estimate prevalence among all Chicago residents without a defensible population-inference method. They cannot establish that one source is correct, infer unmet need, locate services, measure individual risk, or identify causal intervention targets. Direct tract-community differences are cross-frame differences. They are not literal information loss from mathematical aggregation.
+
+## Limitations
+
+First, health-system inclusion depends on care seeking, participating systems, coding, and geocoding. Capture metadata does not correct this selection. Second, the annual tract denominator matches the supplied captured-adult count, but the aggregate extract cannot independently verify person-level eligibility or cross-system deduplication. Third, unresolved zero-or-suppressed values and the denominator threshold change analytic populations by condition. Fourth, the representative-point Chicago rule is provisional, and the full 50%-area alternative frame requires 2 tracts absent from the primary-prefiltered file. Fifth, direct tract and community-area exports may differ in construction beyond geographic scale. Sixth, rank categories are distribution-dependent and sensitive to eligible tracts and ties. Seventh, PLACES differs in phenotype, denominator, period, and estimation method and is not a gold standard. Eighth, HCS is self-reported and survey-derived, its rolling period differs from the CHM pool, and only HCS sampling standard errors are available. Ninth, cluster bootstrap intervals do not fully represent spatial dependence or source-estimate uncertainty. Tenth, the C2 model has only `r c2_n` areas, residual spatial autocorrelation, and ecological interpretation. Eleventh, combined diabetes remains unrun because its source semantics are unresolved. Twelfth, no frozen 2025 CHM extract or approved external-network extract is available, so temporal and geographic transportability remain untested. Thirteenth, the primary-aim amendment and results authorization remain incomplete.
+
+## Additional data or analyses that would strengthen the paper
+
+1. Aggregate annual flow counts for eligible adults, cross-system duplicates removed, geocoded adults, exclusions, and contributing health systems.
+2. Source-owner confirmation of the annual eligibility, deduplication, diagnosis, denominator, unresolved-zero, suppression, and reliability rules.
+3. Health-system capture diagnostics stratified by condition, year, and geography, with clear limits on interpretation.
+4. Compatible source uncertainty for CHM and PLACES or a prespecified measurement-error analysis.
+5. Retain the frozen 1000-replicate community-area cluster-bootstrap intervals if Ashley approves the design, or prespecify and rerun a different replicate count once.
+6. Weighted AC2 only if the category-weight rule and interpretive role are approved in advance.
+7. Direct confirmation of combined diabetes mutual exclusivity, denominator equivalence, phenotype mapping, and period alignment before any combined estimate.
+8. Acquire a frozen 2025 CHM aggregate extract and execute the prespecified out-of-time holdout only after the comparability gate passes.
+9. Request an aggregate external-network extract that satisfies Table R9; MNEHRC/HTAC is the leading candidate, but its public-use file is not currently in the repository.
+10. A prospective public health use-case evaluation that records whether tract signals changed follow-up data collection or decision making.
+11. Rebuild a complete alternative-boundary frame containing all 779 tracts meeting the 50% area rule before treating that sensitivity as executed.
+
+## Conclusions
+
+Tract-level health-system EHR data can add a clinically observed small-area perspective beyond common community-area labels. The HCS triangulation shows why their value is complementary: distinct local data systems can partially align in how they order areas while retaining important differences in level, population, ascertainment, and uncertainty. Population-based public health surveillance remains the foundation for population inference. CHM can help show where clinically recorded patterns vary within larger areas and where additional public health inquiry may be warranted. The prespecified 2025 holdout and external-network replication are the next tests of transportability.
+
+# Reporting and Authorization Checklist
+
+```{r checklist, echo=FALSE}
+checklist <- data.frame(
+  Item = c(
+    "JAMA Health Forum Original Investigation structure",
+    "Five main displays",
+    "STROBE and RECORD reporting",
+    "Aggregate-only review output",
+    "Pooled estimator regression check",
+    "Primary R-Marimo reconciliation",
+    "Combined diabetes gate",
+    "Independent statistical sign-off",
+    "S7 results authorization",
+    "Submission-ready status"
+  ),
+  Status = c(
+    "Present",
+    "Present",
+    "References and checklist domains included",
+    "Passed",
+    "Passed",
+    "Passed",
+    "Not run as required",
+    "Pending",
+    "Closed",
+    "No"
+  ),
+  Required_action = c(
+    "Revalidate journal instructions within 30 days of submission",
+    "Confirm final editorial selection",
+    "Complete final manuscript checklists",
+    "Do not add patient-level rows",
+    "Retain summed numerator-over-denominator rule",
+    "Retain executable stop checks",
+    "Obtain source semantic approval or retain blocker",
+    "Resolve D1 through D17",
+    "Complete independent review and author authorization",
+    "Do not call publication-ready until all pending items close"
+  )
+)
+review_table(checklist, "Table R11. Reporting, reproducibility, and authorization checklist", digits = 0)
+```
+
+# References
+
+1. Ghildayal N, et al. Public health surveillance in electronic health records: lessons from PCORnet. *Prev Chronic Dis.* 2024;21:E51. doi:10.5888/pcd21.230417
+2. Chen T, et al. Small-area estimation for public health surveillance using electronic health record data: reducing the impact of underrepresentation. *BMC Public Health.* 2022;22(1):1515. doi:10.1186/s12889-022-13809-2
+3. Allen KS, et al. Electronic health records for population health management: comparison of electronic health record-derived hypertension prevalence measures against established survey data. *Online J Public Health Inform.* 2024;16:e48300. doi:10.2196/48300
+4. Winkelman TN, et al. Population estimates and hypertension and diabetes prevalence: cross-sectional quantitative study comparing electronic health record-derived counts, Census, and CDC PLACES. *JMIR Public Health Surveill.* 2026;12:e86337. doi:10.2196/86337
+5. Klompas M, et al. State and local chronic disease surveillance using electronic health record systems. *Am J Public Health.* 2017;107(9):1406-1412. doi:10.2105/AJPH.2017.303874
+6. Hunt BR, et al. Life expectancy varies in local communities in Chicago: racial and spatial disparities and correlates. *J Racial Ethn Health Disparities.* 2015;2(4):425-433. doi:10.1007/s40615-015-0089-8
+7. Dixon BE, et al. Measuring population health using electronic health records: exploring biases and representativeness in a community health information exchange. *Stud Health Technol Inform.* 2015;216:1009. PMID:26262310.
+8. Cohen J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. *Psychol Bull.* 1968;70(4):213-220. doi:10.1037/h0026256
+9. Gwet KL. Computing inter-rater reliability and its variance in the presence of high agreement. *Br J Math Stat Psychol.* 2008;61(pt 1):29-48. doi:10.1348/000711006X126600
+10. Nakagawa S, Johnson PCD, Schielzeth H. The coefficient of determination and intraclass correlation coefficient from generalized linear mixed-effects models revisited and expanded. *J R Soc Interface.* 2017;14(134):20170213. doi:10.1098/rsif.2017.0213
+11. Hanley JA, McNeil BJ. The meaning and use of the area under a receiver operating characteristic curve. *Radiology.* 1982;143(1):29-36. doi:10.1148/radiology.143.1.7063747
+12. Efron B. Bootstrap methods: another look at the jackknife. *Ann Stat.* 1979;7(1):1-26. doi:10.1214/aos/1176344552
+13. Long JS, Ervin LH. Using heteroscedasticity consistent standard errors in the linear regression model. *Am Stat.* 2000;54(3):217-224. doi:10.1080/00031305.2000.10474549
+14. Moran PAP. Notes on continuous stochastic phenomena. *Biometrika.* 1950;37(1-2):17-23. doi:10.1093/biomet/37.1-2.17
+15. Anselin L. Local indicators of spatial association-LISA. *Geogr Anal.* 1995;27(2):93-115. doi:10.1111/j.1538-4632.1995.tb00338.x
+16. Getis A, Ord JK. The analysis of spatial association by use of distance statistics. *Geogr Anal.* 1992;24(3):189-206. doi:10.1111/j.1538-4632.1992.tb00261.x
+17. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *J R Stat Soc Series B.* 1995;57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x
+18. von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. *PLoS Med.* 2007;4(10):e296. doi:10.1371/journal.pmed.0040296
+19. Benchimol EI, et al. The REporting of studies Conducted using Observational Routinely-collected health Data statement. *PLoS Med.* 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+20. JAMA Health Forum. Instructions for Authors. Accessed August 27, 2026. https://jamanetwork.com/journals/jama-health-forum/pages/instructions-for-authors
+21. Centers for Disease Control and Prevention. PLACES Census Tract Data, GIS Friendly Format, 2025 release, dataset yjkw-uj5s.
+22. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
+23. Chicago Health Atlas. Life expectancy, indicator VRLE. Originating source: Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
+24. City of Chicago. Boundaries-Community Areas, dataset igwz-8jzy. Accessed July 14, 2026.
+25. CONSCIENCE Project. ChicagoHealthMap.com: CONnecting SCIence-ENgaging Chicago for Equity. Chicago, IL: Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed July 13, 2026.
+26. Chicago Department of Public Health. Healthy Chicago Survey hypertension and adult diabetes indicators. Chicago Health Atlas indicators HCSHYTP and HCSDIAP. Accessed August 27, 2026. https://chicagohealthatlas.org/
+27. Minnesota Electronic Health Record Consortium. Health Trends Across Communities in Minnesota Dashboard. Accessed August 27, 2026. https://mnehrconsortium.org/explore-our-findings/health-trends-across-communities-in-mn/
+28. Johnson SG, Chamberlain AM, Drawz P, et al. Design and implementation of a state-wide network for near real-time public health surveillance and research: the Minnesota Electronic Health Record Consortium experience. *Learn Health Syst.* 2026;10(2):e70070. doi:10.1002/lrh2.70070
+
+# Reproducibility Record
+
+```{r reproducibility-record, echo=FALSE}
+reproducibility <- data.frame(
+  Field = c(
+    "R version",
+    "R Markdown input",
+    "Marimo source",
+    "Marimo input SHA-256",
+    "Marimo notebook SHA-256",
+    "Git commit",
+    "Git dirty at Marimo run",
+    "Random seed",
+    "Spatial permutations",
+    "Results authorized",
+    "Rendered numerical content"
+  ),
+  Value = c(
+    R.version.string,
+    "notebooks/RMD_chm_paper_r_Ashley.Rmd",
+    manifest$notebook_path,
+    manifest$input_sha256,
+    manifest$notebook_sha256,
+    manifest$git_commit,
+    as.character(manifest$git_dirty),
+    as.character(manifest$seed),
+    as.character(manifest$permutations),
+    as.character(manifest$results_authorized),
+    "Aggregate findings for independent biostatistical review only"
+  )
+)
+review_table(reproducibility, "Table R12. Reproducibility and governance record", digits = 0)
+```
+
+```{r session-information}
+sessionInfo()
+```
+
+<div class="review-banner">
+<strong>End-of-notebook gate.</strong> This document shows the aggregate results included in the governed independent-review package. It is not a manuscript-import artifact. Ashley's statistical decisions and the S7 results authorization must be completed before publication use.
+</div>

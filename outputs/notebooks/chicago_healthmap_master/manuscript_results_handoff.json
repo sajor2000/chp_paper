@@ -1,0 +1,45 @@
+{
+  "audit_only": {
+    "c1_result_records": [],
+    "c1_spatial_diagnostic_records": [],
+    "manuscript_import_allowed": false
+  },
+  "complementarity_metrics": {
+    "manuscript_import_allowed": false
+  },
+  "figure_legends": {
+    "figure_1": "[WITHHELD pending independent S7 review.]",
+    "figure_2": "[WITHHELD pending independent S7 review.]",
+    "figure_3": "[WITHHELD pending independent S7 review.]"
+  },
+  "interpretation_boundary": "EHR-diagnosed proportions are measured among observed CAPriCORN adults; they are not population prevalence, individual risk, or causal effects.",
+  "live_journal_verification": "official_jama_health_forum_instructions_directly_verified_2026-08-26",
+  "manuscript_import_allowed": false,
+  "manuscript_import_block_reason": "withheld_pending_independent_review",
+  "model_gate_findings": {
+    "cardiometabolic": "not_run_combined_diabetes_semantics_unapproved",
+    "copd": "candidate_adjusted_estimate_not_authorized"
+  },
+  "per_result_import_authorization": {
+    "C1": {
+      "audit_only": true,
+      "manuscript_import_allowed": false,
+      "results_authorized": false
+    },
+    "C2": {
+      "audit_only": false,
+      "manuscript_import_allowed": false,
+      "results_authorized": false
+    }
+  },
+  "primary_result_sentences": [],
+  "results_authorized": false,
+  "robustness_results": {
+    "manuscript_import_allowed": false
+  },
+  "spatial_diagnostic_sentences": [],
+  "withheld_result_status": {
+    "cardiometabolic": "not_run_combined_diabetes_semantics_unapproved",
+    "copd": "withheld_pending_independent_review"
+  }
+}

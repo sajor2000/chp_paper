@@ -1,0 +1,57 @@
+[
+  {
+    "authorization": "Descriptive; results_authorized=false",
+    "display_id": "table_1",
+    "exact_value_location": "Table 1 cells and editable CSV",
+    "inference_boundary": "Not population prevalence or individual risk",
+    "observed_pattern": "The audit display reports four direct condition streams across Chicago community areas.",
+    "question": "What CHM community-area records are available?",
+    "sensitivity": "Annual quality in eFigure 2",
+    "uncertainty_not_run": "Suppression/missingness; no inferential interval",
+    "unit_denominator": "geographic-condition-year observations; not unique patients"
+  },
+  {
+    "authorization": "Descriptive; results_authorized=false",
+    "display_id": "figure_1",
+    "exact_value_location": "Figure 1 panels and eFigure 1 flow",
+    "inference_boundary": "Coverage is not representativeness",
+    "observed_pattern": "Coverage, suppression, capture, and reliability are shown.",
+    "question": "Where are CHM records available and qualified?",
+    "sensitivity": "Annual quality in eFigure 2",
+    "uncertainty_not_run": "No inferential interval; source states retained",
+    "unit_denominator": "geography-condition-year records"
+  },
+  {
+    "authorization": "Descriptive; results_authorized=false",
+    "display_id": "figure_2",
+    "exact_value_location": "Figure 2 panels; exact metrics in Table 2",
+    "inference_boundary": "Alignment is not validation or superiority",
+    "observed_pattern": "The audit display shows rank alignment and direct cross-frame classification differences.",
+    "question": "How do direct tract CHM ranks align across frames?",
+    "sensitivity": "Annual/noncrossing supplement",
+    "uncertainty_not_run": "Uncertainty-aware agreement not run if inputs are unavailable",
+    "unit_denominator": "eligible census tracts by condition"
+  },
+  {
+    "authorization": "Descriptive; results_authorized=false",
+    "display_id": "figure_3",
+    "exact_value_location": "Figure 3 panels and consequence CSV",
+    "inference_boundary": "Direct-frame differences are not causal aggregation effects",
+    "observed_pattern": "The audit display shows Q4 transitions, repeated source denominators, and stability checks.",
+    "question": "What classifications change under direct community-area linkage?",
+    "sensitivity": "Annual/noncrossing eFigures",
+    "uncertainty_not_run": "Classification intervals not run",
+    "unit_denominator": "eligible tracts and repeated source observations"
+  },
+  {
+    "authorization": "Descriptive; results_authorized=false",
+    "display_id": "table_2",
+    "exact_value_location": "Table 2 cells and editable CSV",
+    "inference_boundary": "No prevalence, causality, validation, or service-need claim",
+    "observed_pattern": "The audit display contains exact cross-condition measures with metric-specific denominators.",
+    "question": "What is the compact cross-condition evidence?",
+    "sensitivity": "Full diagnostics are supplementary",
+    "uncertainty_not_run": "Metric-specific uncertainty/not-run states are explicit",
+    "unit_denominator": "condition-specific eligible census tracts"
+  }
+]

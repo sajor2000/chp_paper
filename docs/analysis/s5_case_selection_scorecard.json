@@ -1,0 +1,155 @@
+{
+  "analysis_authorized": false,
+  "blocked_actions": [
+    "no outcome unblinding",
+    "no confirmatory modeling",
+    "no Results prose",
+    "no final analytic dataset",
+    "no combined marimo case-study notebook"
+  ],
+  "candidate_shells": [
+    {
+      "case_id": "cardiometabolic_bundle",
+      "component_conditions": [
+        "hypertension",
+        "diabetes"
+      ],
+      "display_name": "Cardiometabolic bundle",
+      "reconciled_score": null,
+      "score_status": "pending_two_blinded_scorers"
+    },
+    {
+      "case_id": "respiratory_copd",
+      "component_conditions": [
+        "copd"
+      ],
+      "display_name": "Respiratory COPD candidate",
+      "reconciled_score": null,
+      "score_status": "pending_two_blinded_scorers"
+    }
+  ],
+  "case_study_spatial_frame": {
+    "frame": "City of Chicago",
+    "primary_geography": "census tract",
+    "rule": "Restrict case-study analytic shapefiles and mapped outputs to City of Chicago geographies while preserving six-county source provenance.",
+    "secondary_geography": "Chicago community area"
+  },
+  "forbidden_information": [
+    "life-expectancy values",
+    "mortality values",
+    "outcome maps",
+    "outcome correlations",
+    "model results",
+    "outcome-linked residuals"
+  ],
+  "gate": "S5",
+  "outcome_blinded": true,
+  "portfolio_rules": [
+    {
+      "domain": "Cardiometabolic bundle",
+      "fixed_scoring_rule": "Hypertension and diabetes each pass and score \u226570; joint area-year usability \u226585%; predictor-only VIF <5",
+      "hard_gate": "All bundle rules pass",
+      "maximum_points": 0,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Component scores and predictor-only collinearity audit",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Portfolio and tie-break",
+      "fixed_scoring_rule": "Promote passing cardiometabolic bundle; second nonduplicative candidate score \u226570. Tie-break: phenotype score, community usability, comparator alignment, portfolio distinctiveness, written adjudication",
+      "hard_gate": "Outcome information never used",
+      "maximum_points": 0,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Original/reconciled scores, hashes, signatures",
+      "status": "PENDING S5"
+    }
+  ],
+  "record_type": "outcome_blinded_case_selection_scorecard_template",
+  "required_next_evidence": [
+    "two independent blinded scorer worksheets",
+    "original and reconciled scores",
+    "disagreement disposition",
+    "signed S5 portfolio decision"
+  ],
+  "results_authorized": false,
+  "scoring_domains": [
+    {
+      "domain": "Community-area usability",
+      "fixed_scoring_rule": "15 \u226598%; 12 for 95%-97.9%; 8 for 90%-94.9%; hard fail <90%",
+      "hard_gate": "\u226590% of 231 area-years usable and no year <85%",
+      "maximum_points": 15,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Outcome-blinded eligibility and suppression summary",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Tract usability/precision",
+      "fixed_scoring_rule": "15 \u226590%; 12 for 80%-89.9%; 8 for 70%-79.9%; 4 for 60%-69.9%; hard fail <60% unless community-area-only predeclared",
+      "hard_gate": "\u226560% or signed community-area-only declaration",
+      "maximum_points": 15,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Displayable-tract precision audit by year",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Predictor temporal stability",
+      "fixed_scoring_rule": "10 if median area rank correlation \u22650.80 and no discontinuity; 7 for 0.60-0.79; 3 below 0.60; 0 with unexplained discontinuity",
+      "hard_gate": "No unresolved system discontinuity",
+      "maximum_points": 10,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Predictor-only annual ranks and denominator diagnostics",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Phenotype interpretability",
+      "fixed_scoring_rule": "15 validated stable definition/exclusions; 10 stable diagnosis-only with documented sensitivity; 5 material coding ambiguity; hard fail unresolved",
+      "hard_gate": "Resolved numerator, denominator, phenotype, suppression",
+      "maximum_points": 15,
+      "narrative_sap_section": "\u00a76 and \u00a712",
+      "required_evidence": "Signed S4 semantic audit",
+      "status": "PENDING S4-S5"
+    },
+    {
+      "domain": "Comparator definition/period",
+      "fixed_scoring_rule": "15 aligned crude adult comparator at tract and community-area levels; 10 one level; 5 materially different but interpretable; 0 none",
+      "hard_gate": "Independent comparator or aligned supportive mortality construct",
+      "maximum_points": 15,
+      "narrative_sap_section": "\u00a712 and \u00a716",
+      "required_evidence": "Definition, universe, period, vintage matrix",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Evidence and novelty gap",
+      "fixed_scoring_rule": "15 direct rationale plus search-bounded gap; 10 supportive rationale/gap; 5 crowded literature with limited distinct contribution; 0 no rationale",
+      "hard_gate": "Defensible literature rationale",
+      "maximum_points": 15,
+      "narrative_sap_section": "\u00a712 and \u00a730",
+      "required_evidence": "Frozen evidence matrix independent of outcomes",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Translation questionability",
+      "fixed_scoring_rule": "10 concrete FQHC/CBO questions supported by semantics; 5 general public-health relevance; 0 only speculative action claims",
+      "hard_gate": "No unsupported intervention or outcome claim",
+      "maximum_points": 10,
+      "narrative_sap_section": "\u00a712 and \u00a724",
+      "required_evidence": "Question-formulation review",
+      "status": "PENDING S5"
+    },
+    {
+      "domain": "Distinct portfolio contribution",
+      "fixed_scoring_rule": "5 different phenotype/ascertainment/reliability lesson; 2 partial overlap; 0 duplication",
+      "hard_gate": "Nonduplicative promoted portfolio",
+      "maximum_points": 5,
+      "narrative_sap_section": "\u00a712",
+      "required_evidence": "Cross-candidate comparison",
+      "status": "PENDING S5"
+    }
+  ],
+  "source_scope": {
+    "clinical_source": "CAPriCORN seven-system diagnosis data",
+    "geographic_scope": "six-county Chicagoland",
+    "time_period": "2019-2024"
+  },
+  "status": "scorecard_template_ready"
+}

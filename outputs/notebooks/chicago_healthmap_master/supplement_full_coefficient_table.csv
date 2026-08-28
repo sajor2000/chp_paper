@@ -1,0 +1,7 @@
+model_id,term,role,estimate,standard_error,ci_low,ci_high,confidence_level,scale,unit,n,covariance_type,analysis_status,primary_estimand_executed,results_authorized
+C2,gamma_age65,adjustment,-0.843408430952,0.638750660949,-2.09533672151,0.40851985961,0.95,1 SD,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False
+C2,gamma_capture,adjustment,-0.483555524717,0.851514175861,-2.15249264173,1.1853815923,0.95,1 SD,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False
+C2,gamma_female,adjustment,-0.448686449807,0.833052484424,-2.08143931651,1.1840664169,0.95,1 SD,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False
+C2,gamma_poverty,adjustment,-1.83713125554,0.847722772052,-3.49863735764,-0.175625153447,0.95,1 SD,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False
+C2,beta_c,exposure,-2.60461893283,0.994898511076,-4.83458716924,-0.374650696412,0.975,1 frozen IQR,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False
+C2,alpha,intercept,77.281377037,0.370872462358,76.5544803679,78.0082737061,0.95,mean-centered anchor,life_expectancy_years,76,HC3,freeze_candidate_primary_model_unsecured,True,False

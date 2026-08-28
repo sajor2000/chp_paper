@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Statistical Analysis Plan"
+  short_description: "Build rigorous, reproducible SAP workbooks"
+  default_prompt: "Use $create-statistical-analysis-plan to create a rigorous statistical analysis plan and reference-pattern Excel workbook for this study."

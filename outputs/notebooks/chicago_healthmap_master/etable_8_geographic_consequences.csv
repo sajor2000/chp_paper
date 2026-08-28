@@ -1,0 +1,5 @@
+comparison_geography_type,condition_id,moves_into_highest_quartile,moves_out_of_highest_quartile,remains_below_highest_quartile,remains_high,mixed_coarser_areas,results_authorized
+chicago_community_area,copd,70,31,238,72,6,False
+chicago_community_area,hypertension,32,44,509,137,2,False
+zcta,copd,80,25,227,78,7,False
+zcta,hypertension,135,9,406,172,3,False

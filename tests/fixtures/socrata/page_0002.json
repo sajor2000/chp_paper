@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"area_numbe": "3", "community": "UPTOWN", "area_num_1": "3", "shape_area": "12", "shape_len": "7"},
+      "geometry": {"type": "MultiPolygon", "coordinates": [[[[-87.7, 41.8], [-87.6, 41.8], [-87.6, 41.7], [-87.7, 41.8]]]]}
+    }
+  ]
+}

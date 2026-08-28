@@ -1,0 +1,7 @@
+framework,item_id,requirement,planned_location,source_artifact,owner,status,verified_by,verified_date
+JAMA Health Forum,JHF-001,Original Investigation limits and submission elements,main manuscript and supplement,config/manuscript/jama_health_forum.yml,jama_style_qa_agent,not_assessed,,
+STROBE,STROBE-001,Observational design population variables bias and statistical methods,Methods and supplement,signed SAP,methods_reporting_agent,not_assessed,,
+RECORD,RECORD-001,Routinely collected health-data source linkage cleaning and validation details,Methods and supplement,source contracts and lineage,methods_reporting_agent,not_assessed,,
+STROBE-Equity,EQUITY-001,Equity-relevant categories rationale limitations and interpretation,Methods Discussion and supplement,equity review,discussion_policy_agent,not_assessed,,
+SAGER,SAGER-001,Sex and gender reporting rationale categories and limitations,Methods Results and supplement,analytic dataset dictionary,methods_reporting_agent,not_assessed,,
+JAMA Health Forum,JHF-CHM-001,Traceable claims displays denominators uncertainty and authorization state,Main displays and supplement,docs/analysis/chm_complementarity_evidence_ledger.md,science_reporting_agent,not_assessed,,

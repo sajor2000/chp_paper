@@ -1,0 +1,22 @@
+source_id: chicagohealthmap_website_methods
+organization: CONSCIENCE Project
+dataset_title: Chicago Health Map website methods capture
+transport: documented_export
+snapshot_date: "2026-07-13"
+snapshot_subdir: first_party/chicagohealthmap
+archive_count: 2
+member_count: 11
+unsafe_member_count: 0
+duplicate_content_count: 1
+archives:
+  - filename: f184b065-0187-4d80-a3cb-5ef6af9306c1.zip
+    sha256: b4b9fa02b4eb9f8105fbc49bdeca9293995b65d67ac186f1424dd2768b46659d
+  - filename: 8ae30d57-17e8-4d71-a503-ea7b82d90523.zip
+    sha256: a4b7cfc737e7767784ec942a2640c0f503d685119358263fc9b6f33638c5fcb3
+canonical_glossary:
+  member: 019f5daa-1fda-75df-b2c2-89792bc47700/chicagohealthmap.com_data-glossary.md
+  sha256: faf79c8a27e94b08aa22676407869a9da9ac6eb300f1f36c8ad7192b098adba4
+duplicate_glossary:
+  member: 019f5dab-4815-71bc-af99-2307a58d4b4b/chicagohealthmap.com_data-glossary.md
+  sha256: faf79c8a27e94b08aa22676407869a9da9ac6eb300f1f36c8ad7192b098adba4
+redistribution: Original archives and extracted bytes remain local and ignored.

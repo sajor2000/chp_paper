@@ -1,0 +1,2 @@
+analysis_id,analysis_name,estimand,unit,denominator,period,uncertainty,diagnostic_status,sensitivity_status,source_artifact,results_authorized,status,software_provenance
+A7,Local spatial structure,spatial scan cluster evidence,geography-level cluster,20536,governed scan inputs supplied by caller,scan-specific Monte-Carlo significance not run,not_run_no_governed_scan_population,supplement_feasibility_gate,governed_count_population_frame,False,not_run_no_governed_scan_population,no external scan backend invoked

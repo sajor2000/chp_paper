@@ -1,0 +1,14 @@
+[
+  {
+    "analysis_name": "Cardiometabolic joint analysis",
+    "authorization": false,
+    "narrative": "The prespecified C1 model was not run because mutual exclusivity and denominator equivalence for the 2 diabetes components remain unapproved. No coefficient, confidence interval, influence result, or residual diagnostic was estimated. No C1 coefficient should be interpreted as a primary result.",
+    "status": "not run; combined diabetes semantics unapproved"
+  },
+  {
+    "analysis_name": "COPD association analysis",
+    "authorization": false,
+    "narrative": "Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (97.5% CI, -4.83 to -0.37) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction. This is an area-level association among observed CAPriCORN adults, not an individual effect or a population-prevalence comparison.",
+    "status": "candidate estimate; not authorized for manuscript import"
+  }
+]

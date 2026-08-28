@@ -1,0 +1,5 @@
+condition_id,condition_priority,metric,raw_p,bh_p,comparator_family_id,multiplicity_denominator
+hypertension,1,spearman,2.50047576594e-251,5.00095153188e-251,tract_ehr_public_correlation_tests,4
+copd,3,spearman,5.26262887951e-77,7.01683850602e-77,tract_ehr_public_correlation_tests,4
+hypertension,1,pearson,2.30703606965e-257,9.22814427861e-257,tract_ehr_public_correlation_tests,4
+copd,3,pearson,3.90927862344e-68,3.90927862344e-68,tract_ehr_public_correlation_tests,4

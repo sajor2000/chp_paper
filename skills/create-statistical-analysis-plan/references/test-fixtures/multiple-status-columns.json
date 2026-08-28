@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "title": "Multiple status-column regression fixture",
+    "protocol ID": "TEST-SAP-001",
+    "version": "0.0.0-test",
+    "status": "PENDING APPROVAL"
+  },
+  "overview": [
+    {
+      "Analysis": "Regression fixture",
+      "Claim": "None",
+      "Unit of Analysis": "Test row",
+      "Data File(s)": "None",
+      "Analysis Question": "Are all status columns governed?",
+      "Primary Method": "Not applicable",
+      "Secondary Methods": "Not applicable",
+      "Site Script": "test"
+    }
+  ],
+  "outputs": [
+    {
+      "section": "TEST OUTPUTS",
+      "rows": [
+        {
+          "Output File": "test.txt",
+          "Subfolder": "test",
+          "Dataset / Cohort Scope": "Fixture",
+          "Script Section": "Test",
+          "Contents": "Regression evidence",
+          "Role at Coordinating Center": "Test",
+          "Interpretation": "Not a scientific output"
+        }
+      ]
+    }
+  ],
+  "variableNotes": [
+    "Regression fixture only.",
+    "No scientific content."
+  ],
+  "analysisColumns": [
+    "Primary"
+  ],
+  "variables": [
+    {
+      "Category": "Test",
+      "Variable": "test_id",
+      "Description": "Fixture identifier",
+      "Type": "String",
+      "Format / Values": "Unique",
+      "File": "None",
+      "Primary": "Yes",
+      "Notes / Resolved Decisions": "Regression fixture"
+    }
+  ],
+  "annexes": [
+    {
+      "name": "Protocol",
+      "title": "Multiple Status Columns",
+      "note": "Both status columns require validation and vocabulary enforcement.",
+      "columns": [
+        "Item",
+        "Review Status",
+        "Approval Status"
+      ],
+      "rows": [
+        {
+          "Item": "Fixture row",
+          "Review Status": "Open",
+          "Approval Status": "Blocked"
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "requiredAnnexes": [
+      "Protocol"
+    ],
+    "statusValues": [
+      "Blocked",
+      "Open"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "cardiometabolic": "The C1 analysis was not run because combined diabetes semantics remain unapproved.",
+  "copd": "The C2 estimate is not authorized for coauthor or manuscript import.",
+  "copd_sensitivity": "Numeric sensitivity results remain restricted to the statistician-review package.",
+  "inference_boundary": "Interpret as ecological complementarity; do not infer prevalence, causality, validation, underdiagnosis, access failure, service need, or individual risk.",
+  "resource": "Numeric resource results remain restricted to the statistician-review package.",
+  "results_authorized": false,
+  "tract_complementarity": "Numeric geographic results remain restricted to the statistician-review package."
+}

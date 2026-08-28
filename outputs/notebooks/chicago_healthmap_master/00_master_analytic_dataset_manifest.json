@@ -1,0 +1,69 @@
+{
+  "analysis_authority": "human_approved_s5_s6_unless_catastrophic_blocker",
+  "annual_tract_minimum_denominator": 30,
+  "case_ids": [
+    "cardiometabolic_bundle",
+    "respiratory_copd"
+  ],
+  "checksums": {
+    "00_master_analytic_dataset.csv": "dc59dd5cef6a0671046b7666264084b8e4840165da67fee1e4b19091c4971dcf",
+    "00_master_analytic_dataset.parquet": "373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916",
+    "00_master_analytic_dataset.schema.json": "6d8ba8d44ecf274b4a1e1e1840f10909e2f28525d6be5f8d066cd7eb278fbbb0",
+    "00_master_analytic_dataset_data_book.csv": "b9471ca215cca401acc5c2aec5ba51263490fc170c1ce71dfb99fdf498f6ead1",
+    "00_master_analytic_dataset_data_book.html": "fa42a61b661061f4081f63066086d7e2504c32d68beb56fb7f4309f3c3d19e45",
+    "00_master_analytic_dataset_lineage.csv": "b11019851ccc235f71242d2ecc56bf738b7ee7d4f5f5eebbf9b7b145353df511",
+    "00_master_analytic_dataset_source_join_manifest.json": "2d3be6ae67d76cbbfe02dcfcaa0311e6cd4dfa46d5d153ffe4ec94a7a17fb959",
+    "census_acs_2024_community_area_covariates.parquet": "295eb9864edf07040b0e011636b7b583d52ced9ef9bb458f0868bac515c006ee"
+  },
+  "city_inclusion_rule": "Community-area rows use the direct 77-area ChicagoHealthMap export; tract rows are limited to direct first-party tract disease rows whose 2024 TIGER tract representative point is covered by the frozen union of 77 Chicago community areas. The 50% tract-area rule is retained as a sensitivity definition.",
+  "clinical_value_rule": "Disease numerators, denominators, and published measures are direct ChicagoHealthMap/CAPriCORN first-party export values. The tract-community overlay is linkage metadata only and is not used to create disease values.",
+  "condition_ids": [
+    "copd",
+    "diabetes_with_complication",
+    "diabetes_without_complication",
+    "hypertension"
+  ],
+  "created_at_utc": "2026-05-27T00:00:00+00:00",
+  "created_at_utc_semantics": "deterministic_source_snapshot_time_not_wall_clock_build_time",
+  "dataset_id": "00_master_analytic_dataset",
+  "geography_levels": [
+    "census_tract",
+    "chicago_community_area"
+  ],
+  "grain": "geography_type-geography_id-period-condition",
+  "manifest_schema_version": 2,
+  "primary_key": [
+    "geography_type",
+    "geography_id",
+    "time_period",
+    "condition_id"
+  ],
+  "raw_data_contract": {
+    "contract_version": 1,
+    "higher_geography_estimand_authorized": false,
+    "primary_tract_contract_passed": true,
+    "status": "primary_tract_contract_passed",
+    "unresolved_signoff_items": [
+      "zero_count",
+      "missing_row",
+      "positive_count_below_10",
+      "community_area_weighting",
+      "zcta_weighting",
+      "capture_rate",
+      "annual_tract_eligibility",
+      "diabetes_combination"
+    ]
+  },
+  "results_authorized": false,
+  "row_count": 20536,
+  "source_manifest_validation_status": "passed",
+  "source_snapshot_at_utc": "2026-05-27T00:00:00+00:00",
+  "source_snapshot_id": "capricorn_chicagohealthmap_export_2026_05_27_2026-05-27",
+  "suppression_rule": "ChicagoHealthMap glossary: counts fewer than 10 are suppressed.",
+  "tract_boundary_audit": {
+    "any_intersection_tracts": 867,
+    "area50_sensitivity_tracts": 779,
+    "primary_and_area50_tracts": 777,
+    "primary_representative_point_tracts": 782
+  }
+}

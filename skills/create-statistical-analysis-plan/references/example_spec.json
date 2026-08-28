@@ -1,0 +1,31 @@
+{
+  "metadata": {"title":"Example Statistical Analysis Plan","protocolId":"EX-SAP-001","version":"0.1-draft","status":"PENDING APPROVAL"},
+  "overview": [
+    {"Analysis":"Primary analysis","Claim":"Association","Unit of Analysis":"Participant","Data File(s)":"analysis_dataset","Analysis Question":"What prespecified association is being estimated?","Primary Method":"Specify estimator and 95% CI","Secondary Methods":"Specify supporting analyses","Site Script":"01_primary"}
+  ],
+  "outputs": [{"section":"PRIMARY OUTPUTS","rows":[
+    {"Output File":"Table 1","Subfolder":"tables","Dataset / Cohort Scope":"Primary population","Script Section":"Descriptive","Contents":"Population characteristics and flow","Role at Coordinating Center":"Manuscript table","Interpretation":"Descriptive only"},
+    {"Output File":"Table 2","Subfolder":"tables","Dataset / Cohort Scope":"Primary analytic population","Script Section":"Primary model","Contents":"Estimand, estimate, 95% CI, and diagnostics","Role at Coordinating Center":"Primary results","Interpretation":"Use design-appropriate language"}
+  ]}],
+  "variableNotes":["Use one row per atomic variable and retain the source universe, unit, and provenance.","Replace every PENDING item before the analysis freeze or record why it is not applicable."],
+  "analysisColumns":["Primary","Secondary"],
+  "variables":[
+    {"Category":"Identifier","Variable":"record_id","Description":"Nonidentifying analytic record key","Type":"String","Format / Values":"Unique","File":"analysis_dataset","Primary":"Yes","Secondary":"Yes","Notes / Resolved Decisions":"Confirm uniqueness"},
+    {"Category":"Outcome","Variable":"outcome","Description":"Prespecified outcome definition","Type":"PENDING","Format / Values":"PENDING","File":"analysis_dataset","Primary":"Outcome","Secondary":"Outcome","Notes / Resolved Decisions":"Owner and freeze gate required"}
+  ],
+  "annexes":[
+    {"name":"Protocol","title":"Protocol and Scope","note":"Replace example text with approved study decisions.","columns":["Field","Decision","Status","Owner","Evidence / Source"],"rows":[{"Field":"Design","Decision":"PENDING","Status":"Open","Owner":"Scientific lead","Evidence / Source":"Protocol"}]},
+    {"name":"Estimands","title":"Estimands","note":"Make each component explicit.","columns":["ID","Population / Unit","Exposure Contrast","Outcome","Summary / Method","Allowed Interpretation","Status"],"rows":[{"ID":"E1","Population / Unit":"PENDING","Exposure Contrast":"PENDING","Outcome":"PENDING","Summary / Method":"PENDING","Allowed Interpretation":"PENDING","Status":"Open"}]},
+    {"name":"Measure Semantics","title":"Measure Semantics","note":"Resolve numerator, denominator, coding, missingness, and timing.","columns":["Domain","Question / Requirement","Current Rule","Pass Evidence","Failure Consequence","Status"],"rows":[{"Domain":"Outcome","Question / Requirement":"Definition and ascertainment","Current Rule":"PENDING","Pass Evidence":"Signed definition","Failure Consequence":"Analysis blocked","Status":"Open"}]},
+    {"name":"Analysis Methods","title":"Analysis Methods","note":"Freeze before outcome-guided selection.","columns":["Component","Primary Decision","Diagnostic / Gate","Escalation","Reporting"],"rows":[{"Component":"Estimator","Primary Decision":"PENDING","Diagnostic / Gate":"PENDING","Escalation":"PENDING","Reporting":"Estimate and 95% CI"}]},
+    {"name":"Sensitivity Analyses","title":"Sensitivity Analyses","note":"Challenge assumptions without replacing the primary analysis by convenience.","columns":["Family","Analysis","Trigger / Population","Decision Rule","Interpretation"],"rows":[{"Family":"Missing data","Analysis":"PENDING","Trigger / Population":"PENDING","Decision Rule":"PENDING","Interpretation":"Assumption sensitivity"}]},
+    {"name":"Reporting Checklist","title":"Reporting Checklist","note":"Use live official sources.","columns":["Framework","Requirement","Planned Location","Evidence / URL","Status"],"rows":[{"Framework":"Target journal","Requirement":"PENDING","Planned Location":"Submission checklist","Evidence / URL":"PENDING","Status":"Open"}]},
+    {"name":"Decision Log","title":"Decision Log","note":"Append; never overwrite history.","columns":["Decision ID","Date","Decision","Rationale / Evidence","Owner / Approver","Affected Artifacts","Gate / Freeze"],"rows":[{"Decision ID":"D-001","Date":"PENDING","Decision":"Initialize SAP","Rationale / Evidence":"Protocol","Owner / Approver":"PENDING","Affected Artifacts":"All","Gate / Freeze":"Draft"}]},
+    {"name":"Deviation Log","title":"Deviation Log","note":"Record all post-freeze departures.","columns":["Deviation ID","Date","Original Rule","Actual Change","Reason","Outcome Knowledge","Impact Assessment","Approver"],"rows":[{"Deviation ID":"None","Date":"PENDING","Original Rule":"Not applicable","Actual Change":"No deviations recorded","Reason":"Draft","Outcome Knowledge":"PENDING","Impact Assessment":"None","Approver":"PENDING"}]},
+    {"name":"Freeze Gates","title":"Freeze Gates","note":"Authorization requires signed evidence.","columns":["Gate","Required Evidence","Authorization After Pass","Current Status","Approver"],"rows":[{"Gate":"SAP freeze","Required Evidence":"Complete approved SAP","Authorization After Pass":"Primary analysis","Current Status":"NOT PASSED","Approver":"PENDING"}]}
+  ],
+  "validation":{
+    "requiredAnnexes":["Protocol","Estimands","Measure Semantics","Analysis Methods","Sensitivity Analyses","Reporting Checklist","Decision Log","Deviation Log","Freeze Gates"],
+    "statusValues":["Fixed","Required","Open","Pending","NOT PASSED","Not applicable"]
+  }
+}

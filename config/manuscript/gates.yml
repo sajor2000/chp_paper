@@ -1,0 +1,33 @@
+gates:
+  M0:
+    requires: []
+    artifacts: [journal contract, style contract, agent contract, gate contract]
+    acceptance: [Contracts validate and the journal audit is dated]
+  M1:
+    requires: [S4, S5, S6, S7]
+    artifacts: [analytic dataset, study manifest, frozen outputs, checksums]
+    acceptance: [Every primary number has a frozen artifact ID]
+  M2:
+    requires: [S4]
+    artifacts: [evidence matrix, Paperclip claim repository, novelty update search]
+    acceptance: [Every material non-result claim is verified or labeled a gap]
+  M3:
+    requires: [M0, M1, M2]
+    artifacts: [outline, case packets, disclosure inputs]
+    acceptance: [Methods and Results shells have matching order]
+  M4:
+    requires: [M3]
+    artifacts: [section packets, number ledger, claim ledger, deviation log]
+    acceptance: [Integrated draft has no duplicated or inconsistent claim]
+  M5:
+    requires: [M4, S7, S8]
+    artifacts: [numerical review, traceability review, privacy and equity review]
+    acceptance: [Independent QA has no unresolved critical or important issue]
+  M6:
+    requires: [M5]
+    artifacts: [live journal recheck, reporting matrices, disclosure package]
+    acceptance: [Submission package passes the complete JAMA audit]
+  M7:
+    requires: [M6]
+    artifacts: [author approvals, closed issue log]
+    acceptance: [Named human authors authorize submission]

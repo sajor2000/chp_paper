@@ -1,0 +1,6 @@
+*.html linguist-generated=true whitespace=-trailing-space
+*.md whitespace=-trailing-space,-blank-at-eof
+*.Rmd whitespace=-trailing-space
+*.csv.gz binary
+*.pdf binary
+*.png binary

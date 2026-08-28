@@ -1,0 +1,6 @@
+interface:
+  display_name: "Write JAMA Health Forum Manuscript"
+  short_description: "Audit and draft JAMA Health Forum manuscripts"
+  default_prompt: "Use $write-jama-health-forum-manuscript to audit, draft, or revise this manuscript for JAMA Health Forum."
+policy:
+  allow_implicit_invocation: true

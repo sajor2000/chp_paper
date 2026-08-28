@@ -1,0 +1,298 @@
+{
+  "main_manuscript": [
+    {
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 1,
+      "id": "table_1"
+    },
+    {
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 2,
+      "id": "figure_1"
+    },
+    {
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 3,
+      "id": "figure_2"
+    },
+    {
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 4,
+      "id": "figure_3"
+    },
+    {
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 5,
+      "id": "table_2"
+    }
+  ],
+  "supplementary": [
+    {
+      "artifact": "supplement_source_assembly_flow.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 1,
+      "id": "eFigure 1",
+      "rationale": "Designated manuscript supplement",
+      "title": "Source assembly and analytic-frame flow"
+    },
+    {
+      "artifact": "supplement_annual_data_quality.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 2,
+      "id": "eFigure 2",
+      "rationale": "Designated manuscript supplement",
+      "title": "Annual CHM coverage and data quality"
+    },
+    {
+      "artifact": "supplement_cardiometabolic_resolution.pdf",
+      "authorization_requirement": "none",
+      "citable_status": "reserve",
+      "display_role": "manuscript_candidate",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "reserve",
+      "first_mention_order": 3,
+      "id": "eFigure 3",
+      "rationale": "Reserve supplementary evidence",
+      "title": "Cardiometabolic geographic-resolution sensitivity"
+    },
+    {
+      "artifact": "supplement_cardiometabolic_agreement.pdf",
+      "authorization_requirement": "none",
+      "citable_status": "reserve",
+      "display_role": "manuscript_candidate",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "reserve",
+      "first_mention_order": 4,
+      "id": "eFigure 4",
+      "rationale": "Reserve supplementary evidence",
+      "title": "Cardiometabolic CHM\u2013PLACES agreement"
+    },
+    {
+      "artifact": "supplement_cardiometabolic_spatial.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 5,
+      "id": "eFigure 5",
+      "rationale": "Designated manuscript supplement",
+      "title": "Cardiometabolic spatial diagnostics"
+    },
+    {
+      "artifact": "supplement_cardiometabolic_collinearity.pdf",
+      "authorization_requirement": "none",
+      "citable_status": "qc_only",
+      "display_role": "qc_only",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "qc_only",
+      "first_mention_order": 6,
+      "id": "eFigure 6",
+      "rationale": "Quality-control diagnostic",
+      "title": "Cardiometabolic collinearity diagnostics"
+    },
+    {
+      "artifact": "supplement_coefficient_forest.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "manuscript_candidate",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "not_citable_pending_authorization",
+      "first_mention_order": 7,
+      "id": "eFigure 7",
+      "rationale": "Model evidence requires results authorization",
+      "title": "COPD coefficient forest"
+    },
+    {
+      "artifact": "supplement_model_diagnostics.pdf",
+      "authorization_requirement": "none",
+      "citable_status": "qc_only",
+      "display_role": "qc_only",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "qc_only",
+      "first_mention_order": 8,
+      "id": "eFigure 8",
+      "rationale": "Quality-control diagnostic",
+      "title": "COPD model diagnostics"
+    },
+    {
+      "artifact": "supplement_model_robustness.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "not_citable_pending_authorization",
+      "first_mention_order": 9,
+      "id": "eFigure 9",
+      "rationale": "Model evidence requires results authorization",
+      "title": "COPD robustness analyses"
+    },
+    {
+      "artifact": "supplement_spatial_sensitivity.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "not_citable_pending_authorization",
+      "first_mention_order": 10,
+      "id": "eFigure 10",
+      "rationale": "Model evidence requires results authorization",
+      "title": "COPD spatial sensitivity"
+    },
+    {
+      "artifact": "supplement_geographic_consequences.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "manuscript_candidate",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 11,
+      "id": "eFigure 11",
+      "rationale": "Designated manuscript supplement",
+      "title": "Geographic consequence and ZCTA sensitivity"
+    },
+    {
+      "artifact": "supplement_fdr_spatial_survival.pdf",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 12,
+      "id": "eFigure 12",
+      "rationale": "Designated manuscript supplement",
+      "title": "FDR-controlled spatial survival"
+    },
+    {
+      "artifact": "etable_1_resource_quality.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 13,
+      "id": "eTable 1",
+      "rationale": "Designated manuscript supplement",
+      "title": "Full CHM resource-quality and tract accounting"
+    },
+    {
+      "artifact": "etable_2_model_readiness_sensitivities.html",
+      "authorization_requirement": "none",
+      "citable_status": "qc_only",
+      "display_role": "qc_only",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "qc_only",
+      "first_mention_order": 14,
+      "id": "eTable 2",
+      "rationale": "Quality-control diagnostic",
+      "title": "Full model-readiness and sensitivity audit"
+    },
+    {
+      "artifact": "supplement_full_coefficient_table.html",
+      "authorization_requirement": "none",
+      "citable_status": "qc_only",
+      "display_role": "qc_only",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "qc_only",
+      "first_mention_order": 15,
+      "id": "eTable 3",
+      "rationale": "Quality-control diagnostic",
+      "title": "Full alpha, beta, and gamma coefficients"
+    },
+    {
+      "artifact": "etable_4_robustness_summary.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "not_citable_pending_authorization",
+      "first_mention_order": 16,
+      "id": "eTable 4",
+      "rationale": "Model evidence requires results authorization",
+      "title": "Robustness and alternative spatial weights"
+    },
+    {
+      "artifact": "etable_5_tract_complementarity.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 17,
+      "id": "eTable 5",
+      "rationale": "Designated manuscript supplement",
+      "title": "Tract concordance and heterogeneity"
+    },
+    {
+      "artifact": "etable_6_geographic_resolution.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "manuscript_candidate",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 18,
+      "id": "eTable 6",
+      "rationale": "Designated manuscript supplement",
+      "title": "Geographic-resolution sensitivity"
+    },
+    {
+      "artifact": "etable_7_descriptive_complementarity_methods.html",
+      "authorization_requirement": "none",
+      "citable_status": "qc_only",
+      "display_role": "qc_only",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "qc_only",
+      "first_mention_order": 19,
+      "id": "eTable 7",
+      "rationale": "Quality-control diagnostic",
+      "title": "Descriptive complementarity methods"
+    },
+    {
+      "artifact": "etable_8_geographic_consequences.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 20,
+      "id": "eTable 8",
+      "rationale": "Designated manuscript supplement",
+      "title": "Highest-quartile direct cross-frame classification differences"
+    },
+    {
+      "artifact": "etable_9_uncertainty_feasibility.html",
+      "authorization_requirement": "results_authorized=true",
+      "citable_status": "not_citable_pending_authorization",
+      "display_role": "supplement",
+      "duplicate_main_evidence": false,
+      "editorial_placement": "submitted",
+      "first_mention_order": 21,
+      "id": "eTable 9",
+      "rationale": "Designated manuscript supplement",
+      "title": "Uncertainty-aware agreement feasibility"
+    }
+  ]
+}

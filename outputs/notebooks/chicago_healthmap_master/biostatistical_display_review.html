@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+</head>
+<body>
+<div id="biostatistical_display_review" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#biostatistical_display_review table {
+          font-family: Arial, Helvetica, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#biostatistical_display_review thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#biostatistical_display_review p { margin: 0; padding: 0; }
+ #biostatistical_display_review .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 12px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #biostatistical_display_review .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #biostatistical_display_review .gt_title { color: #333333; font-size: 14px; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #biostatistical_display_review .gt_subtitle { color: #333333; font-size: 11px; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #biostatistical_display_review .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #biostatistical_display_review .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #biostatistical_display_review .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #biostatistical_display_review .gt_col_heading { color: #333333; background-color: #E8EEF5; font-size: 100%; font-weight: bold; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #biostatistical_display_review .gt_column_spanner_outer { color: #333333; background-color: #E8EEF5; font-size: 100%; font-weight: bold; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #biostatistical_display_review .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #biostatistical_display_review .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #biostatistical_display_review .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #biostatistical_display_review .gt_spanner_row { border-bottom-style: hidden; }
+ #biostatistical_display_review .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #F5F7FA; font-size: 100%; font-weight: bold; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #biostatistical_display_review .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #F5F7FA; font-size: 100%; font-weight: bold; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #biostatistical_display_review .gt_from_md> :first-child { margin-top: 0; }
+ #biostatistical_display_review .gt_from_md> :last-child { margin-bottom: 0; }
+ #biostatistical_display_review .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D9E2EC; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #biostatistical_display_review .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #biostatistical_display_review .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #biostatistical_display_review .gt_row_group_first td { border-top-width: 2px; }
+ #biostatistical_display_review .gt_row_group_first th { border-top-width: 2px; }
+ #biostatistical_display_review .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #biostatistical_display_review .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #biostatistical_display_review .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #biostatistical_display_review .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #biostatistical_display_review .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #biostatistical_display_review .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #biostatistical_display_review .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #biostatistical_display_review .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #biostatistical_display_review .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #biostatistical_display_review .gt_sourcenote { font-size: 10px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #biostatistical_display_review .gt_left { text-align: left; }
+ #biostatistical_display_review .gt_center { text-align: center; }
+ #biostatistical_display_review .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #biostatistical_display_review .gt_font_normal { font-weight: normal; }
+ #biostatistical_display_review .gt_font_bold { font-weight: bold; }
+ #biostatistical_display_review .gt_font_italic { font-style: italic; }
+ #biostatistical_display_review .gt_super { font-size: 65%; }
+ #biostatistical_display_review .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #biostatistical_display_review .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #biostatistical_display_review .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #biostatistical_display_review .gt_sourcenote { font-size: 10px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #biostatistical_display_review .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #biostatistical_display_review .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="4" class="gt_heading gt_title gt_font_normal">Biostatistical review matrix for every table and figure</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Aggregate result, interpretation limit, and required supplement or decision</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="biostatistical_display_review-Display">Display</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="biostatistical_display_review-Review-result">Review result</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="biostatistical_display_review-Main-limitation">Main limitation</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="biostatistical_display_review-Needed-supplement-or-decision">Needed supplement or decision</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td class="gt_row gt_left">Table 1</td>
+    <td class="gt_row gt_left">The community-area resource contained 1,848 condition-year records; 1,843 (99.7%) were eligible and 5 were suppressed.</td>
+    <td class="gt_row gt_left">Records are not unique patients; reliability and denominator semantics are unresolved.</td>
+    <td class="gt_row gt_left">Obtain source eligibility, deduplication, denominator, and reliability rules.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">Figure 1</td>
+    <td class="gt_row gt_left">The mapped resource included 782 primary-boundary tracts and 77 community areas. Across tract condition-year records, 16,669 of 18,688 were eligible and 2,015 were suppressed.</td>
+    <td class="gt_row gt_left">Capture is metadata, not a sampling probability; suppression varies by condition.</td>
+    <td class="gt_row gt_left">Add the governed capture definition and a patient-deduplicated flow if available.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">Figure 2</td>
+    <td class="gt_row gt_left">Direct tract and linked community-area quartiles disagreed for 255 of 722 hypertension tracts (35.3%) and 206 of 411 COPD tracts (50.1%). Within-community variation accounted for 0.195 of observed tract variation in hypertension and 0.469 in COPD. In the secondary cross-source analysis, Spearman rho was 0.880 for hypertension and 0.739 for COPD.</td>
+    <td class="gt_row gt_left">PLACES is not a truth standard; metric-specific samples differ; tracts cluster within areas.</td>
+    <td class="gt_row gt_left">Approve 1000 cluster-bootstrap replicates, tie rules, and compatible source-uncertainty analysis.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">Figure 3</td>
+    <td class="gt_row gt_left">Community-area labels moved 76 hypertension tracts and 101 COPD tracts into or out of Q4. Annual Q4 Jaccard overlap ranged from 60.5% to 73.1% for hypertension and 41.1% to 49.2% for COPD.</td>
+    <td class="gt_row gt_left">Q4 movement, Jaccard overlap, and noncrossing disagreement are different estimands.</td>
+    <td class="gt_row gt_left">Prespecify the claim-supporting stability metric and add unique-person denominators if available.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">Table 2</td>
+    <td class="gt_row gt_left">For hypertension, exact tract/community quartile agreement was 467 of 722 tracts (64.7%), the within-community variance share was 0.195, and 76 of 722 tracts (10.5%) moved into or out of Q4. Corresponding COPD estimates were 205 of 411 (49.9%), 0.469, and 101 of 411 (24.6%).</td>
+    <td class="gt_row gt_left">The metrics measure different constructs and cannot be ranked on one accuracy scale.</td>
+    <td class="gt_row gt_left">Add approved cluster-bootstrap intervals and retain metric-specific denominators.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 1</td>
+    <td class="gt_row gt_left">Full resource-quality and tract accounting behind Table 1.</td>
+    <td class="gt_row gt_left">Geography-condition-year accounting does not establish representativeness.</td>
+    <td class="gt_row gt_left">Document source population, reliability rule, and unique-patient denominator.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 2</td>
+    <td class="gt_row gt_left">The prespecified C1 model was not run because mutual exclusivity and denominator equivalence for the 2 diabetes components remain unapproved. No coefficient, confidence interval, influence result, or residual diagnostic was estimated. Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (97.5% CI, -4.83 to -0.37) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction.</td>
+    <td class="gt_row gt_left">C1 failed its gate; C2 has 76 areas and residual spatial dependence.</td>
+    <td class="gt_row gt_left">Approve estimand status, critical values, weights, and spatial sensitivity.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 3</td>
+    <td class="gt_row gt_left">All C2 exposure, adjustment, and intercept coefficients with HC3 intervals.</td>
+    <td class="gt_row gt_left">Adjustment coefficients are not etiologic effects and share one small ecological sample.</td>
+    <td class="gt_row gt_left">Review coding, scaling, covariance choice, and coefficient correlation.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 4</td>
+    <td class="gt_row gt_left">Temporal, weighting, capture, influence, and spatial-weight sensitivity estimates.</td>
+    <td class="gt_row gt_left">Variants are supportive and were not designed as separate confirmatory tests.</td>
+    <td class="gt_row gt_left">Approve the fragility thresholds and identify the sensitivity analyses required in the paper.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 5</td>
+    <td class="gt_row gt_left">Direct tract and linked community-area quartiles disagreed for 255 of 722 hypertension tracts (35.3%) and 206 of 411 COPD tracts (50.1%). Within-community variation accounted for 0.195 of observed tract variation in hypertension and 0.469 in COPD. In the secondary cross-source analysis, Spearman rho was 0.880 for hypertension and 0.739 for COPD.</td>
+    <td class="gt_row gt_left">Agreement depends on rank ties, categories, clustering, and source role.</td>
+    <td class="gt_row gt_left">Approve kappa weights, AC1 categories, tie rules, and production bootstrap count.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 6</td>
+    <td class="gt_row gt_left">Community-area labels moved 76 hypertension tracts and 101 COPD tracts into or out of Q4. Annual Q4 Jaccard overlap ranged from 60.5% to 73.1% for hypertension and 41.1% to 49.2% for COPD.</td>
+    <td class="gt_row gt_left">Linked area values are direct measures, not literal aggregations of tract values.</td>
+    <td class="gt_row gt_left">Add an explicitly population-weighted aggregation experiment only if a valid crosswalk estimand is approved.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 7</td>
+    <td class="gt_row gt_left">Estimator, uncertainty, availability, and governance status for A1 through A7.</td>
+    <td class="gt_row gt_left">A methods-status table cannot resolve open statistical choices.</td>
+    <td class="gt_row gt_left">Sign the VPC, AUC, bootstrap, agreement, and spatial decision rows.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 8</td>
+    <td class="gt_row gt_left">Condition-specific Q4 transitions and represented mean annual source denominators.</td>
+    <td class="gt_row gt_left">Source denominators are repeated records rather than unique people.</td>
+    <td class="gt_row gt_left">Add deduplicated denominators or retain the current source-record label.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eTable 9</td>
+    <td class="gt_row gt_left">Uncertainty-aware agreement ran only where compatible uncertainty inputs existed.</td>
+    <td class="gt_row gt_left">Missing CHM and comparator uncertainty prevents joint error propagation.</td>
+    <td class="gt_row gt_left">Obtain standard errors, replicate weights, or validated uncertainty bounds from both sources.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 1</td>
+    <td class="gt_row gt_left">Source assembly, joins, exclusions, and analytic-frame counts.</td>
+    <td class="gt_row gt_left">Counts mix records and areas and are not patient attrition.</td>
+    <td class="gt_row gt_left">Add a unique-patient flow only if governed identifiers permit deduplication.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 2</td>
+    <td class="gt_row gt_left">Annual availability, suppression, denominator, and capture patterns.</td>
+    <td class="gt_row gt_left">Annual changes may reflect source operations or denominator definitions.</td>
+    <td class="gt_row gt_left">Annotate source-policy changes and verify denominator semantics by year.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 3</td>
+    <td class="gt_row gt_left">Cardiometabolic quartile, VPC, and AUC review outputs; diabetes remains not run.</td>
+    <td class="gt_row gt_left">AUC is area-label separation, not disease prediction; VPC is an observed-scale descriptive partition.</td>
+    <td class="gt_row gt_left">Approve the VPC estimator, AUC construct, and combined-diabetes semantics.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 4</td>
+    <td class="gt_row gt_left">Direct tract and linked community-area quartiles disagreed for 255 of 722 hypertension tracts (35.3%) and 206 of 411 COPD tracts (50.1%). Within-community variation accounted for 0.195 of observed tract variation in hypertension and 0.469 in COPD. In the secondary cross-source analysis, Spearman rho was 0.880 for hypertension and 0.739 for COPD.</td>
+    <td class="gt_row gt_left">Cross-source agreement lacks joint source-uncertainty propagation.</td>
+    <td class="gt_row gt_left">Add approved cluster intervals and source-uncertainty analysis when inputs exist.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 5</td>
+    <td class="gt_row gt_left">Local Moran I and Getis-Ord Gi* counts before and after FDR control.</td>
+    <td class="gt_row gt_left">Findings depend on topology, permutation count, and FDR family.</td>
+    <td class="gt_row gt_left">Approve weights, 9999 permutations, local statistics, and family boundaries.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 6</td>
+    <td class="gt_row gt_left">The prespecified C1 model was not run because mutual exclusivity and denominator equivalence for the 2 diabetes components remain unapproved. No coefficient, confidence interval, influence result, or residual diagnostic was estimated.</td>
+    <td class="gt_row gt_left">No C1 analytic population exists while combined-diabetes semantics remain unapproved.</td>
+    <td class="gt_row gt_left">Document mutual exclusivity and denominator equivalence before any C1 fit.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 7</td>
+    <td class="gt_row gt_left">Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (97.5% CI, -4.83 to -0.37) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction.</td>
+    <td class="gt_row gt_left">Ecological coefficients are noncausal and CIs omit source-measurement error.</td>
+    <td class="gt_row gt_left">Approve z vs t critical values and inspect the full covariance and diagnostics.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 8</td>
+    <td class="gt_row gt_left">C2 residual, Q-Q, leverage, and Cook-distance diagnostics for 76 areas.</td>
+    <td class="gt_row gt_left">Graphical diagnostics have limited power in a small spatial sample.</td>
+    <td class="gt_row gt_left">Review flagged areas, residual shape, and influence thresholds with leave-one-area-out results.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 9</td>
+    <td class="gt_row gt_left">C2 temporal, weighting, capture, and influence sensitivity estimates.</td>
+    <td class="gt_row gt_left">Sensitivity variants do not eliminate ecological or selection bias.</td>
+    <td class="gt_row gt_left">Identify the prespecified minimum set for the final supplement.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 10</td>
+    <td class="gt_row gt_left">Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (97.5% CI, -4.83 to -0.37) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction.</td>
+    <td class="gt_row gt_left">The spatial-error fit uses one primary topology and a bounded maximum-likelihood estimate of lambda.</td>
+    <td class="gt_row gt_left">Approve queen, rook, and connected-distance weights plus the spatial-error estimator.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 11</td>
+    <td class="gt_row gt_left">Community-area labels moved 76 hypertension tracts and 101 COPD tracts into or out of Q4. Annual Q4 Jaccard overlap ranged from 60.5% to 73.1% for hypertension and 41.1% to 49.2% for COPD.</td>
+    <td class="gt_row gt_left">ZCTAs are Census statistical areas, not USPS ZIP Codes; cross-frame values are direct.</td>
+    <td class="gt_row gt_left">Retain community-area and ZCTA results as separate sensitivities and document crosswalk rules.</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">eFigure 12</td>
+    <td class="gt_row gt_left">Counts of local spatial signals before and after BH-FDR.</td>
+    <td class="gt_row gt_left">FDR control is conditional on declared families and does not prove cluster reproducibility.</td>
+    <td class="gt_row gt_left">Approve family definitions and repeat under alternative spatial weights.</td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

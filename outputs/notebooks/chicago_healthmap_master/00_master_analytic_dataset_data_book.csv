@@ -1,0 +1,98 @@
+column,dtype,nullable,non_missing_count,missing_count,source_table,source_position,audit_note
+source_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+snapshot_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_table,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_record_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_type,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+geography_level_role,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+source_geography_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_id,object,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_name,object,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+community_area_id,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+community_area_ids,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+community_area_weights_json,object,True,18688,1848,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+max_community_area_weight,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+covered_fraction,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+is_crossing_tract,bool,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+is_sliver,bool,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+overlay_row_count,int64,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+tract_community_linkage_source_id,object,True,18688,1848,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+tract_community_linkage_snapshot_id,object,True,18688,1848,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+community_area_boundary_source_id,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+community_area_boundary_snapshot_id,object,True,18688,1848,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+tract_community_linkage_method,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+tract_community_linkage_role,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+linkage_method,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+linkage_role,str,False,20536,0,tract_community_overlay_2024.parquet,see source_position_contract,Geographic linkage metadata only; disease values are not interpolated or derived from this overlay.
+disease_value_derivation,str,False,20536,0,analysis_dataset_builder,see source_position_contract,"Audit label: disease values remain direct first-party exports, not interpolated."
+tract_vintage,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+city_inclusion_primary_eligible,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+city_inclusion_primary_rule,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+city_inclusion_area50_sensitivity_eligible,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+city_inclusion_geometry_vintage,object,True,18688,1848,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+city_inclusion_reason,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+time_period,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_condition_label,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_label,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_family,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+case_id,str,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+numerator,int64,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+denominator,int64,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+denominator_status,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+published_measure_name,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+published_measure_value,float64,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+published_measure_unit,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+suppression_flag,bool,False,20536,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+suppression_reason,str,True,2020,18516,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+primary_tract_annual_eligible,bool,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+primary_tract_annual_exclusion_reason,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+capture_rate,float64,True,20471,65,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+capture_flag,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+reliability_tier,str,False,20536,0,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+reliability_flag,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+equity_alignment_label,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+combined_reliability_label,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+public_reliability_description,str,False,20536,0,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+acs_total_population,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_female,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_female_standard_error,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_female_moe90,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_age_65_plus,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_age_65_plus_standard_error,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_age_65_plus_moe90,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_below_fpl,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_below_fpl_standard_error,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+pct_below_fpl_moe90,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+acs_adult_population,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+acs_adult_population_standard_error,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+acs_adult_population_moe90,float64,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_uncertainty_status,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_source_id,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_time_period,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_release_vintage,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_allocation_method,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_allocation_weight_source,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_poverty_universe,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_boundary_snapshot_id,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+census_covariate_boundary_release_vintage,str,True,1848,18688,census_acs_2024_community_area_covariates.parquet,see source_position_contract,Official ACS tract components allocated by 2020 Census block internal point and PL P1 population weight; uncertainty uses 80 ACS variance replicates.
+life_expectancy_time_period,str,True,1848,18688,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+life_expectancy_estimate,float64,True,1848,18688,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+life_expectancy_standard_error,object,True,0,20536,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+mortality_time_period,str,True,1848,18688,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+mortality_estimate,float64,True,1848,18688,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+mortality_standard_error,float64,True,1848,18688,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+public_comparator_source,str,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_role,str,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_measure_id,str,False,20536,0,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_time_period,str,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_measure_type,str,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_estimate,float64,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_confidence_interval,str,True,18659,1877,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+public_comparator_note,str,False,20536,0,cdc_places_current_tract.parquet,see source_position_contract,CDC PLACES tract comparator for concordance/discordance summaries.
+geometry_wkt,str,False,20536,0,chicago_community_areas_current.parquet,see source_position_contract,Public City of Chicago community-area boundary snapshot.
+analysis_frame,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+source_scope,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+sap_variable_role,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+source_position_contract,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+dataset_role,str,False,20536,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.

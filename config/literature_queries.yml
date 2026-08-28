@@ -1,0 +1,125 @@
+schema_version: 1
+database: PubMed
+protocol_status: executed_pending_investigator_review
+frozen_on: "2026-07-14"
+amendment_policy:
+  mode: append_only
+  replace_existing_versions: false
+  required_fields:
+    - version
+    - query
+    - status
+    - frozen_on
+    - amendment_reason
+    - approved_by
+    - screening_phase
+  nullable_exceptions:
+    approved_by:
+      version: 1
+      approval_status: initial_prespecified_freeze
+queries:
+  - id: ehr_public_health
+    purpose: Resource and informatics precedents
+    rationale: Identify how electronic health records have supported public-health surveillance.
+    planned_evidence_use: Frame the platform's informatics and surveillance contribution.
+    concepts:
+      - electronic health records
+      - public health surveillance
+    active_version: 1
+    versions:
+      - version: 1
+        query: '("Electronic Health Records"[MeSH] OR electronic health record*[Title/Abstract] OR EHR[Title/Abstract]) AND ("Public Health Surveillance"[MeSH] OR public health surveillance[Title/Abstract] OR population health surveillance[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening
+  - id: small_area_chronic_disease
+    purpose: Small-area disease mapping precedents
+    rationale: Identify small-area chronic-disease mapping using clinical data systems.
+    planned_evidence_use: Compare geographic resolution, condition definitions, and data sources.
+    concepts:
+      - small-area geography
+      - chronic disease
+      - electronic health records or health information exchange
+    active_version: 1
+    versions:
+      - version: 1
+        query: '(neighborhood*[Title/Abstract] OR "small area"[Title/Abstract] OR census tract*[Title/Abstract] OR geospatial[Title/Abstract]) AND (chronic disease*[Title/Abstract] OR hypertension[Title/Abstract] OR diabetes[Title/Abstract] OR COPD[Title/Abstract]) AND (electronic health record*[Title/Abstract] OR health information exchange[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening
+  - id: urban_life_expectancy
+    purpose: Life-expectancy inequity evidence
+    rationale: Identify evidence on inequities in urban and Chicago-area life expectancy.
+    planned_evidence_use: Support the mortality and life-expectancy context and comparator inventory.
+    concepts:
+      - life expectancy or premature mortality
+      - urban or Chicago geography
+      - inequities or disparities
+    active_version: 1
+    versions:
+      - version: 1
+        query: '("Life Expectancy"[MeSH] OR life expectancy[Title/Abstract] OR premature mortality[Title/Abstract]) AND (Chicago[Title/Abstract] OR urban[Title/Abstract] OR neighborhood*[Title/Abstract]) AND (inequit*[Title/Abstract] OR disparit*[Title/Abstract] OR gap[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening
+  - id: clinical_network_surveillance
+    purpose: Multisystem network precedents
+    rationale: Identify surveillance conducted through multisystem clinical-data networks.
+    planned_evidence_use: Compare network scope, surveillance methods, and public-health applications.
+    concepts:
+      - clinical data research networks or health information exchange
+      - surveillance or population health
+    active_version: 1
+    versions:
+      - version: 1
+        query: '(CAPriCORN[Title/Abstract] OR clinical data research network*[Title/Abstract] OR health information exchange*[Title/Abstract] OR PCORnet[Title/Abstract]) AND (surveillance[Title/Abstract] OR population health[Title/Abstract] OR public health[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening
+  - id: local_resource_planning
+    purpose: Translation and planning precedents
+    rationale: Identify neighborhood data used by FQHCs or community organizations for local planning.
+    planned_evidence_use: Assess translation to resource allocation and service-planning use cases.
+    concepts:
+      - federally qualified health centers or community-based organizations
+      - geospatial data or local resource planning
+    active_version: 1
+    versions:
+      - version: 1
+        query: '(federally qualified health center*[Title/Abstract] OR FQHC[Title/Abstract] OR community-based organization*[Title/Abstract]) AND (geospatial[Title/Abstract] OR neighborhood data[Title/Abstract] OR resource allocation[Title/Abstract] OR service planning[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening
+  - id: candidate_conditions
+    purpose: Candidate-condition rationale
+    rationale: Identify small-area mortality or life-expectancy evidence for the six candidate conditions.
+    planned_evidence_use: Inform outcome-blinded candidate scoring and the condition rationale.
+    concepts:
+      - six candidate conditions
+      - life expectancy or premature mortality
+      - small-area geography
+    active_version: 1
+    versions:
+      - version: 1
+        query: '(hypertension[Title/Abstract] OR diabetes[Title/Abstract] OR chronic obstructive pulmonary disease[Title/Abstract] OR heart failure[Title/Abstract] OR stroke[Title/Abstract] OR substance use disorder*[Title/Abstract]) AND (life expectancy[Title/Abstract] OR premature mortality[Title/Abstract]) AND (neighborhood*[Title/Abstract] OR census tract*[Title/Abstract] OR small area[Title/Abstract])'
+        status: frozen
+        frozen_on: "2026-07-14"
+        amendment_reason: Initial prespecified query
+        approval_status: initial_prespecified_freeze
+        approved_by: null
+        screening_phase: before_screening

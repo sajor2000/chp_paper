@@ -1,0 +1,556 @@
+{
+  "artifact_checksums": {
+    "00_master_analytic_dataset.csv": "dc59dd5cef6a0671046b7666264084b8e4840165da67fee1e4b19091c4971dcf",
+    "00_master_analytic_dataset.parquet": "373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916",
+    "00_master_analytic_dataset.schema.json": "6d8ba8d44ecf274b4a1e1e1840f10909e2f28525d6be5f8d066cd7eb278fbbb0",
+    "00_master_analytic_dataset_data_book.csv": "b9471ca215cca401acc5c2aec5ba51263490fc170c1ce71dfb99fdf498f6ead1",
+    "00_master_analytic_dataset_data_book.html": "fa42a61b661061f4081f63066086d7e2504c32d68beb56fb7f4309f3c3d19e45",
+    "00_master_analytic_dataset_lineage.csv": "b11019851ccc235f71242d2ecc56bf738b7ee7d4f5f5eebbf9b7b145353df511"
+  },
+  "assembly_manifest_schema_version": 1,
+  "assembly_steps": [
+    {
+      "cardinality": "not_applicable_direct_parse",
+      "clinical_values_created": false,
+      "excluded_rows": 310904,
+      "field_role": "direct_disease_values",
+      "geography_coverage": "community areas and Chicago-intersecting tracts",
+      "input_artifacts": [
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_community_area_condition_stats.text",
+          "sha256": "f1caa866e87b336f1f2c2fc859777f6cd1781690a8d19115ebe49bc8f043d08f",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_tract_condition_stats.text",
+          "sha256": "16b78c31357fe2cf73b12b768e258bdbb1835c82b60f201121193d466ccbf257",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_areas.text",
+          "sha256": "ff2447602ba8031547652bd1e634c9414bc92ced16c2c69b6379f30e2c1076e3",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_area_reliability_crosswalk.text",
+          "sha256": "c9dd101beea8e152db2de0e26e174f6501c6534ee65a148e86ec13d1f85adce2",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_tract_reliability_crosswalk.text",
+          "sha256": "caaedd474d4427d98f10d1958ab27ced49904aa01494e63ea14d6dacb715ed06",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/manifest.json",
+          "sha256": "11f704847ea9518c5132afbb0399c5df1b245a4181929a0e9993fc5af0385b5d",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        }
+      ],
+      "input_rows": 360109,
+      "join_key": [
+        "source_geography_id",
+        "time_period",
+        "condition_id"
+      ],
+      "join_validation": "not_applicable_direct_parse",
+      "matched_rows": 49205,
+      "missing_rows": 0,
+      "notes": "Asthma and other non-governed conditions are excluded; suppression is retained.",
+      "operation": "parse_and_filter_governed_condition_fact_tables",
+      "output_rows": 49205,
+      "period_coverage": "2019-2024",
+      "role": "direct_first_party_measure",
+      "source_ids": [
+        "capricorn_chicagohealthmap_export_2026_05_27"
+      ],
+      "step_id": "direct_chm_facts",
+      "step_order": 1,
+      "suppressed_rows": 18688,
+      "unmatched_rows": 0
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 28669,
+      "field_role": "geographic_linkage_metadata",
+      "geography_coverage": "tract representative points covered by the frozen Chicago union",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/tract_community_overlay_2024.parquet",
+          "sha256": "11a0b00fbf1ea9488aeb2f3411f807af065f1fe52f2c2114e6db482001d33851",
+          "source_id": "us_census_acs"
+        }
+      ],
+      "input_rows": 47357,
+      "join_key": [
+        "geography_id"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 18688,
+      "missing_rows": 0,
+      "notes": "The primary cohort requires a tract representative point covered by the frozen Chicago union. The overlay does not interpolate or aggregate CHM disease values.",
+      "operation": "restrict_tract_rows_to_authoritative_chicago_overlay",
+      "output_rows": 18688,
+      "period_coverage": "2024 overlay snapshot",
+      "role": "linkage_metadata_only",
+      "source_ids": [
+        "tract_community_overlay_2024"
+      ],
+      "step_id": "tract_overlay_linkage",
+      "step_order": 2,
+      "suppressed_rows": 0,
+      "unmatched_rows": 28669
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "public_adjustment_covariates",
+      "geography_coverage": "77 community areas",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/census_acs_2024_community_area_covariates.parquet",
+          "sha256": "295eb9864edf07040b0e011636b7b583d52ced9ef9bb458f0868bac515c006ee",
+          "source_id": "us_census_acs"
+        }
+      ],
+      "input_rows": 1848,
+      "join_key": [
+        "community_area_id"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 1848,
+      "missing_rows": 0,
+      "notes": "ACS values describe community areas and do not replace CHM measures.",
+      "operation": "left_join_acs_covariates_to_community_rows",
+      "output_rows": 1848,
+      "period_coverage": "2020-2024 ACS",
+      "role": "community_area_adjustment",
+      "source_ids": [
+        "us_census_acs"
+      ],
+      "step_id": "community_acs_covariates",
+      "step_order": 3,
+      "suppressed_rows": 0,
+      "unmatched_rows": 0
+    },
+    {
+      "cardinality": "concatenation_no_join",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "direct_values_preserved",
+      "geography_coverage": "community areas and census tracts",
+      "input_artifacts": [
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_community_area_condition_stats.text",
+          "sha256": "f1caa866e87b336f1f2c2fc859777f6cd1781690a8d19115ebe49bc8f043d08f",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_tract_condition_stats.text",
+          "sha256": "16b78c31357fe2cf73b12b768e258bdbb1835c82b60f201121193d466ccbf257",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_areas.text",
+          "sha256": "ff2447602ba8031547652bd1e634c9414bc92ced16c2c69b6379f30e2c1076e3",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_area_reliability_crosswalk.text",
+          "sha256": "c9dd101beea8e152db2de0e26e174f6501c6534ee65a148e86ec13d1f85adce2",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_tract_reliability_crosswalk.text",
+          "sha256": "caaedd474d4427d98f10d1958ab27ced49904aa01494e63ea14d6dacb715ed06",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        },
+        {
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/manifest.json",
+          "sha256": "11f704847ea9518c5132afbb0399c5df1b245a4181929a0e9993fc5af0385b5d",
+          "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+        }
+      ],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id"
+      ],
+      "join_validation": "concatenation_no_join",
+      "matched_rows": 20536,
+      "missing_rows": 0,
+      "notes": "Community and tract disease values remain direct; no tract aggregation is performed.",
+      "operation": "concatenate_direct_community_and_tract_frames",
+      "output_rows": 20536,
+      "period_coverage": "2019-2024",
+      "role": "analytic_frame_assembly",
+      "source_ids": [
+        "capricorn_chicagohealthmap_export_2026_05_27"
+      ],
+      "step_id": "concat_geography_frames",
+      "step_order": 4,
+      "suppressed_rows": 2020,
+      "unmatched_rows": 0
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "linked_geography_and_reliability_metadata",
+      "geography_coverage": "community areas and census tracts",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/chicago_community_areas_current.parquet",
+          "sha256": "7d49610c164771ebfbd39d681e37fc7ad988166d8a7f7eeed20c74dee1908227",
+          "source_id": "us_census_acs"
+        },
+        {
+          "path": "data/processed/public/census_tiger_2024_tract.parquet",
+          "sha256": "bbefabcac1a288f955e8f00d84819db95d55e0281e554f2b461e7d35807c5b70",
+          "source_id": "us_census_acs"
+        },
+        {
+          "path": "data/processed/public/tract_community_overlay_2024.parquet",
+          "sha256": "11a0b00fbf1ea9488aeb2f3411f807af065f1fe52f2c2114e6db482001d33851",
+          "source_id": "us_census_acs"
+        }
+      ],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_id"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 20536,
+      "missing_rows": 0,
+      "notes": "Geometry and reliability are metadata; they do not create disease values.",
+      "operation": "left_join_names_reliability_and_geometry",
+      "output_rows": 20536,
+      "period_coverage": "2024 boundary snapshots",
+      "role": "geography_context",
+      "source_ids": [
+        "chicago_community_areas_current",
+        "census_tiger_2024_tract"
+      ],
+      "step_id": "geography_context",
+      "step_order": 5,
+      "suppressed_rows": 0,
+      "unmatched_rows": 0
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "public_outcome",
+      "geography_coverage": "community areas",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/chicago_health_atlas_life_expectancy.parquet",
+          "sha256": "931da547b67412f35d2c9d0bba1db7219f9def4eb06f243f91d615c67fae86a9",
+          "source_id": "chicago_health_atlas"
+        }
+      ],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_id",
+        "time_period"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 1848,
+      "missing_rows": 18688,
+      "notes": "Atlas outcomes remain public comparator context, not CHM exposure values.",
+      "operation": "left_join_life_expectancy_by_geography_and_period",
+      "output_rows": 20536,
+      "period_coverage": "source-specific Atlas periods",
+      "role": "community_area_outcome",
+      "source_ids": [
+        "chicago_health_atlas"
+      ],
+      "step_id": "health_atlas_outcomes",
+      "step_order": 6,
+      "suppressed_rows": 0,
+      "unmatched_rows": 18688
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "public_outcome_context",
+      "geography_coverage": "community areas",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/chicago_health_atlas_mortality.parquet",
+          "sha256": "2b910a993d2c402c389ffd551e482e030abaed7e3852e6997c583dcc2c844d0d",
+          "source_id": "chicago_health_atlas"
+        }
+      ],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_id"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 1848,
+      "missing_rows": 18688,
+      "notes": "Latest Atlas mortality is context only and does not alter CHM disease values.",
+      "operation": "left_join_latest_mortality_by_geography",
+      "output_rows": 20536,
+      "period_coverage": "latest available Atlas period",
+      "role": "community_area_outcome_context",
+      "source_ids": [
+        "chicago_health_atlas"
+      ],
+      "step_id": "health_atlas_mortality",
+      "step_order": 7,
+      "suppressed_rows": 0,
+      "unmatched_rows": 18688
+    },
+    {
+      "cardinality": "many_to_one",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "public_tract_comparator",
+      "geography_coverage": "census tracts",
+      "input_artifacts": [
+        {
+          "path": "data/processed/public/cdc_places_current_tract.parquet",
+          "sha256": "2c87b44865518560babe1c6557858ba85dfc9b9b83d7dbe8f12fcc8c97f8edac",
+          "source_id": "cdc_places"
+        }
+      ],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_id",
+        "public_comparator_measure_id"
+      ],
+      "join_validation": "many_to_one",
+      "matched_rows": 18659,
+      "missing_rows": 1877,
+      "notes": "PLACES is a comparator for tract concordance, not validation of CHM.",
+      "operation": "left_join_places_by_tract_and_measure_id",
+      "output_rows": 20536,
+      "period_coverage": "2023 BRFSS / 2025 PLACES release",
+      "role": "tract_public_comparator",
+      "source_ids": [
+        "cdc_places"
+      ],
+      "step_id": "places_tract_comparators",
+      "step_order": 8,
+      "suppressed_rows": 0,
+      "unmatched_rows": 1877
+    },
+    {
+      "cardinality": "derived_fields_no_join",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "derived_flags_and_lineage",
+      "geography_coverage": "community areas and census tracts",
+      "input_artifacts": [],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_id",
+        "condition_id",
+        "time_period"
+      ],
+      "join_validation": "derived_fields_no_join",
+      "matched_rows": 20536,
+      "missing_rows": 20536,
+      "notes": "Roles and lineage labels are derived metadata; missing is not zero.",
+      "operation": "derive_roles_flags_and_lineage_fields",
+      "output_rows": 20536,
+      "period_coverage": "2019-2024",
+      "role": "derived_analysis_metadata",
+      "source_ids": [
+        "analysis_dataset_builder"
+      ],
+      "step_id": "derive_flags_lineage",
+      "step_order": 9,
+      "suppressed_rows": 2020,
+      "unmatched_rows": 0
+    },
+    {
+      "cardinality": "unique_key",
+      "clinical_values_created": false,
+      "excluded_rows": 0,
+      "field_role": "derived_validation_metadata",
+      "geography_coverage": "community areas and census tracts",
+      "input_artifacts": [],
+      "input_rows": 20536,
+      "join_key": [
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id"
+      ],
+      "join_validation": "unique_key",
+      "matched_rows": 20536,
+      "missing_rows": 0,
+      "notes": "Missing, suppressed, and zero-count states remain explicit in the final artifact.",
+      "operation": "validate_final_grain_and_unique_key",
+      "output_rows": 20536,
+      "period_coverage": "2019-2024",
+      "primary_key": [
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id"
+      ],
+      "role": "analytic_dataset_validation",
+      "source_ids": [
+        "analysis_dataset_builder"
+      ],
+      "step_id": "final_key_validation",
+      "step_order": 10,
+      "suppressed_rows": 2020,
+      "unique_key": true,
+      "unmatched_rows": 0
+    }
+  ],
+  "dataset_id": "00_master_analytic_dataset",
+  "joins": [
+    {
+      "keys": [
+        "geography_id"
+      ],
+      "name": "community_context",
+      "validation": "many_to_one"
+    },
+    {
+      "keys": [
+        "community_area_id"
+      ],
+      "name": "community_area_adjustment",
+      "validation": "many_to_one"
+    },
+    {
+      "keys": [
+        "geography_id",
+        "time_period"
+      ],
+      "name": "health_atlas_outcome",
+      "validation": "many_to_one"
+    },
+    {
+      "keys": [
+        "geography_id",
+        "public_comparator_measure_id"
+      ],
+      "name": "places_tract_comparator",
+      "validation": "many_to_one"
+    }
+  ],
+  "sources": [
+    {
+      "inputs": [
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_community_area_condition_stats.text",
+          "required": true,
+          "sha256": "f1caa866e87b336f1f2c2fc859777f6cd1781690a8d19115ebe49bc8f043d08f"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_tract_condition_stats.text",
+          "required": true,
+          "sha256": "16b78c31357fe2cf73b12b768e258bdbb1835c82b60f201121193d466ccbf257"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_areas.text",
+          "required": true,
+          "sha256": "ff2447602ba8031547652bd1e634c9414bc92ced16c2c69b6379f30e2c1076e3"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_community_area_reliability_crosswalk.text",
+          "required": true,
+          "sha256": "c9dd101beea8e152db2de0e26e174f6501c6534ee65a148e86ec13d1f85adce2"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_tract_reliability_crosswalk.text",
+          "required": true,
+          "sha256": "caaedd474d4427d98f10d1958ab27ced49904aa01494e63ea14d6dacb715ed06"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/manifest.json",
+          "required": true,
+          "sha256": "11f704847ea9518c5132afbb0399c5df1b245a4181929a0e9993fc5af0385b5d"
+        }
+      ],
+      "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_community_area_condition_stats.text",
+      "role": "direct_ehr_diagnosed_measure",
+      "sha256": "f1caa866e87b336f1f2c2fc859777f6cd1781690a8d19115ebe49bc8f043d08f",
+      "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+    },
+    {
+      "inputs": [
+        {
+          "exists": true,
+          "path": "data/processed/public/chicago_health_atlas_life_expectancy.parquet",
+          "required": false,
+          "sha256": "931da547b67412f35d2c9d0bba1db7219f9def4eb06f243f91d615c67fae86a9"
+        },
+        {
+          "exists": true,
+          "path": "data/processed/public/chicago_health_atlas_mortality.parquet",
+          "required": false,
+          "sha256": "2b910a993d2c402c389ffd551e482e030abaed7e3852e6997c583dcc2c844d0d"
+        }
+      ],
+      "path": "data/processed/public/chicago_health_atlas_life_expectancy.parquet",
+      "role": "community_area_outcome",
+      "sha256": "931da547b67412f35d2c9d0bba1db7219f9def4eb06f243f91d615c67fae86a9",
+      "source_id": "chicago_health_atlas"
+    },
+    {
+      "inputs": [
+        {
+          "exists": true,
+          "path": "data/processed/public/census_acs_2024_community_area_covariates.parquet",
+          "required": true,
+          "sha256": "295eb9864edf07040b0e011636b7b583d52ced9ef9bb458f0868bac515c006ee"
+        },
+        {
+          "exists": true,
+          "path": "data/processed/public/chicago_community_areas_current.parquet",
+          "required": false,
+          "sha256": "7d49610c164771ebfbd39d681e37fc7ad988166d8a7f7eeed20c74dee1908227"
+        },
+        {
+          "exists": true,
+          "path": "data/processed/public/census_tiger_2024_tract.parquet",
+          "required": false,
+          "sha256": "bbefabcac1a288f955e8f00d84819db95d55e0281e554f2b461e7d35807c5b70"
+        },
+        {
+          "exists": true,
+          "path": "data/processed/public/tract_community_overlay_2024.parquet",
+          "required": false,
+          "sha256": "11a0b00fbf1ea9488aeb2f3411f807af065f1fe52f2c2114e6db482001d33851"
+        }
+      ],
+      "path": "data/processed/public/census_acs_2024_community_area_covariates.parquet",
+      "role": "community_area_adjustment",
+      "sha256": "295eb9864edf07040b0e011636b7b583d52ced9ef9bb458f0868bac515c006ee",
+      "source_id": "us_census_acs"
+    },
+    {
+      "inputs": [
+        {
+          "exists": true,
+          "path": "data/processed/public/cdc_places_current_tract.parquet",
+          "required": false,
+          "sha256": "2c87b44865518560babe1c6557858ba85dfc9b9b83d7dbe8f12fcc8c97f8edac"
+        }
+      ],
+      "path": "data/processed/public/cdc_places_current_tract.parquet",
+      "role": "tract_public_comparator",
+      "sha256": "2c87b44865518560babe1c6557858ba85dfc9b9b83d7dbe8f12fcc8c97f8edac",
+      "source_id": "cdc_places"
+    }
+  ]
+}

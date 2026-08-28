@@ -1,0 +1,68 @@
+{
+  "artifact_checksums": {
+    "chicago_healthmap_zcta_sidecar.csv": "2a29a5748b8c758fa56c88dfbdb1dc13ebda470df1a600c93a7c6cc921a11545",
+    "chicago_healthmap_zcta_sidecar.parquet": "4dbc4bc52a61d7191eeff876c22051158043b0f269ef4f979a387788708454bf",
+    "chicago_healthmap_zcta_sidecar.schema.json": "d2e80dbbbd643d305d169de7f390b24680a1a422c14e37caf4e8896cd804e1f7",
+    "chicago_healthmap_zcta_sidecar_data_book.csv": "513c68ed284df6226961a853c1ca481dfb6039d90fbb3b3ed9cfbca01c48ada0",
+    "chicago_healthmap_zcta_sidecar_data_book.html": "d9979f8bf5fc0411caddb94da20fd926acd0813cc4e93bd5ceef3f819db30db8",
+    "chicago_healthmap_zcta_sidecar_lineage.csv": "d37e64b449a187cb5c0971f8d3e96e134af18df99b6c67584ec4e1be19ff4dfc"
+  },
+  "assembly_manifest_schema_version": 1,
+  "assembly_steps": [
+    {
+      "clinical_values_created": false,
+      "field_role": "direct_values_with_linked_metadata",
+      "input_rows": 66903,
+      "join_key": [
+        "geography_id"
+      ],
+      "join_validation": "many_to_one",
+      "output_rows": 7585,
+      "step_id": "direct_zcta_facts",
+      "step_order": 1
+    }
+  ],
+  "dataset_id": "chicago_healthmap_zcta_sidecar",
+  "joins": [
+    {
+      "keys": [
+        "geography_id"
+      ],
+      "name": "zcta_context",
+      "role": "linked_metadata_only",
+      "validation": "many_to_one"
+    }
+  ],
+  "sources": [
+    {
+      "inputs": [
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/fact_zcta_condition_stats.text",
+          "required": true,
+          "sha256": "664c13e03e31e7b14f7ff7053e62df0de60ed07f9fa83022b84a1d9a70743dc0"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_zcta.text",
+          "required": true,
+          "sha256": "89b62d0c11d24fe55729b38a6c8e70b87e8563da3dd9579ec7169d189adaa5b7"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/original/dim_zcta_reliability_crosswalk.text",
+          "required": true,
+          "sha256": "173a27564a56b244eb6cfe23ba2a6ebfe0b7fefb57abcf76776712662fe01a21"
+        },
+        {
+          "exists": true,
+          "path": "sources/first_party/capricorn/snapshots/2026-05-27/manifest.json",
+          "required": true,
+          "sha256": "11f704847ea9518c5132afbb0399c5df1b245a4181929a0e9993fc5af0385b5d"
+        }
+      ],
+      "role": "direct_zcta_ehr_diagnosed_measure_and_metadata",
+      "source_id": "capricorn_chicagohealthmap_export_2026_05_27"
+    }
+  ]
+}

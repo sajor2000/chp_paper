@@ -1,0 +1,61 @@
+agents:
+  orchestrator_editor:
+    responsibility: [Own outline, assignments, budgets, integration, issue log, and gates]
+    permitted_inputs: [contracts, gate reports, ledgers, authorized section packets]
+    permitted_outputs: [integrated control packet, issue entries]
+    prohibited_actions: [Invent results, silently resolve scientific conflicts]
+    human_approval_required: [Scientific conflicts, final integration]
+  artifact_lineage_agent:
+    responsibility: [Map every number and variable to frozen sources, transformations, and outputs]
+    permitted_inputs: [study manifest, frozen outputs, provenance reports]
+    permitted_outputs: [number ledger, lineage findings]
+    prohibited_actions: [Interpret findings, alter frozen outputs]
+    human_approval_required: [Lineage exceptions]
+  methods_reporting_agent:
+    responsibility: [Draft from the signed SAP and maintain reporting, ethics, and sharing crosswalks]
+    permitted_inputs: [signed SAP, source contracts, reporting rules]
+    permitted_outputs: [methods packet, reporting matrix]
+    prohibited_actions: [Back-fit methods to observed results]
+    human_approval_required: [Method deviation]
+  results_agent:
+    responsibility: [Convert frozen outputs into factual statements and maintain the number ledger]
+    permitted_inputs: [S7-approved artifacts, number ledger]
+    permitted_outputs: [results packet]
+    prohibited_actions: [Add literature interpretation, use causal wording]
+    human_approval_required: [Result discrepancy]
+  case_study_1_agent:
+    responsibility: [Populate the selected first case template]
+    permitted_inputs: [S5 decision, S7-approved case artifacts]
+    permitted_outputs: [case 1 packet]
+    prohibited_actions: [Change estimands, outcomes, candidate, or multiplicity]
+    human_approval_required: [Case conflict]
+  case_study_2_agent:
+    responsibility: [Populate the selected second case template]
+    permitted_inputs: [S5 decision, S7-approved case artifacts]
+    permitted_outputs: [case 2 packet]
+    prohibited_actions: [Change estimands, outcomes, candidate, or multiplicity]
+    human_approval_required: [Case conflict]
+  evidence_claims_agent:
+    responsibility: [Verify sources and maintain claim support, conflicts, gaps, and language bounds]
+    permitted_inputs: [evidence matrix, Paperclip repository, official primary sources]
+    permitted_outputs: [claim ledger, citation findings]
+    prohibited_actions: [Use abstracts alone for material claims, generate references from memory]
+    human_approval_required: [Conflicting evidence, novelty language]
+  discussion_policy_agent:
+    responsibility: [Interpret within evidence bounds and synthesize the selected cases]
+    permitted_inputs: [verified claims, S7-approved results packets]
+    permitted_outputs: [discussion packet]
+    prohibited_actions: [Claim implementation benefit, need, allocation, access, or outcomes]
+    human_approval_required: [Policy interpretation]
+  statistical_qa_agent:
+    responsibility: [Independently verify estimates, denominators, intervals, diagnostics, and reconciliation]
+    permitted_inputs: [frozen artifacts, SAP, code, number ledger]
+    permitted_outputs: [numerical review report]
+    prohibited_actions: [Strengthen narrative by changing scientific content]
+    human_approval_required: [Unresolved numerical discrepancy]
+  jama_style_qa_agent:
+    responsibility: [Enforce live journal rules, reporting, files, disclosures, and voice]
+    permitted_inputs: [official rules, draft package, ledgers, checklists]
+    permitted_outputs: [compliance audit]
+    prohibited_actions: [Change scientific content without a logged query]
+    human_approval_required: [Rule ambiguity, submission authorization]

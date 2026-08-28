@@ -1,0 +1,94 @@
+{
+  "skill_name": "write-jama-health-forum-manuscript",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit this JAMA Health Forum Original Investigation sentence: The EHR measure reduced mortality.",
+      "expected_output": "Flags causal language as unsupported unless the design and evidence authorize it.",
+      "files": [],
+      "expectations": [
+        "The response identifies 'reduced' as causal language.",
+        "The response conditions any causal wording on the study design and evidence.",
+        "The proposed revision does not strengthen the claim."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Apply this skill to a JAMA Surgery manuscript.",
+      "expected_output": "Confirms the target journal and does not apply JAMA Health Forum-specific requirements to another JAMA Network journal.",
+      "files": [],
+      "expectations": [
+        "The response recognizes JAMA Surgery as distinct from JAMA Health Forum.",
+        "The response does not present JAMA Health Forum limits as controlling.",
+        "The response directs compliance work to current JAMA Surgery instructions."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review a structured abstract for JAMA Health Forum.",
+      "expected_output": "Checks the required abstract structure and the consistency of its quantitative claims.",
+      "files": [],
+      "expectations": [
+        "The response checks separate Importance, Objective, Design, Setting, Participants, Exposures, Main Outcomes and Measures, Results, and Conclusions and Relevance headings.",
+        "The response checks that the analyzed sample and primary estimates appear in Results.",
+        "The response checks abstract numbers against the manuscript or source artifacts."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Draft references from memory for a JAMA Health Forum paper.",
+      "expected_output": "Declines to generate references from memory and requires verified source records.",
+      "files": [],
+      "expectations": [
+        "The response does not invent a citation or bibliographic field.",
+        "The response requires authoritative source records or a reference manager.",
+        "Any placeholder is visibly labeled and not presented as a finished reference."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Make this JAMA paper submission-ready. I have not said which JAMA Network journal or article type it targets.",
+      "expected_output": "Determines the target journal and article type before applying requirements and does not claim compliance from ambiguous scope.",
+      "files": [],
+      "expectations": [
+        "The response identifies the target journal and article type as unresolved.",
+        "The response does not apply JAMA Health Forum numerical limits as though they govern all JAMA Network journals.",
+        "The response does not claim that the manuscript is compliant or submission-ready."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Adversarially audit this observational JAMA Health Forum manuscript. The abstract reports 1240 participants and an odds ratio of 1.42, while Table 2 reports 1214 and 1.24. The Discussion says the exposure reduced the outcome.",
+      "expected_output": "Leads with evidence and inference defects, identifies the numerical contradictions and unsupported causal wording, and defers prose polish.",
+      "files": [],
+      "expectations": [
+        "The response identifies the 1240 vs 1214 denominator conflict.",
+        "The response identifies the 1.42 vs 1.24 odds-ratio conflict.",
+        "The response flags 'reduced' as unsupported causal language for the observational design.",
+        "Scientific findings appear before prose-style suggestions."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Draft the Results and abstract for our JAMA Health Forum Original Investigation. The model output is not frozen and I do not have the final denominator or confidence interval yet.",
+      "expected_output": "Does not invent values; creates explicit blockers or placeholders with evidence needs and avoids calling the result submission-ready.",
+      "files": [],
+      "expectations": [
+        "The response does not fabricate a denominator, estimate, or confidence interval.",
+        "Every unresolved quantitative field is visibly labeled as a placeholder or blocker.",
+        "The response identifies the evidence or author decision needed to resolve each blocker."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Revise this JAMA Health Forum Discussion so it sounds human and concise, but preserve every scientific claim and number. Remove stock AI phrasing without making the observational findings causal.",
+      "expected_output": "Improves cadence and concrete syntax while preserving quantitative facts and associational boundaries.",
+      "files": [],
+      "expectations": [
+        "All supplied numbers and directions are preserved unless a discrepancy is explicitly flagged.",
+        "The revision uses associational rather than causal language.",
+        "The revision removes stock transitions without replacing them with stronger claims."
+      ]
+    }
+  ]
+}

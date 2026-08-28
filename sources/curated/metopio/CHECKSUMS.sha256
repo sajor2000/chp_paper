@@ -1,0 +1,17 @@
+# SHA-256 checksums for the unauthenticated Metopio public catalog acquired 2026-07-13.
+# Full subscription-visible catalogs and observations require METOPIO_API_TOKEN and are not included.
+460044926b48d57430891e3e68eff584b6ea306fc79e1c9054c3824690d31630  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/api_root.json
+8f6f7d246b5d6f5e1a20b549882194622427a3d41b11e8f7f49915729d2d585b  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/benchmarks.json
+bba21c9bd5b5b134f7a4c42fa97b342cb5af5bdb5b7275808568ca98d0a93800  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/categories.json
+46b2fac3fa960f5bcb226f584899187ccc4cbb996481a8ae247dbbbddffb9669  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/dataset-updates.json
+04294c6b8ffde8874de4576a838bb149da30d60cc3e86f46efad537443fbfcdd  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/datasets.json
+223302f2c50e796a8ccfa8a57070aca211c2da9e0f629c7b73f8ac38afba7fa7  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/geographies.json
+7a2e14f9073ebfd30dfd7506b0215466b933bf9f3abb179b6b6f6b7494d2fe07  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/layers.json
+a164233313145b4b2356fb033674e1c04d5d8b52585505449ba080814cb86db5  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/periods.json
+0595424161ea863805d9b92c0e52d7aa1e3c46ec58cd8f0d6933759006a5fb74  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/points.json
+0595424161ea863805d9b92c0e52d7aa1e3c46ec58cd8f0d6933759006a5fb74  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/regions.json
+0595424161ea863805d9b92c0e52d7aa1e3c46ec58cd8f0d6933759006a5fb74  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/shapefiles.json
+df9f93f639d259cfdfdc08ff856b41a08bde870b9b8bd46239747396092cc6cf  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/sources.json
+d4bdb2d5809512eb45d265967142a1033628b444adcec36b916c5f9ae83bacaf  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/stratification-groupings.json
+2646e7a9f3a0f2a98b479d18aca86935f70d4c084c6fb00edb137ae43605fd28  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/stratifications.json
+360303948a443f7cd2d9baf77831123f5592672dc0aa38652d3c275270095515  sources/curated/metopio/snapshots/2026-07-13/public_catalog/original/topics.json

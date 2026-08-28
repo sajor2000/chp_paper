@@ -1,0 +1,498 @@
+{
+  "columns": [
+    {
+      "dtype": "str",
+      "name": "source_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "snapshot_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_table",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_record_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_type",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_level_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_geography_id",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "geography_id",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "geography_name",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "community_area_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "community_area_ids",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "community_area_weights_json",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "max_community_area_weight",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "covered_fraction",
+      "nullable": true
+    },
+    {
+      "dtype": "bool",
+      "name": "is_crossing_tract",
+      "nullable": false
+    },
+    {
+      "dtype": "bool",
+      "name": "is_sliver",
+      "nullable": false
+    },
+    {
+      "dtype": "int64",
+      "name": "overlay_row_count",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "tract_community_linkage_source_id",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "tract_community_linkage_snapshot_id",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "community_area_boundary_source_id",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "community_area_boundary_snapshot_id",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "tract_community_linkage_method",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "tract_community_linkage_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "linkage_method",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "linkage_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "disease_value_derivation",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "tract_vintage",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "city_inclusion_primary_eligible",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "city_inclusion_primary_rule",
+      "nullable": false
+    },
+    {
+      "dtype": "object",
+      "name": "city_inclusion_area50_sensitivity_eligible",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "city_inclusion_geometry_vintage",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "city_inclusion_reason",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "time_period",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_condition_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_family",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "case_id",
+      "nullable": false
+    },
+    {
+      "dtype": "int64",
+      "name": "numerator",
+      "nullable": false
+    },
+    {
+      "dtype": "int64",
+      "name": "denominator",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "denominator_status",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "published_measure_name",
+      "nullable": false
+    },
+    {
+      "dtype": "float64",
+      "name": "published_measure_value",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "published_measure_unit",
+      "nullable": false
+    },
+    {
+      "dtype": "bool",
+      "name": "suppression_flag",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "suppression_reason",
+      "nullable": true
+    },
+    {
+      "dtype": "bool",
+      "name": "primary_tract_annual_eligible",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "primary_tract_annual_exclusion_reason",
+      "nullable": false
+    },
+    {
+      "dtype": "float64",
+      "name": "capture_rate",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "capture_flag",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "reliability_tier",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "reliability_flag",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "equity_alignment_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "combined_reliability_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "public_reliability_description",
+      "nullable": false
+    },
+    {
+      "dtype": "float64",
+      "name": "acs_total_population",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_female",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_female_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_female_moe90",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_age_65_plus",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_age_65_plus_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_age_65_plus_moe90",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_below_fpl",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_below_fpl_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "pct_below_fpl_moe90",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "acs_adult_population",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "acs_adult_population_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "acs_adult_population_moe90",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_uncertainty_status",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_source_id",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_time_period",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_release_vintage",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_allocation_method",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_allocation_weight_source",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_poverty_universe",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_boundary_snapshot_id",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "census_covariate_boundary_release_vintage",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "life_expectancy_time_period",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "life_expectancy_estimate",
+      "nullable": true
+    },
+    {
+      "dtype": "object",
+      "name": "life_expectancy_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "mortality_time_period",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "mortality_estimate",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "mortality_standard_error",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_source",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_role",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_measure_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_time_period",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_measure_type",
+      "nullable": true
+    },
+    {
+      "dtype": "float64",
+      "name": "public_comparator_estimate",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_confidence_interval",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "public_comparator_note",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geometry_wkt",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "analysis_frame",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_scope",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "sap_variable_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_position_contract",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "dataset_role",
+      "nullable": false
+    }
+  ],
+  "dataset_id": "00_master_analytic_dataset",
+  "grain": "geography_type-geography_id-period-condition",
+  "primary_key": [
+    "geography_type",
+    "geography_id",
+    "time_period",
+    "condition_id"
+  ],
+  "schema_version": 1
+}

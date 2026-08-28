@@ -1,0 +1,8 @@
+{
+  "results_authorized": false,
+  "status": "withheld_pending_s7_independent_review",
+  "owner": "governance-review",
+  "updated": "2026-07-15",
+  "implementation_baseline_commit": "fd760ac",
+  "blocker": "Human S7 authorization remains open; no manuscript import or submission-readiness claim is permitted. The official JAMA Health Forum instructions were checked directly on 2026-07-15, while the separate Tavily quota blocker remains recorded."
+}

@@ -1,0 +1,39 @@
+source_id: capricorn_chicagohealthmap_export_2026_05_27
+organization: CAPriCORN and CONSCIENCE Project
+snapshot_date: "2026-05-27"
+files:
+  - community_area_description_facts.text
+  - dim_aldermanic.text
+  - dim_census_tracts.text
+  - dim_community_area_reliability_crosswalk.text
+  - dim_community_areas.text
+  - dim_conditions.text
+  - dim_congressional_districts.text
+  - dim_tract_reliability_crosswalk.text
+  - dim_ward_reliability_crosswalk.text
+  - dim_zcta.text
+  - dim_zcta_reliability_crosswalk.text
+  - drug_providers.text
+  - fact_chicago_condition_prevalence.text
+  - fact_community_area_condition_stats.text
+  - fact_community_area_vulnerability.text
+  - fact_congress_condition_stats.text
+  - fact_tract_condition_stats.text
+  - fact_ward_condition_stats.text
+  - fact_zcta_condition_stats.text
+  - svi_2020.text
+  - wic_locations.text
+website_methods:
+  source_id: chicagohealthmap_website_methods
+  snapshot_date: "2026-07-13"
+  expected_archive_count: 2
+  expected_member_count: 11
+  expected_duplicate_content_count: 1
+  archives:
+    - filename: f184b065-0187-4d80-a3cb-5ef6af9306c1.zip
+      sha256: b4b9fa02b4eb9f8105fbc49bdeca9293995b65d67ac186f1424dd2768b46659d
+    - filename: 8ae30d57-17e8-4d71-a503-ea7b82d90523.zip
+      sha256: a4b7cfc737e7767784ec942a2640c0f503d685119358263fc9b6f33638c5fcb3
+  canonical_glossary:
+    member: 019f5daa-1fda-75df-b2c2-89792bc47700/chicagohealthmap.com_data-glossary.md
+    sha256: faf79c8a27e94b08aa22676407869a9da9ac6eb300f1f36c8ad7192b098adba4

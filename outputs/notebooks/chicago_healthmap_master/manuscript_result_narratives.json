@@ -1,0 +1,14 @@
+{
+  "C1": {
+    "manuscript_import_allowed": false,
+    "narrative": "No numeric C1 result is available for manuscript import.",
+    "status": "withheld_vif_above_5"
+  },
+  "C2": {
+    "manuscript_import_allowed": false,
+    "narrative": "The C2 estimate remains restricted to the statistician-review package.",
+    "status": "freeze_candidate_primary_model_unsecured"
+  },
+  "manuscript_import_allowed": false,
+  "results_authorized": false
+}

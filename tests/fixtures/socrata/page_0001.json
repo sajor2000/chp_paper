@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"area_numbe": "1", "community": "ROGERS PARK", "area_num_1": "1", "shape_area": "10", "shape_len": "5"},
+      "geometry": {"type": "MultiPolygon", "coordinates": [[[[-87.7, 42.0], [-87.6, 42.0], [-87.6, 41.9], [-87.7, 42.0]]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"area_numbe": "2", "community": "WEST RIDGE", "area_num_1": "2", "shape_area": "11", "shape_len": "6"},
+      "geometry": {"type": "MultiPolygon", "coordinates": [[[[-87.7, 41.9], [-87.6, 41.9], [-87.6, 41.8], [-87.7, 41.9]]]]}
+    }
+  ]
+}

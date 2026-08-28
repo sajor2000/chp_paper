@@ -1,0 +1,147 @@
+{
+  "accessibility": {
+    "categorical_secondary_encoding": "not_applicable_no_categorical_main_map_fill",
+    "manual_inspection_status": "manual_inspection_required_for_current_output_hashes",
+    "palette_simulations": {
+      "RdBu_r": {
+        "deuteranopia": {
+          "minimum_pairwise_rgb_distance": 0.5874770677236757
+        },
+        "grayscale": {
+          "minimum_pairwise_rgb_distance": 0.2306577587552779
+        },
+        "protanopia": {
+          "minimum_pairwise_rgb_distance": 0.5234281965039976
+        }
+      },
+      "categorical": {
+        "deuteranopia": {
+          "minimum_pairwise_rgb_distance": 0.1467997718335441
+        },
+        "grayscale": {
+          "minimum_pairwise_rgb_distance": 0.05971839490253155
+        },
+        "protanopia": {
+          "minimum_pairwise_rgb_distance": 0.1805910769543685
+        }
+      },
+      "cividis": {
+        "deuteranopia": {
+          "minimum_pairwise_rgb_distance": 0.5379040344101266
+        },
+        "grayscale": {
+          "minimum_pairwise_rgb_distance": 0.5238663974722448
+        },
+        "protanopia": {
+          "minimum_pairwise_rgb_distance": 0.5273488835355117
+        }
+      }
+    },
+    "rank_gap_secondary_encoding": "circle_triangle_markers_and_dot_slash_map_hatching",
+    "secondary_encodings_verified": {
+      "categorical_hatching": {
+        "observed": [],
+        "passed": true,
+        "status": "not_applicable_no_categorical_main_map_fill"
+      },
+      "quartile_matrix_annotations": {
+        "observed": 32,
+        "passed": true
+      },
+      "stability_marker_shapes": {
+        "observed_vertex_counts": [
+          11
+        ],
+        "passed": true
+      },
+      "transition_hatching": {
+        "observed": [
+          "//"
+        ],
+        "passed": true
+      }
+    },
+    "sequential_map_encoding": "cividis_luminance_order",
+    "simulations_generated": [
+      "grayscale",
+      "protanopia",
+      "deuteranopia"
+    ]
+  },
+  "figures": {
+    "figure_1_data_flow_coverage.png": {
+      "color_vision_palette_review": "cividis_and_RdBu_r_with_grayscale_distinguishable_states",
+      "file_size_bytes": 320483,
+      "grayscale_renderable": true,
+      "pixel_height": 1463,
+      "pixel_width": 2123,
+      "simulations": {
+        "deuteranopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.16463596387393759
+        },
+        "grayscale": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.16306793217961157
+        },
+        "protanopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.16440565700803253
+        }
+      }
+    },
+    "figure_2_cardiometabolic_patterns.png": {
+      "color_vision_palette_review": "cividis_and_RdBu_r_with_grayscale_distinguishable_states",
+      "file_size_bytes": 231742,
+      "grayscale_renderable": true,
+      "pixel_height": 1383,
+      "pixel_width": 2124,
+      "simulations": {
+        "deuteranopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.20614884181355822
+        },
+        "grayscale": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.20614884181355822
+        },
+        "protanopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.20614884181355822
+        }
+      }
+    },
+    "figure_3_copd_patterns.png": {
+      "color_vision_palette_review": "cividis_and_RdBu_r_with_grayscale_distinguishable_states",
+      "file_size_bytes": 215550,
+      "grayscale_renderable": true,
+      "pixel_height": 1463,
+      "pixel_width": 2024,
+      "simulations": {
+        "deuteranopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.25994585324011465
+        },
+        "grayscale": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.24530036669567282
+        },
+        "protanopia": {
+          "luminance_range": 1.0,
+          "nonblank": true,
+          "pixel_standard_deviation": 0.25622200506652854
+        }
+      }
+    }
+  },
+  "status": "passed_automated_render_and_accessibility_smoke_check",
+  "submission_format": "PDF vector exports"
+}

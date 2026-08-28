@@ -1,0 +1,6 @@
+# Public timezone string misclassified by the generic API-key rule.
+sources/SOURCE_REGISTRY.yml:generic-api-key:3
+
+# SHA-256 output digests misclassified by the Discord-token rule.
+outputs/notebooks/chicago_healthmap_master/notebook_run_manifest.json:discord-api-token:255
+outputs/notebooks/chicago_healthmap_master/notebook_run_manifest.json:discord-api-token:256

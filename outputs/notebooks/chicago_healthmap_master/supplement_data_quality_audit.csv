@@ -1,0 +1,10 @@
+check_id,domain,question,expected,observed,status,severity,source_artifact,authorization
+dataset_shape,shape,Does the artifact match its frozen shape?,20536 x 97,20536 x 97,pass,critical_if_failed,analytic parquet,False
+primary_key_uniqueness,grain,Is one row retained per governed key?,0 duplicate keys,0 duplicate keys,pass,critical_if_failed,analytic parquet,False
+direct_values,validity,Are CHM disease values direct and uninterpolated?,direct first-party values,direct_first_party_export_not_interpolated,pass,critical_if_failed,dataset lineage,False
+suppression_state,validity,Are suppression and observed values distinct?,numerator <10 iff suppressed,2020 suppressed rows,pass,critical_if_failed,analytic parquet,False
+source_roles,integrity,Are public-source roles geography-specific?,PLACES comparator on tracts only,role separation verified,pass,critical_if_failed,source/join manifest,False
+source_periods,timeliness,Are source periods explicit and noninterchangeable?,source-specific periods,"CHM=2019,2020,2021,2022,2023,2024; Atlas=2019,2020,2021,2022,2023,2024; ACS=2020-2024; PLACES=2023 BRFSS / 2025 release",pass,critical_if_failed,analytic parquet,False
+join_cardinality,integrity,Do joins avoid row multiplication?,one-to-one or many-to-one,many_to_one,pass,critical_if_failed,source/join manifest,False
+checksums,provenance,Are built artifacts checksum-bound?,checksums present,8 checksums,pass,critical_if_failed,dataset manifest,False
+authorization,governance,Is manuscript authorization closed?,results_authorized=false,results_authorized=false,pass,critical_if_failed,results authorization,False

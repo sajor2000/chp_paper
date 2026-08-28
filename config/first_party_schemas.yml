@@ -1,0 +1,136 @@
+schema_version: 1
+
+# This catalog records exact source shapes without inventing semantic column names.
+# The archived website glossary contains no export-column order, and no CAPriCORN
+# export specification or owner correspondence is present in the evidence snapshot.
+# Consequently every nonempty position remains unverified and blocked from analysis.
+tables:
+  community_area_description_facts.text:
+    observed_rows: 77
+    observed_field_counts: [20]
+    empty_expected: false
+    positional_contract: &unverified_20
+      count: 20
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_aldermanic.text:
+    observed_rows: 50
+    observed_field_counts: [18]
+    empty_expected: false
+    positional_contract:
+      count: 18
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_census_tracts.text:
+    observed_rows: 3265
+    observed_field_counts: [20]
+    empty_expected: false
+    positional_contract: *unverified_20
+  dim_community_area_reliability_crosswalk.text:
+    observed_rows: 77
+    observed_field_counts: [7]
+    empty_expected: false
+    positional_contract: &unverified_7
+      count: 7
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_community_areas.text:
+    observed_rows: 77
+    observed_field_counts: [17]
+    empty_expected: false
+    positional_contract: &unverified_17
+      count: 17
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_conditions.text:
+    observed_rows: 39
+    observed_field_counts: [11]
+    empty_expected: false
+    positional_contract:
+      count: 11
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_congressional_districts.text:
+    observed_rows: 17
+    observed_field_counts: [17]
+    empty_expected: false
+    positional_contract: *unverified_17
+  dim_tract_reliability_crosswalk.text:
+    observed_rows: 3265
+    observed_field_counts: [7]
+    empty_expected: false
+    positional_contract: *unverified_7
+  dim_ward_reliability_crosswalk.text:
+    observed_rows: 50
+    observed_field_counts: [7]
+    empty_expected: false
+    positional_contract: *unverified_7
+  dim_zcta.text:
+    observed_rows: 400
+    observed_field_counts: [16]
+    empty_expected: false
+    positional_contract:
+      count: 16
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  dim_zcta_reliability_crosswalk.text:
+    observed_rows: 400
+    observed_field_counts: [7]
+    empty_expected: false
+    positional_contract: *unverified_7
+  drug_providers.text:
+    observed_rows: 0
+    observed_field_counts: []
+    empty_expected: true
+    suppression_semantics: unverified
+  fact_chicago_condition_prevalence.text:
+    observed_rows: 234
+    observed_field_counts: [7]
+    empty_expected: false
+    positional_contract: *unverified_7
+  fact_community_area_condition_stats.text:
+    observed_rows: 17836
+    observed_field_counts: [67]
+    empty_expected: false
+    positional_contract: &unverified_67
+      count: 67
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; subgroup and measure semantics lack positional owner evidence"
+  fact_community_area_vulnerability.text:
+    observed_rows: 77
+    observed_field_counts: [40]
+    empty_expected: false
+    positional_contract:
+      count: 40
+      evidence_status: unverified
+      evidence_source: "2026-05-27 export: observed position and field count only; semantic owner evidence absent"
+  fact_congress_condition_stats.text:
+    observed_rows: 3096
+    observed_field_counts: [67]
+    empty_expected: false
+    positional_contract: *unverified_67
+  fact_tract_condition_stats.text:
+    observed_rows: 342273
+    observed_field_counts: [67]
+    empty_expected: false
+    positional_contract: *unverified_67
+  fact_ward_condition_stats.text:
+    observed_rows: 11698
+    observed_field_counts: [67]
+    empty_expected: false
+    positional_contract: *unverified_67
+  fact_zcta_condition_stats.text:
+    observed_rows: 66903
+    observed_field_counts: [67]
+    empty_expected: false
+    positional_contract: *unverified_67
+  svi_2020.text:
+    observed_rows: 3263
+    observed_field_counts: [20]
+    empty_expected: false
+    positional_contract: *unverified_20
+  wic_locations.text:
+    observed_rows: 0
+    observed_field_counts: []
+    empty_expected: true
+    suppression_semantics: unverified

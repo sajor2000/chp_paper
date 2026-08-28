@@ -1,0 +1,178 @@
+{
+  "columns": [
+    {
+      "dtype": "str",
+      "name": "source_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "snapshot_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_table",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_record_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_type",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_geography_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_level_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "time_period",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_id",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "source_condition_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "condition_family",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "case_id",
+      "nullable": false
+    },
+    {
+      "dtype": "int64",
+      "name": "numerator",
+      "nullable": false
+    },
+    {
+      "dtype": "int64",
+      "name": "denominator",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "denominator_status",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "published_measure_name",
+      "nullable": false
+    },
+    {
+      "dtype": "float64",
+      "name": "published_measure_value",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "published_measure_unit",
+      "nullable": false
+    },
+    {
+      "dtype": "bool",
+      "name": "suppression_flag",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "suppression_reason",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "source_position_contract",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "sap_variable_role",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geography_name_source",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geometry_wkt",
+      "nullable": false
+    },
+    {
+      "dtype": "float64",
+      "name": "capture_rate",
+      "nullable": true
+    },
+    {
+      "dtype": "str",
+      "name": "reliability_tier",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "equity_alignment_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "combined_reliability_label",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "public_reliability_description",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "disease_value_derivation",
+      "nullable": false
+    },
+    {
+      "dtype": "str",
+      "name": "geographic_linkage_role",
+      "nullable": false
+    }
+  ],
+  "dataset_id": "chicago_healthmap_zcta_sidecar",
+  "grain": "geography_type-geography_id-period-condition",
+  "primary_key": [
+    "geography_type",
+    "geography_id",
+    "time_period",
+    "condition_id"
+  ],
+  "schema_version": 1
+}

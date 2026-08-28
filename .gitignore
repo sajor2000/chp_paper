@@ -1,0 +1,60 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Raw and derived source data
+data/
+sources/**/original/
+sources/**/requests/
+sources/**/extracted/
+sources/**/snapshots/
+*.parquet
+*.feather
+*.arrow
+*.rds
+*.rda
+*.rdata
+*.sqlite
+*.sqlite3
+*.db
+*.dbf
+
+# The release includes only the compressed aggregate analytic CSV.
+outputs/notebooks/chicago_healthmap_master/00_master_analytic_dataset.csv
+outputs/notebooks/chicago_healthmap_master/chicago_healthmap_zcta_sidecar.csv
+
+# Local render and analysis directories not included in the release
+outputs/frozen/
+outputs/quality/
+outputs/manuscript/
+outputs/notebooks/audit-*/
+outputs/notebooks/test-*/
+
+# Python and notebook environments
+.venv/
+.python-version
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.marimo/
+notebooks/__marimo__/
+
+# R and R Markdown local products
+.Rhistory
+.RData
+.Rproj.user/
+*_cache/
+*_files/
+*.knit.md
+
+# Local worktrees and editor metadata
+.worktrees/
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,144 @@
+contract_version: 1
+contract_status: study_specific_verified_interface_with_open_semantic_gates
+
+evidence:
+  audited_at: "2026-08-27"
+  source: "Read-only Neon PostgreSQL information_schema, pg_catalog, relation comments, and aggregate reconciliation queries"
+  database_role: "read_only_role_identifier_omitted_from_public_release"
+  transaction_read_only: true
+  credential_material_stored: false
+  limitation: >-
+    The database contains aggregate geography-condition-year records, not patient-level
+    records. The audit verifies stored schema and aggregate consistency but cannot verify
+    MRAIA deduplication, patient-level denominator construction, or diabetes mutual
+    exclusivity.
+
+study_scope:
+  source_years: [2019, 2020, 2021, 2022, 2023, 2024]
+  source_counties:
+    - {fips: "17031", name: "Cook"}
+    - {fips: "17043", name: "DuPage"}
+    - {fips: "17089", name: "Kane"}
+    - {fips: "17097", name: "Lake"}
+    - {fips: "17111", name: "McHenry"}
+    - {fips: "17197", name: "Will"}
+  primary_analysis_geography: census_tract
+  chicago_boundary_rule_status: provisional_primary_representative_point_requires_statistician_signoff
+  chicago_boundary_rule_primary: 2024_tiger_tract_representative_point_covered_by_frozen_77_area_union
+  chicago_boundary_rule_sensitivity: at_least_50_percent_of_tract_area_covered_by_frozen_77_area_union
+  prohibited_boundary_rule: any_polygon_intersection
+  annual_tract_minimum_denominator: 30
+
+condition_fact_columns:
+  - id
+  - geography_key
+  - dx_year
+  - condition_key
+  - total_count
+  - age_18_34
+  - age_35_44
+  - age_45_54
+  - age_55_64
+  - age_65_74
+  - age_75_84
+  - age_85_above
+  - sex_male
+  - sex_female
+  - sex_other_unknown
+  - race_white
+  - race_black
+  - race_asian
+  - race_other
+  - race_unknown
+  - hispanic_yes
+  - hispanic_no
+  - hispanic_other
+  - hispanic_unknown
+  - denom_total_count
+  - denom_age_18_34
+  - denom_age_35_44
+  - denom_age_45_54
+  - denom_age_55_64
+  - denom_age_65_74
+  - denom_age_75_84
+  - denom_age_85_above
+  - denom_sex_male
+  - denom_sex_female
+  - denom_sex_other_unknown
+  - denom_race_white
+  - denom_race_black
+  - denom_race_asian
+  - denom_race_other
+  - denom_race_unknown
+  - denom_hispanic_yes
+  - denom_hispanic_no
+  - denom_hispanic_other
+  - denom_hispanic_unknown
+  - prev_total_count
+  - prev_age_18_34
+  - prev_age_35_44
+  - prev_age_45_54
+  - prev_age_55_64
+  - prev_age_65_74
+  - prev_age_75_84
+  - prev_age_85_above
+  - prev_sex_male
+  - prev_sex_female
+  - prev_sex_other_unknown
+  - prev_race_white
+  - prev_race_black
+  - prev_race_asian
+  - prev_race_other
+  - prev_race_unknown
+  - prev_hispanic_yes
+  - prev_hispanic_no
+  - prev_hispanic_other
+  - prev_hispanic_unknown
+  - data_source
+  - loaded_at
+  - is_active
+
+table_bindings:
+  fact_tract_condition_stats.text:
+    geography_column: geocode_tract
+    geography_dimension: dim_census_tracts.text
+    stored_measure: crude_ehr_diagnosed_proportion
+    denominator_contract: annual_unique_observed_adults_with_at_least_one_of_39_conditions
+    primary_estimand_authorized: true
+  fact_community_area_condition_stats.text:
+    geography_column: community_area_id
+    geography_dimension: dim_community_areas.text
+    stored_measure: source_density_weighted_diagnosed_proportion
+    denominator_contract: condition_varying_source_denominator
+    primary_estimand_authorized: false
+  fact_zcta_condition_stats.text:
+    geography_column: zcta5
+    geography_dimension: dim_zcta.text
+    stored_measure: source_density_weighted_diagnosed_proportion
+    denominator_contract: condition_varying_source_denominator
+    primary_estimand_authorized: false
+  fact_chicago_condition_prevalence.text:
+    geography_column: chicago
+    derivation: ratio_of_summed_community_area_numerators_and_denominators
+    primary_estimand_authorized: false
+
+raw_data_gates:
+  - tract_denominator_constant_within_geography_year
+  - tract_published_measure_equals_numerator_divided_by_denominator_when_denominator_positive
+  - tract_positive_counts_below_10_absent
+  - counts_nonnegative_and_numerator_not_greater_than_denominator
+  - published_proportions_within_zero_one
+  - out_of_scope_county_rows_have_zero_numerator_and_denominator
+  - fact_keys_unique_within_geography_condition_year
+  - chicago_table_equals_ratio_of_sums_from_community_area_table
+  - tract_denominator_equals_annual_capture_count_for_linked_tract_years
+
+fail_closed_semantics:
+  zero_count: zero_or_suppressed_unresolved
+  missing_row: not_observed_not_zero
+  positive_count_below_10: conflicts_with_public_suppression_description
+  community_area_weighting: exact_density_weighting_and_rounding_specification_required
+  zcta_weighting: exact_density_weighting_and_rounding_specification_required
+  capture_rate: retain_supplied_static_value_do_not_recompute
+  annual_tract_eligibility: chicago_primary_boundary_and_denominator_at_least_30_and_observable_after_suppression
+  diabetes_combination: blocked_pending_patient_level_mutual_exclusivity_and_denominator_equivalence

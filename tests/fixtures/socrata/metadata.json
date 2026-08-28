@@ -1,0 +1,15 @@
+{
+  "id": "igwz-8jzy",
+  "name": "Boundaries - Community Areas",
+  "attribution": "City of Chicago",
+  "rowsUpdatedAt": 1745363197,
+  "license": {"name": "See Terms of Use"},
+  "columns": [
+    {"name": "the_geom", "fieldName": "the_geom", "dataTypeName": "multipolygon"},
+    {"name": "AREA_NUMBE", "fieldName": "area_numbe", "dataTypeName": "number"},
+    {"name": "COMMUNITY", "fieldName": "community", "dataTypeName": "text"},
+    {"name": "AREA_NUM_1", "fieldName": "area_num_1", "dataTypeName": "text"},
+    {"name": "SHAPE_AREA", "fieldName": "shape_area", "dataTypeName": "number"},
+    {"name": "SHAPE_LEN", "fieldName": "shape_len", "dataTypeName": "number"}
+  ]
+}

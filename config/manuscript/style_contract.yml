@@ -1,0 +1,5 @@
+required_measure_phrase: EHR-diagnosed proportion among observed CAPriCORN adults
+paragraph_pattern: finding -> boundary -> implication
+prohibited_observational_verbs: [cause, caused, causes, drive, drives, drove, effect, effects, impact, impacts, impacted, improve, improves, improved, lead, leads, led, prevent, prevents, prevented, reduce, reduces, reduced]
+unsupported_superlatives: [actionable, comprehensive, first, novel, representative, robust, scalable, unique, validated]
+policy_boundary: Findings may formulate planning questions but do not establish need, access, capacity, underdiagnosis, optimal allocation, care improvement, or outcomes.

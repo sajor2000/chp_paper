@@ -1,0 +1,12 @@
+source_id: capricorn_chicagohealthmap_export_2026_05_27
+organization: CAPriCORN and CONSCIENCE Project
+dataset_title: Chicago Health Map data exports
+transport: documented_export
+snapshot_date: "2026-05-27"
+snapshot_subdir: first_party/capricorn
+expected_file_count: 21
+observed_empty_files:
+  - drug_providers.text
+  - wic_locations.text
+observed_empty_disposition: Preserve byte-for-byte and flag for methods review.
+redistribution: Original export bytes remain local; redistribution terms require review.

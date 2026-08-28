@@ -1,0 +1,34 @@
+column,dtype,nullable,non_missing_count,missing_count,source_table,source_position,audit_note
+source_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+snapshot_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_table,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_record_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_type,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+source_geography_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+geography_level_role,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+time_period,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+source_condition_label,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_label,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+condition_family,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+case_id,str,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+numerator,int64,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+denominator,int64,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+denominator_status,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+published_measure_name,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+published_measure_value,float64,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+published_measure_unit,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+suppression_flag,bool,False,7585,0,condition fact tables,see source_position_contract,Mapped from S4 accepted first-party condition-stat positions.
+suppression_reason,str,True,3250,4335,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+source_position_contract,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+sap_variable_role,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+geography_name_source,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+geometry_wkt,str,False,7585,0,dim_zcta.text,see source_position_contract,Public City of Chicago community-area boundary snapshot.
+capture_rate,float64,True,3888,3697,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+reliability_tier,str,False,7585,0,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+equity_alignment_label,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+combined_reliability_label,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.
+public_reliability_description,str,False,7585,0,reliability crosswalk tables,see source_position_contract,Mapped from S4 accepted reliability crosswalk positions.
+disease_value_derivation,str,False,7585,0,analysis_dataset_builder,see source_position_contract,"Audit label: disease values remain direct first-party exports, not interpolated."
+geographic_linkage_role,str,False,7585,0,derived_or_optional_public_context,see source_position_contract,Derived audit field or optional public comparator context.

@@ -1,0 +1,666 @@
+{
+  "approval_record_format": {
+    "approval_fields": [
+      "human",
+      "date",
+      "decision"
+    ],
+    "case_fields": [
+      "order",
+      "case_id",
+      "display_name"
+    ],
+    "destination": "outputs/governance/case_selection.json",
+    "required_fields": [
+      "record_type",
+      "gate",
+      "status",
+      "outcome_blinded",
+      "cases",
+      "approval"
+    ],
+    "required_values": {
+      "gate": "S5",
+      "outcome_blinded": true,
+      "record_type": "outcome_blinded_case_selection",
+      "status": "approved"
+    }
+  },
+  "blocked_actions": [
+    "no outcome unblinding",
+    "no confirmatory modeling",
+    "no Results prose",
+    "no final analytic dataset",
+    "no combined marimo case-study notebook"
+  ],
+  "forbidden_information": [
+    "life-expectancy values",
+    "mortality values",
+    "outcome maps",
+    "outcome correlations",
+    "model results",
+    "outcome-linked residuals"
+  ],
+  "gate": "S5",
+  "outcome_blinded": true,
+  "reconciliation_template": {
+    "entries": [
+      {
+        "case_id": "cardiometabolic_bundle",
+        "disagreement_disposition": null,
+        "hard_gate_disposition": "pending",
+        "promoted": null,
+        "reconciled_total_score": null
+      },
+      {
+        "case_id": "respiratory_copd",
+        "disagreement_disposition": null,
+        "hard_gate_disposition": "pending",
+        "promoted": null,
+        "reconciled_total_score": null
+      }
+    ],
+    "outcome_information_used": false,
+    "portfolio_decision": "pending_signed_S5_decision",
+    "status": "pending_reconciliation"
+  },
+  "record_type": "outcome_blinded_s5_scoring_artifacts_template",
+  "results_authorized": false,
+  "scorer_worksheets": [
+    {
+      "outcome_blinded_attestation": "Complete without life-expectancy values, mortality values, outcome maps, outcome correlations, model results, or outcome-linked residuals.",
+      "outcome_information_used": false,
+      "rows": [
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Community-area usability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "outputs/provenance/variable_lineage.csv",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 \u226598%; 12 for 95%-97.9%; 8 for 90%-94.9%; hard fail <90%",
+          "hard_gate": "\u226590% of 231 area-years usable and no year <85%",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Outcome-blinded eligibility and suppression summary",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Tract usability/precision",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 \u226590%; 12 for 80%-89.9%; 8 for 70%-79.9%; 4 for 60%-69.9%; hard fail <60% unless community-area-only predeclared",
+          "hard_gate": "\u226560% or signed community-area-only declaration",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Displayable-tract precision audit by year",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Predictor temporal stability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/methods/data_sources.md"
+          ],
+          "fixed_scoring_rule": "10 if median area rank correlation \u22650.80 and no discontinuity; 7 for 0.60-0.79; 3 below 0.60; 0 with unexplained discontinuity",
+          "hard_gate": "No unresolved system discontinuity",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Predictor-only annual ranks and denominator diagnostics",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Phenotype interpretability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 validated stable definition/exclusions; 10 stable diagnosis-only with documented sensitivity; 5 material coding ambiguity; hard fail unresolved",
+          "hard_gate": "Resolved numerator, denominator, phenotype, suppression",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Signed S4 semantic audit",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Comparator definition/period",
+          "evidence_references": [
+            "config/source_registry.yml",
+            "docs/methods/data_sources.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 aligned crude adult comparator at tract and community-area levels; 10 one level; 5 materially different but interpretable; 0 none",
+          "hard_gate": "Independent comparator or aligned supportive mortality construct",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Definition, universe, period, vintage matrix",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Evidence and novelty gap",
+          "evidence_references": [
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv",
+            "sources/literature/paperclip/snapshots/2026-07-14/verified_corpus.md"
+          ],
+          "fixed_scoring_rule": "15 direct rationale plus search-bounded gap; 10 supportive rationale/gap; 5 crowded literature with limited distinct contribution; 0 no rationale",
+          "hard_gate": "Defensible literature rationale",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Frozen evidence matrix independent of outcomes",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Translation questionability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "sources/public/_registry/acquisition_matrix.csv",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "10 concrete FQHC/CBO questions supported by semantics; 5 general public-health relevance; 0 only speculative action claims",
+          "hard_gate": "No unsupported intervention or outcome claim",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Question-formulation review",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Distinct portfolio contribution",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv"
+          ],
+          "fixed_scoring_rule": "5 different phenotype/ascertainment/reliability lesson; 2 partial overlap; 0 duplication",
+          "hard_gate": "Nonduplicative promoted portfolio",
+          "hard_gate_status": "pending",
+          "maximum_points": 5,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Cross-candidate comparison",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Community-area usability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "outputs/provenance/variable_lineage.csv",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 \u226598%; 12 for 95%-97.9%; 8 for 90%-94.9%; hard fail <90%",
+          "hard_gate": "\u226590% of 231 area-years usable and no year <85%",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Outcome-blinded eligibility and suppression summary",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Tract usability/precision",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 \u226590%; 12 for 80%-89.9%; 8 for 70%-79.9%; 4 for 60%-69.9%; hard fail <60% unless community-area-only predeclared",
+          "hard_gate": "\u226560% or signed community-area-only declaration",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Displayable-tract precision audit by year",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Predictor temporal stability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/methods/data_sources.md"
+          ],
+          "fixed_scoring_rule": "10 if median area rank correlation \u22650.80 and no discontinuity; 7 for 0.60-0.79; 3 below 0.60; 0 with unexplained discontinuity",
+          "hard_gate": "No unresolved system discontinuity",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Predictor-only annual ranks and denominator diagnostics",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Phenotype interpretability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 validated stable definition/exclusions; 10 stable diagnosis-only with documented sensitivity; 5 material coding ambiguity; hard fail unresolved",
+          "hard_gate": "Resolved numerator, denominator, phenotype, suppression",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Signed S4 semantic audit",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Comparator definition/period",
+          "evidence_references": [
+            "config/source_registry.yml",
+            "docs/methods/data_sources.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 aligned crude adult comparator at tract and community-area levels; 10 one level; 5 materially different but interpretable; 0 none",
+          "hard_gate": "Independent comparator or aligned supportive mortality construct",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Definition, universe, period, vintage matrix",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Evidence and novelty gap",
+          "evidence_references": [
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv",
+            "sources/literature/paperclip/snapshots/2026-07-14/verified_corpus.md"
+          ],
+          "fixed_scoring_rule": "15 direct rationale plus search-bounded gap; 10 supportive rationale/gap; 5 crowded literature with limited distinct contribution; 0 no rationale",
+          "hard_gate": "Defensible literature rationale",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Frozen evidence matrix independent of outcomes",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Translation questionability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "sources/public/_registry/acquisition_matrix.csv",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "10 concrete FQHC/CBO questions supported by semantics; 5 general public-health relevance; 0 only speculative action claims",
+          "hard_gate": "No unsupported intervention or outcome claim",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Question-formulation review",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Distinct portfolio contribution",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv"
+          ],
+          "fixed_scoring_rule": "5 different phenotype/ascertainment/reliability lesson; 2 partial overlap; 0 duplication",
+          "hard_gate": "Nonduplicative promoted portfolio",
+          "hard_gate_status": "pending",
+          "maximum_points": 5,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Cross-candidate comparison",
+          "score": null
+        }
+      ],
+      "scorer_id": "blinded_scorer_1",
+      "status": "pending_completion"
+    },
+    {
+      "outcome_blinded_attestation": "Complete without life-expectancy values, mortality values, outcome maps, outcome correlations, model results, or outcome-linked residuals.",
+      "outcome_information_used": false,
+      "rows": [
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Community-area usability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "outputs/provenance/variable_lineage.csv",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 \u226598%; 12 for 95%-97.9%; 8 for 90%-94.9%; hard fail <90%",
+          "hard_gate": "\u226590% of 231 area-years usable and no year <85%",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Outcome-blinded eligibility and suppression summary",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Tract usability/precision",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 \u226590%; 12 for 80%-89.9%; 8 for 70%-79.9%; 4 for 60%-69.9%; hard fail <60% unless community-area-only predeclared",
+          "hard_gate": "\u226560% or signed community-area-only declaration",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Displayable-tract precision audit by year",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Predictor temporal stability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/methods/data_sources.md"
+          ],
+          "fixed_scoring_rule": "10 if median area rank correlation \u22650.80 and no discontinuity; 7 for 0.60-0.79; 3 below 0.60; 0 with unexplained discontinuity",
+          "hard_gate": "No unresolved system discontinuity",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Predictor-only annual ranks and denominator diagnostics",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Phenotype interpretability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 validated stable definition/exclusions; 10 stable diagnosis-only with documented sensitivity; 5 material coding ambiguity; hard fail unresolved",
+          "hard_gate": "Resolved numerator, denominator, phenotype, suppression",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Signed S4 semantic audit",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Comparator definition/period",
+          "evidence_references": [
+            "config/source_registry.yml",
+            "docs/methods/data_sources.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 aligned crude adult comparator at tract and community-area levels; 10 one level; 5 materially different but interpretable; 0 none",
+          "hard_gate": "Independent comparator or aligned supportive mortality construct",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Definition, universe, period, vintage matrix",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Evidence and novelty gap",
+          "evidence_references": [
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv",
+            "sources/literature/paperclip/snapshots/2026-07-14/verified_corpus.md"
+          ],
+          "fixed_scoring_rule": "15 direct rationale plus search-bounded gap; 10 supportive rationale/gap; 5 crowded literature with limited distinct contribution; 0 no rationale",
+          "hard_gate": "Defensible literature rationale",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Frozen evidence matrix independent of outcomes",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Translation questionability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "sources/public/_registry/acquisition_matrix.csv",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "10 concrete FQHC/CBO questions supported by semantics; 5 general public-health relevance; 0 only speculative action claims",
+          "hard_gate": "No unsupported intervention or outcome claim",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Question-formulation review",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Cardiometabolic bundle",
+          "candidate_id": "cardiometabolic_bundle",
+          "domain": "Distinct portfolio contribution",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv"
+          ],
+          "fixed_scoring_rule": "5 different phenotype/ascertainment/reliability lesson; 2 partial overlap; 0 duplication",
+          "hard_gate": "Nonduplicative promoted portfolio",
+          "hard_gate_status": "pending",
+          "maximum_points": 5,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Cross-candidate comparison",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Community-area usability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "outputs/provenance/variable_lineage.csv",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 \u226598%; 12 for 95%-97.9%; 8 for 90%-94.9%; hard fail <90%",
+          "hard_gate": "\u226590% of 231 area-years usable and no year <85%",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Outcome-blinded eligibility and suppression summary",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Tract usability/precision",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 \u226590%; 12 for 80%-89.9%; 8 for 70%-79.9%; 4 for 60%-69.9%; hard fail <60% unless community-area-only predeclared",
+          "hard_gate": "\u226560% or signed community-area-only declaration",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Displayable-tract precision audit by year",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Predictor temporal stability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/methods/data_sources.md"
+          ],
+          "fixed_scoring_rule": "10 if median area rank correlation \u22650.80 and no discontinuity; 7 for 0.60-0.79; 3 below 0.60; 0 with unexplained discontinuity",
+          "hard_gate": "No unresolved system discontinuity",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Predictor-only annual ranks and denominator diagnostics",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Phenotype interpretability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/analysis/methods_discrepancies.md",
+            "docs/analysis/data_dictionary.md"
+          ],
+          "fixed_scoring_rule": "15 validated stable definition/exclusions; 10 stable diagnosis-only with documented sensitivity; 5 material coding ambiguity; hard fail unresolved",
+          "hard_gate": "Resolved numerator, denominator, phenotype, suppression",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Signed S4 semantic audit",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Comparator definition/period",
+          "evidence_references": [
+            "config/source_registry.yml",
+            "docs/methods/data_sources.md",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "15 aligned crude adult comparator at tract and community-area levels; 10 one level; 5 materially different but interpretable; 0 none",
+          "hard_gate": "Independent comparator or aligned supportive mortality construct",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Definition, universe, period, vintage matrix",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Evidence and novelty gap",
+          "evidence_references": [
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv",
+            "sources/literature/paperclip/snapshots/2026-07-14/verified_corpus.md"
+          ],
+          "fixed_scoring_rule": "15 direct rationale plus search-bounded gap; 10 supportive rationale/gap; 5 crowded literature with limited distinct contribution; 0 no rationale",
+          "hard_gate": "Defensible literature rationale",
+          "hard_gate_status": "pending",
+          "maximum_points": 15,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Frozen evidence matrix independent of outcomes",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Translation questionability",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "sources/public/_registry/acquisition_matrix.csv",
+            "outputs/provenance/variable_lineage.csv"
+          ],
+          "fixed_scoring_rule": "10 concrete FQHC/CBO questions supported by semantics; 5 general public-health relevance; 0 only speculative action claims",
+          "hard_gate": "No unsupported intervention or outcome claim",
+          "hard_gate_status": "pending",
+          "maximum_points": 10,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Question-formulation review",
+          "score": null
+        },
+        {
+          "candidate_display_name": "Respiratory COPD candidate",
+          "candidate_id": "respiratory_copd",
+          "domain": "Distinct portfolio contribution",
+          "evidence_references": [
+            "docs/analysis/s4_methods_mapping.json",
+            "docs/methods/literature_search_protocol.md",
+            "sources/literature/pubmed/snapshots/2026-07-14/records.csv"
+          ],
+          "fixed_scoring_rule": "5 different phenotype/ascertainment/reliability lesson; 2 partial overlap; 0 duplication",
+          "hard_gate": "Nonduplicative promoted portfolio",
+          "hard_gate_status": "pending",
+          "maximum_points": 5,
+          "outcome_information_used": false,
+          "rationale": null,
+          "required_evidence": "Cross-candidate comparison",
+          "score": null
+        }
+      ],
+      "scorer_id": "blinded_scorer_2",
+      "status": "pending_completion"
+    }
+  ],
+  "source_scorecard_path": "docs/analysis/s5_case_selection_scorecard.json",
+  "source_scorecard_sha256": "935c2f4205cb7919b682fa4ae2545842f1da384252857b9ab20e71bc6a5a4189",
+  "status": "worksheets_ready_reconciliation_pending"
+}

@@ -1,0 +1,41 @@
+{
+  "checksums": {
+    "chicago_healthmap_zcta_sidecar.csv": "2a29a5748b8c758fa56c88dfbdb1dc13ebda470df1a600c93a7c6cc921a11545",
+    "chicago_healthmap_zcta_sidecar.parquet": "4dbc4bc52a61d7191eeff876c22051158043b0f269ef4f979a387788708454bf",
+    "chicago_healthmap_zcta_sidecar.schema.json": "d2e80dbbbd643d305d169de7f390b24680a1a422c14e37caf4e8896cd804e1f7",
+    "chicago_healthmap_zcta_sidecar_data_book.csv": "513c68ed284df6226961a853c1ca481dfb6039d90fbb3b3ed9cfbca01c48ada0",
+    "chicago_healthmap_zcta_sidecar_data_book.html": "d9979f8bf5fc0411caddb94da20fd926acd0813cc4e93bd5ceef3f819db30db8",
+    "chicago_healthmap_zcta_sidecar_lineage.csv": "d37e64b449a187cb5c0971f8d3e96e134af18df99b6c67584ec4e1be19ff4dfc",
+    "chicago_healthmap_zcta_sidecar_source_join_manifest.json": "a1af4f452deddd99c2d1f695fcd5107aa0cbd2809f88ce893a69a4d234452cd0"
+  },
+  "clinical_value_rule": "Direct first-party ZCTA values; never derived from tracts.",
+  "condition_ids": [
+    "copd",
+    "diabetes_with_complication",
+    "diabetes_without_complication",
+    "hypertension"
+  ],
+  "dataset_id": "chicago_healthmap_zcta_sidecar",
+  "excluded_rows": 59318,
+  "geography_count": 367,
+  "grain": "zcta-period-condition",
+  "manifest_schema_version": 2,
+  "primary_key": [
+    "geography_type",
+    "geography_id",
+    "time_period",
+    "condition_id"
+  ],
+  "results_authorized": false,
+  "row_count": 7585,
+  "selected_rows": 7585,
+  "source_input_rows": 66903,
+  "time_periods": [
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024"
+  ]
+}

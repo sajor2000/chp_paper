@@ -1,0 +1,24 @@
+article_type: Original Investigation
+main_text_words: 3000
+abstract_words: 350
+title_characters: 100
+key_points_words: 100
+max_main_displays: 5
+reference_range: [50, 75]
+abstract_headings:
+  - Importance
+  - Objective
+  - Design
+  - Setting
+  - Participants
+  - Exposures
+  - Main Outcomes and Measures
+  - Results
+  - Conclusions and Relevance
+key_point_headings: [Question, Findings, Meaning]
+official_url: https://jamanetwork.com/journals/jama-health-forum/pages/instructions-for-authors
+# The official page was opened directly and rechecked for this notebook manuscript revision.
+accessed: 2026-08-27
+# Tavily remained quota-blocked; that tool failure is recorded separately and did not
+# prevent direct verification of the official JAMA Health Forum page.
+revalidate_days_before_submission: 30

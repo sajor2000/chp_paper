@@ -1,0 +1,335 @@
+{
+  "analysis_authorized": false,
+  "authority": {
+    "access_date": "2026-07-14",
+    "decision": "accepted_for_s4_methods_dictionary",
+    "decision_basis": "User instructed Codex to treat the ChicagoHealthMap website data dictionary as the authoritative S4 methods dictionary.",
+    "source_id": "chicagohealthmap_data_glossary",
+    "title": "Data Methods & Resources - Chicago Health Map",
+    "url": "https://chicagohealthmap.com/data-glossary"
+  },
+  "candidate_mappings": {
+    "capture_rate": {
+      "candidate_positions": "reliability crosswalk positions require generated mapping review",
+      "candidate_tables": [
+        "dim_tract_reliability_crosswalk.text",
+        "dim_community_area_reliability_crosswalk.text",
+        "dim_ward_reliability_crosswalk.text",
+        "dim_zcta_reliability_crosswalk.text"
+      ],
+      "dictionary_support": "direct"
+    },
+    "capture_rate_metric": {
+      "candidate_positions": "health-system patient and ACS adult population positions require mapping review",
+      "candidate_tables": [
+        "dim_tract_reliability_crosswalk.text",
+        "dim_census_tracts.text"
+      ],
+      "dictionary_support": "direct"
+    },
+    "geography": {
+      "candidate_positions": {
+        "dim_census_tracts.text": [
+          "position_01"
+        ],
+        "dim_tract_reliability_crosswalk.text": [
+          "position_01"
+        ],
+        "fact_tract_condition_stats.text": [
+          "position_02"
+        ]
+      },
+      "candidate_tables": [
+        "dim_census_tracts.text",
+        "fact_tract_condition_stats.text",
+        "dim_tract_reliability_crosswalk.text"
+      ],
+      "dictionary_support": "direct"
+    },
+    "small_cell_suppression": {
+      "candidate_positions": "condition-stat count cells require suppression-state mapping review",
+      "candidate_tables": [
+        "fact_tract_condition_stats.text",
+        "fact_community_area_condition_stats.text",
+        "fact_ward_condition_stats.text",
+        "fact_zcta_condition_stats.text",
+        "fact_congress_condition_stats.text"
+      ],
+      "dictionary_support": "direct"
+    },
+    "standardized_mean_difference": {
+      "candidate_positions": "age, sex, and race/ethnicity SMD positions require mapping review",
+      "candidate_tables": [
+        "dim_tract_reliability_crosswalk.text",
+        "dim_community_area_reliability_crosswalk.text",
+        "dim_ward_reliability_crosswalk.text",
+        "dim_zcta_reliability_crosswalk.text"
+      ],
+      "dictionary_support": "direct"
+    }
+  },
+  "case_study_spatial_frame": {
+    "frame": "City of Chicago",
+    "primary_geography": "census tract",
+    "rule": "Restrict case-study analytic shapefiles and mapped outputs to City of Chicago geographies while preserving six-county source provenance.",
+    "secondary_geography": "Chicago community area"
+  },
+  "concepts": {
+    "capture_rate": {
+      "definition": "Capture rate is the proportion of a census tract's adult population seen at participating health systems in a given year and is the primary data coverage measure for reliability tier assignment.",
+      "source": "ChicagoHealthMap data glossary"
+    },
+    "capture_rate_metric": {
+      "definition": "Capture Rate is health-system patients divided by ACS census tract adult population; tracts with fewer than 30 health-system patients are excluded from analysis.",
+      "source": "ChicagoHealthMap data glossary"
+    },
+    "geography": {
+      "definition": "Census tract is the primary geographic unit used in Chicago Health Map.",
+      "source": "ChicagoHealthMap data glossary"
+    },
+    "small_cell_suppression": {
+      "definition": "Counts fewer than 10 people are hidden for privacy; suppressed values display as N/A or <10, not zero.",
+      "source": "ChicagoHealthMap data glossary"
+    },
+    "standardized_mean_difference": {
+      "definition": "An absolute standardized mean difference of 0.1 or greater flags meaningful demographic imbalance and is computed separately for age, sex, and race/ethnicity.",
+      "source": "ChicagoHealthMap data glossary"
+    }
+  },
+  "position_mappings": {
+    "capture_rate": {
+      "evidence_basis": "ChicagoHealthMap glossary defines capture rate as health-system patients divided by ACS adult population; reliability crosswalk profiles show a stable rate-like position immediately after the geography key.",
+      "positions": {
+        "dim_community_area_reliability_crosswalk.text": {
+          "position_02": "capture_rate"
+        },
+        "dim_tract_reliability_crosswalk.text": {
+          "position_02": "capture_rate"
+        },
+        "dim_ward_reliability_crosswalk.text": {
+          "position_02": "capture_rate"
+        },
+        "dim_zcta_reliability_crosswalk.text": {
+          "position_02": "capture_rate"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    },
+    "denominator": {
+      "evidence_basis": "ChicagoHealthMap glossary defines the ACS adult-population denominator. Source profiles show a paired denominator-like block, with position 25 as the overall candidate and positions 26-44 as subgroup candidates. Denominator reconstruction remains guarded until aggregate denominator semantics are audited.",
+      "positions": {
+        "fact_community_area_condition_stats.text": {
+          "position_25": "overall_denominator_candidate_guarded",
+          "position_range_26_44": "subgroup_denominator_block_guarded"
+        },
+        "fact_congress_condition_stats.text": {
+          "position_25": "overall_denominator_candidate_guarded",
+          "position_range_26_44": "subgroup_denominator_block_guarded"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_25": "overall_denominator_candidate_guarded",
+          "position_range_26_44": "subgroup_denominator_block_guarded"
+        },
+        "fact_ward_condition_stats.text": {
+          "position_25": "overall_denominator_candidate_guarded",
+          "position_range_26_44": "subgroup_denominator_block_guarded"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_25": "overall_denominator_candidate_guarded",
+          "position_range_26_44": "subgroup_denominator_block_guarded"
+        }
+      },
+      "status": "methods_semantics_accepted_positions_guarded"
+    },
+    "geography": {
+      "evidence_basis": "ChicagoHealthMap glossary defines census tract as the primary geography and community area as the Chicago aggregate geography; source profiles show stable geography-key positions across dimensions, condition facts, and reliability crosswalks.",
+      "positions": {
+        "dim_census_tracts.text": {
+          "position_01": "census_tract_geography_key"
+        },
+        "dim_community_area_reliability_crosswalk.text": {
+          "position_01": "community_area_geography_key"
+        },
+        "dim_community_areas.text": {
+          "position_01": "community_area_geography_key"
+        },
+        "dim_tract_reliability_crosswalk.text": {
+          "position_01": "census_tract_geography_key"
+        },
+        "dim_zcta.text": {
+          "position_01": "zcta_geography_key",
+          "position_15": "zcta_geometry_ewkb"
+        },
+        "dim_zcta_reliability_crosswalk.text": {
+          "position_01": "zcta_geography_key"
+        },
+        "fact_community_area_condition_stats.text": {
+          "position_02": "community_area_geography_key"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_02": "census_tract_geography_key"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_02": "zcta_geography_key"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    },
+    "numerator": {
+      "evidence_basis": "ChicagoHealthMap glossary defines diagnosed condition counts. Source profiles show integer count blocks; aggregate checks identify position 05 as the total diagnosed-condition count in condition-stat tables and position 03 in the Chicago-wide prevalence table.",
+      "positions": {
+        "fact_chicago_condition_prevalence.text": {
+          "position_03": "diagnosed_condition_count"
+        },
+        "fact_community_area_condition_stats.text": {
+          "position_05": "overall_diagnosed_condition_count",
+          "position_range_06_24": "subgroup_count_block_guarded"
+        },
+        "fact_congress_condition_stats.text": {
+          "position_05": "overall_diagnosed_condition_count",
+          "position_range_06_24": "subgroup_count_block_guarded"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_05": "overall_diagnosed_condition_count",
+          "position_range_06_24": "subgroup_count_block_guarded"
+        },
+        "fact_ward_condition_stats.text": {
+          "position_05": "overall_diagnosed_condition_count",
+          "position_range_06_24": "subgroup_count_block_guarded"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_05": "overall_diagnosed_condition_count",
+          "position_range_06_24": "subgroup_count_block_guarded"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    },
+    "phenotype": {
+      "evidence_basis": "ChicagoHealthMap glossary lists the tracked conditions and ICD-10 phenotype definitions; condition fact profiles show a stable 39-condition position.",
+      "positions": {
+        "dim_conditions.text": {
+          "position_01": "condition"
+        },
+        "fact_chicago_condition_prevalence.text": {
+          "position_01": "condition"
+        },
+        "fact_community_area_condition_stats.text": {
+          "position_04": "condition"
+        },
+        "fact_congress_condition_stats.text": {
+          "position_04": "condition"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_04": "condition"
+        },
+        "fact_ward_condition_stats.text": {
+          "position_04": "condition"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_04": "condition"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    },
+    "published_measure": {
+      "evidence_basis": "ChicagoHealthMap glossary describes diagnosis percent/rate display; source profiles show paired count, denominator-like, and rate/proportion-like blocks. Downstream labels must preserve source-specific measure wording.",
+      "positions": {
+        "fact_chicago_condition_prevalence.text": {
+          "position_04": "published_condition_measure"
+        },
+        "fact_community_area_condition_stats.text": {
+          "position_45": "overall_published_condition_measure",
+          "position_range_46_64": "subgroup_measure_block_guarded"
+        },
+        "fact_congress_condition_stats.text": {
+          "position_45": "overall_published_condition_measure",
+          "position_range_46_64": "subgroup_measure_block_guarded"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_45": "overall_published_condition_measure",
+          "position_range_46_64": "subgroup_measure_block_guarded"
+        },
+        "fact_ward_condition_stats.text": {
+          "position_45": "overall_published_condition_measure",
+          "position_range_46_64": "subgroup_measure_block_guarded"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_45": "overall_published_condition_measure",
+          "position_range_46_64": "subgroup_measure_block_guarded"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    },
+    "reliability": {
+      "evidence_basis": "ChicagoHealthMap glossary defines reliability tiers and equity notes. Reliability crosswalk profiles show stable label/description positions after capture rate, but downstream code must retain source text until display labels are audited.",
+      "positions": {
+        "dim_community_area_reliability_crosswalk.text": {
+          "position_03": "reliability_tier_or_label",
+          "position_04": "equity_or_alignment_label",
+          "position_05": "combined_reliability_label",
+          "position_06": "public_reliability_description"
+        },
+        "dim_tract_reliability_crosswalk.text": {
+          "position_03": "reliability_tier_or_label",
+          "position_04": "equity_or_alignment_label",
+          "position_05": "combined_reliability_label",
+          "position_06": "public_reliability_description"
+        },
+        "dim_ward_reliability_crosswalk.text": {
+          "position_03": "reliability_tier_or_label",
+          "position_04": "equity_or_alignment_label",
+          "position_05": "combined_reliability_label",
+          "position_06": "public_reliability_description"
+        },
+        "dim_zcta_reliability_crosswalk.text": {
+          "position_03": "reliability_tier_or_label",
+          "position_04": "equity_or_alignment_label",
+          "position_05": "combined_reliability_label",
+          "position_06": "public_reliability_description"
+        }
+      },
+      "status": "label_positions_accepted_description_guarded"
+    },
+    "small_cell_suppression": {
+      "evidence_basis": "ChicagoHealthMap glossary defines fewer-than-10 suppression and suppressed values as N/A or <10, not zero. No dedicated raw suppression flag is mapped; display/output code must apply the glossary rule before public reporting.",
+      "positions": {},
+      "status": "methods_semantics_accepted_display_guarded"
+    },
+    "time_period": {
+      "evidence_basis": "ChicagoHealthMap glossary defines the 2019-2024 reporting period; condition fact profiles show a stable four-digit year position.",
+      "positions": {
+        "fact_chicago_condition_prevalence.text": {
+          "position_02": "year"
+        },
+        "fact_community_area_condition_stats.text": {
+          "position_03": "year"
+        },
+        "fact_congress_condition_stats.text": {
+          "position_03": "year"
+        },
+        "fact_tract_condition_stats.text": {
+          "position_03": "year"
+        },
+        "fact_ward_condition_stats.text": {
+          "position_03": "year"
+        },
+        "fact_zcta_condition_stats.text": {
+          "position_03": "year"
+        }
+      },
+      "status": "accepted_for_case_study_mapping"
+    }
+  },
+  "source_scope": {
+    "clinical_source": "CAPriCORN seven-system diagnosis data",
+    "geographic_scope": "six-county Chicagoland",
+    "time_period": "2019-2024"
+  },
+  "status": "website_dictionary_authoritative",
+  "unresolved_requirements": [
+    "keep adult-denominator reconstruction guarded unless explicitly audited",
+    "audit subgroup count/rate blocks before race/ethnicity-, age-, or sex-stratified analysis",
+    "apply fewer-than-10 suppression before public reporting or manuscript tables",
+    "keep confirmatory modeling blocked until S6"
+  ]
+}

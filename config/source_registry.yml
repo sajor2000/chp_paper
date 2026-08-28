@@ -1,0 +1,481 @@
+schema_version: 1
+registry_date: 2026-07-16
+sources:
+  - source_id: chicago_health_atlas_life_expectancy
+    organization: Chicago Health Atlas
+    dataset_title: Life expectancy
+    analytical_purpose: Community-area life-expectancy outcome and inequity context.
+    transport: documented_export
+    official_domain: chicagohealthatlas.org
+    landing_url: https://chicagohealthatlas.org/indicators/VRLE
+    documentation_url: https://chicagohealthatlas.org/api/v1/topics/?limit=10000
+    endpoint_url: https://chicagohealthatlas.org/api/v1/data/
+    catalog_id: VRLE
+    release: Live API coverage verified 2026-07-14; frozen snapshot 2026-07-13
+    years: ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+    geography: "77 Chicago community areas (API layer: neighborhood)"
+    license: Public access confirmed; API metadata does not state a redistribution license, so raw redistribution requires terms review.
+    access_date: 2026-07-14
+    citation: Chicago Health Atlas. Life expectancy (VRLE); originating source Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
+    citation_url: https://chicagohealthatlas.org/indicators/VRLE
+    expected_grain: community area × annual period × population stratum
+    primary_key: [g, l, a, p, d]
+    request:
+      method: GET
+      url: https://chicagohealthatlas.org/api/v1/data/
+      parameters: {topic: VRLE, population: "", layer: neighborhood, period: "{period}"}
+    fallback:
+      policy: Retain and checksum the frozen 2026-07-13 API responses; do not replace with a derivative.
+      status: frozen_snapshot_available
+      reason: Live coverage agrees with the frozen metadata; no new bulk download is authorized at Task 11.
+      url: https://chicagohealthatlas.org/api/v1/coverage/VRLE/
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: ["https://chicagohealthatlas.org/api/v1/topics/?limit=10000", https://chicagohealthatlas.org/api/v1/coverage/VRLE/]
+      notes: VRLE is distinct from mortality; annual 2010-2024 community-area values use v for estimate and se for uncertainty, although standard error may be null.
+      ref_mcp_status: &ref_status "unavailable: OAuth authorization required; official primary documentation used"
+      tavily_status: &tavily_status "unavailable: monthly_cap_reached_bonus_eligible on 2026-07-14; no retry or enrollment"
+
+  - source_id: chicago_health_atlas_mortality
+    organization: Chicago Health Atlas
+    dataset_title: All-cause mortality rate
+    analytical_purpose: Community-area age-adjusted all-cause mortality outcome and life-expectancy comparator.
+    transport: documented_export
+    official_domain: chicagohealthatlas.org
+    landing_url: https://chicagohealthatlas.org/indicators/VRDTHR
+    documentation_url: https://chicagohealthatlas.org/api/v1/topics/?limit=10000
+    endpoint_url: https://chicagohealthatlas.org/api/v1/data/
+    catalog_id: VRDTHR
+    release: Live API coverage verified 2026-07-14; frozen snapshot 2026-07-13
+    years: ["2010-2014", "2011-2015", "2012-2016", "2013-2017", "2014-2018", "2015-2019", "2016-2020", "2017-2021", "2018-2022", "2019-2023", "2020-2024"]
+    geography: "77 Chicago community areas (API layer: neighborhood)"
+    license: Public access confirmed; API metadata does not state a redistribution license, so raw redistribution requires terms review.
+    access_date: 2026-07-14
+    citation: Chicago Health Atlas. All-cause mortality rate (VRDTHR); originating source Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
+    citation_url: https://chicagohealthatlas.org/indicators/VRDTHR
+    expected_grain: community area × five-year period × population stratum
+    primary_key: [g, l, a, p, d]
+    request:
+      method: GET
+      url: https://chicagohealthatlas.org/api/v1/data/
+      parameters: {topic: VRDTHR, population: "", layer: neighborhood, period: "{period}"}
+    fallback:
+      policy: Retain and checksum the frozen 2026-07-13 API responses; do not replace with a derivative.
+      status: frozen_snapshot_available
+      reason: Live five-year neighborhood coverage agrees with the frozen metadata.
+      url: https://chicagohealthatlas.org/api/v1/coverage/VRDTHR/
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: ["https://chicagohealthatlas.org/api/v1/topics/?limit=10000", https://chicagohealthatlas.org/api/v1/coverage/VRDTHR/]
+      notes: VRDTHR is an age-adjusted rate per 100,000 and is not VRLE; neighborhood responses include v for estimate and se for standard error.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: census_acs_2019_5y
+    organization: United States Census Bureau
+    dataset_title: 2019 ACS 5-Year Detailed Tables
+    analytical_purpose: Pre-2020-tract demographic, socioeconomic, insurance, and adult-population covariates with margins of error.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/data/developers/data-sets/acs-5year/2019.html
+    documentation_url: https://www.census.gov/programs-surveys/acs/data/summary-file/sequence-based.html
+    endpoint_url: https://www2.census.gov/programs-surveys/acs/summary_file/2019/data/5_year_seq_by_state/Illinois_Tracts_Block_Groups_Only.zip
+    release: 2019 ACS 5-year sequence-based Summary File
+    years: ["2019"]
+    geography: Illinois tracts and block groups; analysis filters Chicago/Cook County tracts
+    license: United States government statistical data; cite the Census Bureau and exact release/table.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2019 American Community Survey 5-Year Detailed Tables, tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
+    citation_url: https://www.census.gov/data/developers/data-sets/acs-5year/2019.html
+    expected_grain: tract × ACS detailed-table cell
+    primary_key: [GEO_ID, table_id, variable]
+    request:
+      method: GET
+      url: https://www2.census.gov/programs-surveys/acs/summary_file/2019/data/5_year_seq_by_state/Illinois_Tracts_Block_Groups_Only.zip
+      parameters: {tables: "B01001,B03002,B15003,B17001,B19013,B23025,B25044,B27001"}
+    fallback:
+      policy: Use the frozen official sequence-based Illinois archive and preserve margins of error.
+      status: frozen_snapshot_available
+      reason: The 2026-07-13 Data API attempt returned HTTP-200 HTML Missing Key; official bulk was frozen instead.
+      url: https://api.census.gov/data/2019/acs/acs5/groups.json
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://www.census.gov/data/developers/data-sets/acs-5year/2019.html, https://www.census.gov/programs-surveys/acs/data/summary-file/sequence-based.html, https://api.census.gov/data/2019/acs/acs5/groups.json]
+      notes: API metadata is reachable without credentials, but the recorded observation request failure remains provenance for the frozen bulk fallback.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: census_acs_2022_5y
+    organization: United States Census Bureau
+    dataset_title: 2022 ACS 5-Year Detailed Tables
+    analytical_purpose: 2020-era-tract demographic, socioeconomic, insurance, and adult-population covariates with margins of error.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/data/developers/data-sets/acs-5year/2022.html
+    documentation_url: https://www.census.gov/programs-surveys/acs/data/summary-file.html
+    endpoint_url: https://www2.census.gov/programs-surveys/acs/summary_file/2022/table-based-SF/data/5YRData/
+    release: 2022 ACS 5-year table-based Summary File
+    years: ["2022"]
+    geography: National table files joined to 2020-era Illinois tracts; analysis filters Chicago/Cook County
+    license: United States government statistical data; cite the Census Bureau and exact release/table.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2022 American Community Survey 5-Year Detailed Tables, tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
+    citation_url: https://www.census.gov/data/developers/data-sets/acs-5year/2022.html
+    expected_grain: tract × ACS detailed-table cell
+    primary_key: [GEO_ID, table_id, variable]
+    request:
+      method: GET
+      url: https://www2.census.gov/programs-surveys/acs/summary_file/2022/table-based-SF/data/5YRData/
+      parameters: {tables: "B01001,B03002,B15003,B17001,B19013,B23025,B25044,B27001"}
+    fallback:
+      policy: Use the frozen official table-based files; retain estimates, annotations, and margins of error.
+      status: frozen_snapshot_available
+      reason: The 2026-07-13 Data API attempt returned HTTP-200 HTML Missing Key; official bulk was frozen instead.
+      url: https://api.census.gov/data/2022/acs/acs5/groups.json
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://www.census.gov/data/developers/data-sets/acs-5year/2022.html, https://www.census.gov/programs-surveys/acs/data/summary-file.html, https://api.census.gov/data/2022/acs/acs5/groups.json]
+      notes: Census documents table-based Summary Files beginning with the 2022 release.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: census_acs_2024_5y
+    organization: United States Census Bureau
+    dataset_title: 2024 ACS 5-Year Detailed Tables
+    analytical_purpose: Current 2020-era-tract demographic, socioeconomic, insurance, and adult-population covariates with margins of error.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/data/developers/data-sets/acs-5year/2024.html
+    documentation_url: https://www.census.gov/programs-surveys/acs/data/summary-file.html
+    endpoint_url: https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/
+    release: 2024 ACS 5-year table-based Summary File
+    years: ["2024"]
+    geography: National table files joined to 2020-era Illinois tracts; analysis filters Chicago/Cook County
+    license: United States government statistical data; cite the Census Bureau and exact release/table.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2024 American Community Survey 5-Year Detailed Tables, tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
+    citation_url: https://www.census.gov/data/developers/data-sets/acs-5year/2024.html
+    expected_grain: tract × ACS detailed-table cell
+    primary_key: [GEO_ID, table_id, variable]
+    request:
+      method: GET
+      url: https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/
+      parameters: {tables: "B01001,B03002,B15003,B17001,B19013,B23025,B25044,B27001"}
+    fallback:
+      policy: Use the frozen official table-based files; retain estimates, annotations, and margins of error.
+      status: frozen_snapshot_available
+      reason: The 2026-07-13 Data API attempt returned HTTP-200 HTML Missing Key; official bulk was frozen instead.
+      url: https://api.census.gov/data/2024/acs/acs5/groups.json
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://www.census.gov/data/developers/data-sets/acs-5year/2024.html, https://www.census.gov/programs-surveys/acs/data/summary-file.html, https://api.census.gov/data/2024/acs/acs5/groups.json]
+      notes: Official developer documentation identifies the 2024 ACS 5-Year Detailed Tables and annotation behavior.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: census_tiger_2019_tract
+    organization: United States Census Bureau
+    dataset_title: 2019 TIGER/Line Shapefiles — Illinois Census Tracts
+    analytical_purpose: Authoritative pre-2020 tract geometry for the 2019 ACS release.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2019.html
+    documentation_url: https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/tiger-geo-line.2019.html
+    endpoint_url: https://www2.census.gov/geo/tiger/TIGER2019/TRACT/tl_2019_17_tract.zip
+    release: TIGER/Line 2019
+    years: ["2019"]
+    geography: Illinois census tracts (state FIPS 17)
+    license: United States government geographic data; cite the Census Bureau and exact vintage.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2019 TIGER/Line Shapefiles, Illinois Census Tracts.
+    citation_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2019.html
+    expected_grain: one geometry per 2019 Illinois tract GEOID
+    primary_key: [GEOID]
+    request: {method: GET, url: https://www2.census.gov/geo/tiger/TIGER2019/TRACT/tl_2019_17_tract.zip, parameters: {}}
+    fallback: {policy: Retain the frozen official ZIP byte-for-byte., status: frozen_snapshot_available, reason: Endpoint and content length reverified; no live bulk download at Task 11., url: https://www2.census.gov/geo/tiger/TIGER2019/TRACT/}
+    verification: {status: verified, verified_at: 2026-07-14, evidence_urls: [https://www2.census.gov/geo/tiger/TIGER2019/TRACT/, https://www2.census.gov/geo/tiger/TIGER2019/TRACT/tl_2019_17_tract.zip], notes: Official Illinois tract ZIP returned HTTP 200., ref_mcp_status: *ref_status, tavily_status: *tavily_status}
+
+  - source_id: census_tiger_2020_tract
+    organization: United States Census Bureau
+    dataset_title: 2020 TIGER/Line Shapefiles — Illinois Census Tracts
+    analytical_purpose: Authoritative 2020 tract geometry and vintage transition reference.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2020.html
+    documentation_url: https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/tiger-geo-line.2020.html
+    endpoint_url: https://www2.census.gov/geo/tiger/TIGER2020/TRACT/tl_2020_17_tract.zip
+    release: TIGER/Line 2020
+    years: ["2020"]
+    geography: Illinois census tracts (state FIPS 17)
+    license: United States government geographic data; cite the Census Bureau and exact vintage.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2020 TIGER/Line Shapefiles, Illinois Census Tracts.
+    citation_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2020.html
+    expected_grain: one geometry per 2020 Illinois tract GEOID
+    primary_key: [GEOID]
+    request: {method: GET, url: https://www2.census.gov/geo/tiger/TIGER2020/TRACT/tl_2020_17_tract.zip, parameters: {}}
+    fallback: {policy: Retain the frozen official ZIP byte-for-byte., status: frozen_snapshot_available, reason: Endpoint and content length reverified; no live bulk download at Task 11., url: https://www2.census.gov/geo/tiger/TIGER2020/TRACT/}
+    verification: {status: verified, verified_at: 2026-07-14, evidence_urls: [https://www2.census.gov/geo/tiger/TIGER2020/TRACT/, https://www2.census.gov/geo/tiger/TIGER2020/TRACT/tl_2020_17_tract.zip], notes: Official Illinois tract ZIP returned HTTP 200., ref_mcp_status: *ref_status, tavily_status: *tavily_status}
+
+  - source_id: census_tiger_2023_tract
+    organization: United States Census Bureau
+    dataset_title: 2023 TIGER/Line Shapefiles — Illinois Census Tracts
+    analytical_purpose: Authoritative tract geometry required by the PLACES 2025 release.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2023.html
+    documentation_url: https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/tiger-geo-line.2023.html
+    endpoint_url: https://www2.census.gov/geo/tiger/TIGER2023/TRACT/tl_2023_17_tract.zip
+    release: TIGER/Line 2023
+    years: ["2023"]
+    geography: Illinois census tracts (state FIPS 17)
+    license: United States government geographic data; cite the Census Bureau and exact vintage.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2023 TIGER/Line Shapefiles, Illinois Census Tracts.
+    citation_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2023.html
+    expected_grain: one geometry per 2023 Illinois tract GEOID
+    primary_key: [GEOID]
+    request: {method: GET, url: https://www2.census.gov/geo/tiger/TIGER2023/TRACT/tl_2023_17_tract.zip, parameters: {}}
+    fallback: {policy: Retain the frozen official ZIP byte-for-byte., status: frozen_snapshot_available, reason: Endpoint and content length reverified; no live bulk download at Task 11., url: https://www2.census.gov/geo/tiger/TIGER2023/TRACT/}
+    verification: {status: verified, verified_at: 2026-07-14, evidence_urls: [https://www2.census.gov/geo/tiger/TIGER2023/TRACT/, https://www2.census.gov/geo/tiger/TIGER2023/TRACT/tl_2023_17_tract.zip], notes: Official Illinois tract ZIP returned HTTP 200; PLACES metadata specifies 2023 boundaries., ref_mcp_status: *ref_status, tavily_status: *tavily_status}
+
+  - source_id: census_zcta_2020_tract_relationship
+    organization: United States Census Bureau
+    dataset_title: 2020 ZCTA to 2020 Census Tract Relationship File
+    analytical_purpose: Comparison-only linkage of direct tract and direct ZCTA measures with overlap-area metadata.
+    transport: http_file
+    expected_media_types: [text/plain]
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/geographies/reference-files/2020/geo/relationship-files.html
+    documentation_url: https://www2.census.gov/geo/pdfs/maps-data/data/rel2020/zcta520/explanation_tab20_zcta520_tract20_natl.pdf
+    endpoint_url: https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tract20_natl.txt
+    release: 2020 Census geographic relationship file
+    years: ["2020"]
+    geography: National 2020 ZCTA by 2020 census tract overlap relationships; analysis filters eligible Chicago tracts
+    license: United States government geographic data; cite the Census Bureau and exact relationship release.
+    access_date: 2026-07-16
+    citation: U.S. Census Bureau. 2020 ZCTA to 2020 Census Tract Relationship File. Accessed July 16, 2026.
+    citation_url: https://www.census.gov/geographies/reference-files/2020/geo/relationship-files.html
+    expected_grain: one ZCTA-tract overlap relationship per row, including land and water overlap areas
+    primary_key: [GEOID_ZCTA5_20, GEOID_TRACT_20]
+    request: {method: GET, url: https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tract20_natl.txt, parameters: {}}
+    fallback:
+      policy: Preserve the frozen official text byte-for-byte and verify its record layout and SHA-256 checksum.
+      status: frozen_snapshot_available
+      reason: The official file was acquired directly on 2026-07-16 for deterministic comparison linkage.
+      url: https://www.census.gov/geographies/reference-files/2020/geo/relationship-files.html
+    verification:
+      status: verified
+      verified_at: 2026-07-16
+      evidence_urls: [https://www.census.gov/geographies/reference-files/2020/geo/relationship-files.html, https://www2.census.gov/geo/pdfs/maps-data/data/rel2020/zcta520/explanation_tab20_zcta520_tract20_natl.pdf]
+      notes: The relationship file includes overlap areas but no population or housing counts; linkage metadata never creates clinical values.
+      ref_mcp_status: "unavailable: official Census primary documentation used"
+      tavily_status: "unavailable: monthly_cap_reached_bonus_eligible; direct official source verified"
+
+  - source_id: census_tiger_2024_tract
+    organization: United States Census Bureau
+    dataset_title: 2024 TIGER/Line Shapefiles — Illinois Census Tracts
+    analytical_purpose: Authoritative current tract geometry for the 2024 ACS release.
+    transport: http_file
+    official_domain: www2.census.gov
+    landing_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2024.html
+    documentation_url: https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/tiger-geo-line.2024.html
+    endpoint_url: https://www2.census.gov/geo/tiger/TIGER2024/TRACT/tl_2024_17_tract.zip
+    release: TIGER/Line 2024
+    years: ["2024"]
+    geography: Illinois census tracts (state FIPS 17)
+    license: United States government geographic data; cite the Census Bureau and exact vintage.
+    access_date: 2026-07-14
+    citation: U.S. Census Bureau. 2024 TIGER/Line Shapefiles, Illinois Census Tracts.
+    citation_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2024.html
+    expected_grain: one geometry per 2024 Illinois tract GEOID
+    primary_key: [GEOID]
+    request: {method: GET, url: https://www2.census.gov/geo/tiger/TIGER2024/TRACT/tl_2024_17_tract.zip, parameters: {}}
+    fallback: {policy: Retain the frozen official ZIP byte-for-byte., status: frozen_snapshot_available, reason: Endpoint and content length reverified; no live bulk download at Task 11., url: https://www2.census.gov/geo/tiger/TIGER2024/TRACT/}
+    verification: {status: verified, verified_at: 2026-07-14, evidence_urls: [https://www2.census.gov/geo/tiger/TIGER2024/TRACT/, https://www2.census.gov/geo/tiger/TIGER2024/TRACT/tl_2024_17_tract.zip], notes: Official Illinois tract ZIP returned HTTP 200., ref_mcp_status: *ref_status, tavily_status: *tavily_status}
+
+  - source_id: cdc_places_current_tract
+    organization: Centers for Disease Control and Prevention
+    dataset_title: "PLACES: Census Tract Data (GIS Friendly Format), 2025 release"
+    analytical_purpose: External model-based tract estimates for high blood pressure, diagnosed diabetes, and COPD; not observed EHR prevalence.
+    transport: socrata
+    official_domain: data.cdc.gov
+    landing_url: https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2025-/yjkw-uj5s
+    documentation_url: https://data.cdc.gov/api/views/yjkw-uj5s
+    endpoint_url: https://data.cdc.gov/resource/yjkw-uj5s.csv
+    catalog_id: yjkw-uj5s
+    release: 2025 release; BRFSS model inputs 2023/2022; 2023 tract boundaries
+    years: ["2025 release", "2023 BRFSS", "2022 BRFSS biennial measures", "2023 tract boundaries"]
+    geography: Request restricts to Cook County, Illinois tracts; downstream analysis intersects the Chicago study boundary
+    license: Public Domain in Socrata metadata.
+    access_date: 2026-07-14
+    citation: Centers for Disease Control and Prevention. PLACES Census Tract Data (GIS Friendly Format), 2025 release, dataset yjkw-uj5s.
+    citation_url: https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2025-/yjkw-uj5s
+    expected_grain: one Cook County census tract per row with model-based hypertension, diabetes, and COPD estimates and confidence intervals
+    primary_key: [tractfips]
+    request:
+      method: GET
+      url: https://data.cdc.gov/resource/yjkw-uj5s.csv
+      parameters:
+        $select: stateabbr,statedesc,countyname,countyfips,tractfips,totalpopulation,totalpop18plus,bphigh_crudeprev,bphigh_crude95ci,diabetes_crudeprev,diabetes_crude95ci,copd_crudeprev,copd_crude95ci
+        $where: "stateabbr='IL' AND countyfips='17031'"
+        $order: tractfips ASC
+        $limit: "50000"
+    fallback:
+      policy: Retain the frozen 2025-release Illinois extract and Socrata metadata byte-for-byte.
+      status: frozen_snapshot_available
+      reason: Live dataset identity, model inputs, and boundary vintage agree with the frozen snapshot.
+      url: https://data.cdc.gov/api/views/yjkw-uj5s
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://data.cdc.gov/api/views/yjkw-uj5s, https://data.cdc.gov/resource/yjkw-uj5s.csv]
+      notes: Metadata identifies 40 model-based measures, primarily 2023 BRFSS with five 2022 biennial measures, Census 2020 population, ACS 2019-2023/2018-2022, and 2023 tract boundaries.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: cdc_svi_2022_tract
+    organization: CDC/Agency for Toxic Substances and Disease Registry, GRASP
+    dataset_title: CDC/ATSDR Social Vulnerability Index 2022 Database, Illinois
+    analytical_purpose: Tract-level social-vulnerability covariates, retaining release-specific estimates, margins, flags, and percentiles.
+    transport: http_file
+    expected_media_types: [text/csv]
+    required_response_headers: [ETag, Last-Modified, Content-Length]
+    official_domain: svi.cdc.gov
+    landing_url: https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html
+    documentation_url: https://www.atsdr.cdc.gov/place-health/media/pdfs/2024/10/SVI2022Documentation.pdf
+    endpoint_url: https://svi.cdc.gov/Documents/Data/2022/csv/states/Illinois.csv
+    release: CDC/ATSDR SVI 2022; corrected MP_CROWD values published 2024-12-11
+    years: ["2022"]
+    geography: Illinois census tracts
+    license: Publicly downloadable federal data; use the agency suggested citation.
+    access_date: 2026-07-14
+    citation: CDC/ATSDR/GRASP. CDC/ATSDR Social Vulnerability Index 2022 Database, Illinois. Accessed July 14, 2026.
+    citation_url: https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html
+    expected_grain: one row per 2022 Illinois census tract
+    primary_key: [FIPS]
+    request: {method: GET, url: https://svi.cdc.gov/Documents/Data/2022/csv/states/Illinois.csv, parameters: {}}
+    fallback:
+      policy: Retain the frozen corrected Illinois CSV and documentation; do not compare release percentiles as an invariant longitudinal scale.
+      status: frozen_snapshot_available
+      reason: Live correction note and official CSV endpoint agree with the frozen source.
+      url: https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html, https://svi.cdc.gov/Documents/Data/2022/csv/states/Illinois.csv]
+      notes: MP_CROWD was corrected on 2024-12-11 because the earlier denominator used housing units instead of occupied housing units; SVI rankings were not affected.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: hrsa_health_centers_current
+    organization: Health Resources and Services Administration, Bureau of Primary Health Care
+    dataset_title: Health Center Service Delivery and Look-Alike Sites
+    analytical_purpose: Current FQHC and look-alike service-delivery site locations for the bounded planning demonstration.
+    transport: http_file
+    expected_media_types: [text/csv]
+    required_response_headers: [ETag, Last-Modified, Content-Length]
+    official_domain: data.hrsa.gov
+    landing_url: https://data.hrsa.gov/topics/health-centers
+    documentation_url: https://data.hrsa.gov/data/download?titleFilter=Health%20Center
+    endpoint_url: https://data.hrsa.gov/DataDownload/DD_Files/Health_Center_Service_Delivery_and_LookAlike_Sites.csv
+    catalog_id: PrimaryHealthCareFacilities_FS/MapServer/0
+    release: Daily source; official page updated 2026-07-14; frozen snapshot 2026-07-13 retained
+    years: ["current as of 2026-07-14"]
+    geography: National service-delivery and look-alike site file; downstream filter to Chicago/Cook County
+    license: HRSA Data Warehouse usage limitations are none; domestic-violence shelter address fields may be suppressed.
+    access_date: 2026-07-14
+    citation: Health Resources and Services Administration, Bureau of Primary Health Care. Health Center Service Delivery and Look-Alike Sites. Accessed July 14, 2026.
+    citation_url: https://data.hrsa.gov/topics/health-centers
+    expected_grain: one row per health center service-delivery site record
+    primary_key: [Health Center Number, BPHC Assigned Number]
+    request: {method: GET, url: https://data.hrsa.gov/DataDownload/DD_Files/Health_Center_Service_Delivery_and_LookAlike_Sites.csv, parameters: {}}
+    fallback:
+      policy: Preserve the frozen official CSV and metadata; at acquisition, record the daily release date and use the official ArcGIS layer only if the CSV fails validation.
+      status: frozen_snapshot_available
+      reason: The source is intentionally daily; a newer update is expected release cadence, not unexplained definition drift.
+      url: https://gisportal.hrsa.gov/server/rest/services/HealthCareFacilities/PrimaryHealthCareFacilities_FS/MapServer/0/
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://data.hrsa.gov/topics/health-centers, https://data.hrsa.gov/DataDownload/DD_Files/Health_Center_Service_Delivery_and_LookAlike_Sites.csv, https://gisportal.hrsa.gov/server/rest/services/HealthCareFacilities/PrimaryHealthCareFacilities_FS/MapServer/0/]
+      notes: Official HRSA page reports daily refresh and 2026-07-14 update; CSV includes site address, state, postal code, county/FIPS, and X/Y coordinates; ArcGIS layer 0 exposes current site fields with max record count 2000.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: chicago_community_areas_current
+    organization: City of Chicago
+    dataset_title: Boundaries - Community Areas
+    analytical_purpose: Official 77-community-area boundary, crosswalk, and display geometry.
+    transport: socrata
+    official_domain: data.cityofchicago.org
+    landing_url: https://data.cityofchicago.org/d/igwz-8jzy
+    documentation_url: https://data.cityofchicago.org/api/views/igwz-8jzy
+    endpoint_url: https://data.cityofchicago.org/resource/igwz-8jzy.geojson
+    catalog_id: igwz-8jzy
+    release: Current community area boundaries; updated as needed; metadata rows updated 2025-04-22
+    years: ["current"]
+    geography: 77 Chicago community areas
+    license: Socrata metadata says See Terms of Use; review before raw redistribution.
+    access_date: 2026-07-14
+    citation: City of Chicago. Boundaries - Community Areas, dataset igwz-8jzy. Accessed July 14, 2026.
+    citation_url: https://data.cityofchicago.org/d/igwz-8jzy
+    expected_grain: one polygon per official Chicago community area
+    primary_key: [area_numbe]
+    request:
+      method: GET
+      url: https://data.cityofchicago.org/resource/igwz-8jzy.geojson
+      parameters:
+        $select: the_geom,area_numbe,community,area_num_1,shape_area,shape_len
+        $order: area_numbe ASC
+        $limit: "50000"
+    fallback:
+      policy: Retain the frozen official GeoJSON and Socrata view metadata.
+      status: frozen_snapshot_available
+      reason: Dataset identity, fields, current-boundary status, and 77-row inventory agree with the frozen snapshot.
+      url: https://data.cityofchicago.org/api/views/igwz-8jzy
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://data.cityofchicago.org/api/views/igwz-8jzy, https://data.cityofchicago.org/resource/igwz-8jzy.geojson]
+      notes: Official fields are area_numbe, community, and geometry. No police, 311, pharmacy, or WIC layer is approved or registered.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status
+
+  - source_id: metopio_catalog
+    organization: Metopio
+    dataset_title: Metopio public API catalog
+    analytical_purpose: Curated discovery catalog and cross-source metadata only; observation access remains credential-gated and is not required for Task 11.
+    transport: documented_export
+    official_domain: metop.io
+    landing_url: https://metop.io/
+    documentation_url: https://metop.io/api/v1/
+    endpoint_url: https://metop.io/api/v1/
+    catalog_id: public_api_v1
+    release: Public catalog snapshot 2026-07-13; live API root reverified 2026-07-14
+    years: ["current catalog"]
+    geography: Public unauthenticated catalog has limited geography coverage; no observation geography is inferred
+    license: Subscription and API terms govern access, storage, automation, and redistribution; original-producer rights are not inherited.
+    access_date: 2026-07-14
+    citation: Metopio. Public API catalog, version 1. Accessed July 14, 2026; cite originating agencies for analytical measures.
+    citation_url: https://metop.io/api/v1/
+    expected_grain: one catalog record per API metadata object type
+    primary_key: [endpoint, object_id]
+    request: {method: GET, url: https://metop.io/api/v1/, parameters: {}}
+    fallback:
+      policy: Retain the frozen unauthenticated public catalog; require METOPIO_API_TOKEN locally for any future subscription-visible request and never persist it.
+      status: authenticated_observations_pending
+      reason: Public catalog is available, but complete geography/topic catalogs and observations require user-supplied authorization.
+      url: https://metop.io/api/v1/
+    verification:
+      status: verified
+      verified_at: 2026-07-14
+      evidence_urls: [https://metop.io/, https://metop.io/api/v1/]
+      notes: Live API root is reachable without credentials. This entry registers catalog metadata only and does not claim authenticated observation availability.
+      ref_mcp_status: *ref_status
+      tavily_status: *tavily_status

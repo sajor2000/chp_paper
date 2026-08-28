@@ -1,0 +1,5 @@
+Condition,"Years, No.","Condition-year records, No.","Community areas represented, No.","CHM condition-record denominator, median (IQR)","Eligible, No. (%)","Suppressed, No. (%)","Source-published capture, median (IQR), %",Reliability status
+COPD,6,462,77,"3,163 (3,102)",457 (98.9),5 (1.1),7.3 (6.1),withheld pending reliability rule
+Diabetes with complication,6,462,77,"3,193 (3,102)",462 (100.0),0 (0.0),7.3 (6.1),withheld pending reliability rule
+Diabetes without complication,6,462,77,"3,193 (3,102)",462 (100.0),0 (0.0),7.3 (6.1),withheld pending reliability rule
+Hypertension,6,462,77,"3,193 (3,102)",462 (100.0),0 (0.0),7.3 (6.1),withheld pending reliability rule
