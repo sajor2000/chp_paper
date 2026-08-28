@@ -13,14 +13,30 @@ propose replacing population-based surveillance.
 
 ## Current scientific status
 
-This is an independent biostatistical-review package. The repository preserves
-`results_authorized=false`. Aggregate review results are visible so a
-biostatistician can evaluate the methods, denominators, diagnostics, and
-interpretation boundaries. The package is not authorized for manuscript import
-or submission until the documented S7 review and author decisions are complete.
+The aggregate analyses and biostatistical review artifacts are complete.
+Governed aggregate results are displayed in the R Markdown, Marimo, and methods
+reports so an independent statistician can inspect the methods and findings.
+`results_authorized=false` remains binding. The results are not authorized for
+manuscript import or submission until independent S7 review and human approval
+are recorded. Combined diabetes was excluded because the available source
+documentation did not establish mutual exclusivity and denominator equivalence.
 
-Combined diabetes analyses remain unexecuted pending evidence that the 2 source
-categories are mutually exclusive and use equivalent denominators.
+## Methods website
+
+The public Docusaurus site explains the scientific question, data sources,
+analytic cohort, estimands, statistical methods, results, limitations, and
+reproducibility workflow:
+
+- [Chicago Health Map Methods](https://sajor2000.github.io/chp_paper/)
+
+The website source is under `website/`. Build it locally with:
+
+```bash
+cd website
+npm ci
+npm run typecheck
+npm run build
+```
 
 ## Primary files
 

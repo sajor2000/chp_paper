@@ -45,6 +45,11 @@ __pycache__/
 .marimo/
 notebooks/__marimo__/
 
+# Docusaurus local products
+website/node_modules/
+website/.docusaurus/
+website/build/
+
 # R and R Markdown local products
 .Rhistory
 .RData

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Chicago Health Map methods">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0d3b4f"/>
+      <stop offset="1" stop-color="#1e7a75"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="1030" cy="110" r="220" fill="#ef8734" opacity=".2"/>
+  <text x="90" y="180" fill="#ffd6a5" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="4">CHICAGO HEALTH MAP</text>
+  <text x="90" y="310" fill="#fff" font-family="Arial, sans-serif" font-size="76" font-weight="800">Methods and</text>
+  <text x="90" y="400" fill="#fff" font-family="Arial, sans-serif" font-size="76" font-weight="800">statistical analysis</text>
+  <text x="90" y="500" fill="#d7efed" font-family="Arial, sans-serif" font-size="34">How tract-level health-system data can supplement public-health surveillance</text>
+</svg>
