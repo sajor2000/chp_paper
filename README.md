@@ -13,9 +13,12 @@ propose replacing population-based surveillance.
 
 ## Current scientific status
 
-This repository contains the final aggregate statistical analysis and the full
-biostatistical review record. Completed results are displayed in the R Markdown
-and Marimo reports. Combined diabetes was excluded because the available source
+The aggregate analyses and biostatistical review artifacts are complete.
+Governed aggregate results are displayed in the R Markdown, Marimo, and methods
+reports so an independent statistician can inspect the methods and findings.
+`results_authorized=false` remains binding. The results are not authorized for
+manuscript import or submission until independent S7 review and human approval
+are recorded. Combined diabetes was excluded because the available source
 documentation did not establish mutual exclusivity and denominator equivalence.
 
 ## Methods website

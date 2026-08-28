@@ -40,7 +40,7 @@ function Home(): ReactNode {
             </Heading>
             <p className={styles.heroSubtitle}>
               A transparent account of the data, denominators, statistical estimands, uncertainty methods,
-              results, and interpretation boundaries behind the final aggregate analysis.
+              results, and interpretation boundaries behind the aggregate review analysis.
             </p>
             <div className={styles.actions}>
               <Link className="button button--primary button--lg" to="/methods/">

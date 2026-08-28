@@ -1,6 +1,6 @@
 ---
 title: Reproducibility and provenance
-description: How the final aggregate analysis is bound, tested, rendered, and reviewed.
+description: How the aggregate review analysis is bound, tested, rendered, and reviewed.
 ---
 
 # Reproducibility and provenance
@@ -23,7 +23,7 @@ Every required analytic input is bound by SHA-256 digest. The R render stops if
 an expected file is missing or differs from the completed Marimo manifest. It
 does not substitute an alternate file.
 
-The final analysis uses:
+The review analysis uses:
 
 - random seed `20260715`;
 - 1000 community-area cluster-bootstrap replicates; and

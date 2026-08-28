@@ -5,8 +5,10 @@ description: What each main figure and table shows and how it should be interpre
 
 # Results and display guide
 
-The final report uses 5 main manuscript displays. Supporting diagnostics and
-robustness analyses remain supplementary.
+The review report presents 5 planned main manuscript displays. Supporting
+diagnostics and robustness analyses remain supplementary. Aggregate results are
+visible for independent statistical review. They are not authorized for
+manuscript import while `results_authorized=false` remains binding.
 
 ## Main result
 

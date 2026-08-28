@@ -1,6 +1,6 @@
 ---
 title: Data sources and variables
-description: Source roles, measures, periods, geographies, and variables used in the final analysis.
+description: Source roles, measures, periods, geographies, and variables used in the review analysis.
 ---
 
 # Data sources and variables
@@ -15,7 +15,7 @@ diagnosed proportion as:
 > that year with at least 1 of the represented conditions.
 
 The upstream process was described as deduplicating adults across participating
-systems within each year. The final analysis received only aggregate
+systems within each year. The review analysis received only aggregate
 geography-condition-year records and could not independently reconstruct the
 person-level deduplication sequence.
 
@@ -57,6 +57,6 @@ routine covariate in the principal unweighted ecological model.
 ## Data that were deliberately not combined
 
 Diabetes with complication and diabetes without complication remained separate.
-The final analysis did not add their numerators or denominators because the
+The review analysis did not add their numerators or denominators because the
 available source documentation did not establish mutual exclusivity and
 denominator equivalence.

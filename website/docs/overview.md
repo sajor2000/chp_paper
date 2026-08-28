@@ -10,7 +10,7 @@ description: A concise map of the Chicago Health Map geographic-resolution study
 
 This site explains what we studied, which data we used, how we constructed the
 analytic populations, why each statistical method was selected, and how to
-reproduce the final aggregate analysis.
+reproduce the aggregate review analysis.
 
 ## The central question
 

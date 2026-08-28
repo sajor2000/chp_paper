@@ -1,13 +1,13 @@
 ---
 title: Interpretation and limitations
-description: What the final analysis can support, cannot support, and what would strengthen it.
+description: What the review analysis can support, cannot support, and what would strengthen it.
 ---
 
 # Interpretation and limitations
 
 ## What the data support
 
-The final data support descriptive small-area comparison, resource-quality
+The current aggregate data support descriptive small-area comparison, resource-quality
 accounting, within-area heterogeneity analysis, rank and classification
 comparison, HCS hypertension triangulation, prespecified sensitivities, and
 supplementary ecological models.

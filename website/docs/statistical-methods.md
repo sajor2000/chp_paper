@@ -25,7 +25,7 @@ shown to be mutually exclusive with equivalent denominators.
 
 The uncertainty analysis resampled the 77 community areas with replacement and
 retained all member tracts. Ranks and classification statistics were recomputed
-inside each replicate. The final analysis used:
+inside each replicate. The review analysis used:
 
 - 1000 replicates;
 - random seed `20260715`; and
@@ -79,7 +79,7 @@ geographic mechanisms or causal effects.
 
 ## Sensitivity analyses
 
-The final package records annual estimates, leave-one-year-out summaries,
+The review package records annual estimates, leave-one-year-out summaries,
 noncrossing-tract restrictions, ZCTA comparison, population weighting for the
 ecological model, alternative spatial weights, spatial-error modeling, and the
 status of the incomplete 50%-area tract frame.
