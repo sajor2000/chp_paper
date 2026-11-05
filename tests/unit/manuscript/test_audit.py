@@ -328,3 +328,21 @@ def test_real_manuscript_citation_audit() -> None:
 
     assert report.references == 44
     assert report.companion_references == 33
+
+
+def test_real_manuscript_uses_portable_equations_and_artifact_bound_flow_values() -> None:
+    root = Path(__file__).resolve().parents[3]
+    source = (
+        root / "manuscript" / "chicago_health_map_jama_health_forum_original_investigation.Rmd"
+    ).read_text(encoding="utf-8")
+
+    assert "p_{" not in source
+    assert "\\sum" not in source
+    assert "MRAIA" not in source
+    assert "resource_record_n <- sum(table_1$`Condition-year records, No.`)" in source
+    assert "Chicago Health Map included `r resource_record_n`" in source
+    assert "The community-area resource contained `r resource_record_n`" in source
+    assert "The table summarizes `r resource_record_n`" in source
+    assert "Chicago Health Map included 1848" not in source
+    assert "The community-area resource contained 1848" not in source
+    assert "The table summarizes 1848" not in source

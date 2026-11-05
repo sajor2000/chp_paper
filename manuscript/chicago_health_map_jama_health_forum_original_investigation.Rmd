@@ -62,6 +62,52 @@ flow_value <- function(condition, field) {
   row[[field]][1]
 }
 
+table_1_value <- function(condition, field) {
+  row <- table_1[table_1$Condition == condition, , drop = FALSE]
+  stopifnot(nrow(row) == 1)
+  row[[field]][1]
+}
+
+leading_number <- function(value) {
+  as.numeric(gsub(",", "", sub(" .*", "", as.character(value))))
+}
+
+parenthetical_number <- function(value) {
+  as.numeric(sub(".*\\(([-0-9.]+).*", "\\1", as.character(value)))
+}
+
+table_1_count <- function(condition, field) {
+  leading_number(table_1_value(condition, field))
+}
+
+table_1_percent <- function(condition, field) {
+  parenthetical_number(table_1_value(condition, field))
+}
+
+resource_record_n <- sum(table_1$`Condition-year records, No.`)
+resource_area_n <- unique(table_1$`Community areas represented, No.`)
+resource_year_n <- unique(table_1$`Years, No.`)
+
+stopifnot(
+  length(resource_area_n) == 1,
+  length(resource_year_n) == 1,
+  all(
+    table_1$`Condition-year records, No.` ==
+      table_1$`Years, No.` * table_1$`Community areas represented, No.`
+  ),
+  all(
+    vapply(
+      table_1$`Eligible, No. (%)`,
+      leading_number,
+      numeric(1)
+    ) + vapply(
+      table_1$`Suppressed, No. (%)`,
+      leading_number,
+      numeric(1)
+    ) == table_1$`Condition-year records, No.`
+  )
+)
+
 noise_value <- function(condition, metric, field) {
   row <- noise[noise$condition_id == condition & noise$metric == metric, , drop = FALSE]
   stopifnot(nrow(row) == 1)
@@ -174,7 +220,7 @@ Outcomes were within-community variance share, median absolute percentile-rank d
 
 ## Results
 
-Chicago Health Map included 1848 community-area condition-year records. The primary analysis included `r flow_value("hypertension", "loo_comparator_eligible_tracts")` hypertension tracts and `r flow_value("copd", "loo_comparator_eligible_tracts")` chronic obstructive pulmonary disease (COPD) tracts. For hypertension, within-community variance share was `r fmt_prop_pct(value("hypertension", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_high"))`%). Median absolute rank difference was `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_high"))`), quartile disagreement was `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("hypertension", "Quartile disagreement", "ci_high"))`%), and highest-quartile movement was `r fmt_pct(value("hypertension", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_high"))`%). Corresponding COPD estimates were `r fmt_prop_pct(value("copd", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("copd", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("copd", "Within-community variance share", "ci_high"))`%), `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_high"))`), `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("copd", "Quartile disagreement", "ci_high"))`%), and `r fmt_pct(value("copd", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("copd", "Movement into or out of Q4", "ci_high"))`%).
+Chicago Health Map included `r resource_record_n` community-area condition-year records. The primary analysis included `r flow_value("hypertension", "loo_comparator_eligible_tracts")` hypertension tracts and `r flow_value("copd", "loo_comparator_eligible_tracts")` chronic obstructive pulmonary disease (COPD) tracts. For hypertension, within-community variance share was `r fmt_prop_pct(value("hypertension", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_high"))`%). Median absolute rank difference was `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_high"))`), quartile disagreement was `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("hypertension", "Quartile disagreement", "ci_high"))`%), and highest-quartile movement was `r fmt_pct(value("hypertension", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_high"))`%). Corresponding COPD estimates were `r fmt_prop_pct(value("copd", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("copd", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("copd", "Within-community variance share", "ci_high"))`%), `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_high"))`), `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("copd", "Quartile disagreement", "ci_high"))`%), and `r fmt_pct(value("copd", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("copd", "Movement into or out of Q4", "ci_high"))`%).
 
 ## Conclusions and Relevance
 
@@ -204,7 +250,7 @@ The public resource combines CAPriCORN diagnosis aggregates with American Commun
 
 This study used the governed aggregate exports underlying the website rather than values transcribed from the map. We restricted the analysis to Chicago and compared the census tract view with community-area summaries constructed from the same validated tract numerators and denominators. The primary analysis used CAPriCORN diagnosis aggregates and geographic crosswalks. American Community Survey variables entered only supplementary models. The website's retail, service, crime, and social vulnerability layers were not analyzed. The study evaluated the geographic information provided by the underlying data. It did not evaluate website usability, community engagement, or whether viewing the map changed policy or resource decisions.
 
-The analytic unit was a geography-condition-year aggregate. No patient-level records were used. For each tract and condition, the numerator was the annual number of unique CAPriCORN adults with the diagnosis, and the denominator was the annual number of unique CAPriCORN adults with at least 1 of 39 included conditions who were observed that year. MRAIA performed cross-system deduplication within each year. The aggregate files did not permit independent verification of person-level linkage or identification of people appearing in multiple years. We therefore refer to every estimate as an EHR-diagnosed proportion among observed CAPriCORN adults, not population prevalence.
+The analytic unit was a geography-condition-year aggregate. No patient-level records were used. For each tract and condition, the numerator was the annual number of unique CAPriCORN adults with the diagnosis, and the denominator was the annual number of unique CAPriCORN adults with at least 1 of 39 included conditions who were observed that year. The upstream data integration process performed cross-system deduplication within each year. The aggregate files did not permit independent verification of person-level linkage or identification of people appearing in multiple years. We therefore refer to every estimate as an EHR-diagnosed proportion among observed CAPriCORN adults, not population prevalence.
 
 ## Eligibility and Geographic Linkage
 
@@ -214,7 +260,7 @@ We treated unresolved zero-or-suppressed values as informative missingness. The 
 
 ## Primary Estimands
 
-We summed annual numerators and denominators before division. For focal tract (i) in community area (j), the pooled tract estimate was (p_{ij}=\sum_t y_{ijt}/\sum_t n_{ijt}). Its community-area comparator excluded the focal tract: (p_{-i,j}=\sum_{k\ne i,t}y_{kjt}/\sum_{k\ne i,t}n_{kjt}). Tests prevented substitution of an unweighted mean of annual percentages and verified that each focal tract contributed neither numerator nor denominator to its comparator.
+We summed annual numerators and denominators before division. For focal tract <i>i</i> in community area <i>j</i>, the pooled tract estimate was <i>p</i><sub><i>ij</i></sub> = ∑<sub><i>t</i></sub> <i>y</i><sub><i>ijt</i></sub> / ∑<sub><i>t</i></sub> <i>n</i><sub><i>ijt</i></sub>. Its community-area comparator excluded the focal tract: <i>p</i><sub>−<i>i</i>,<i>j</i></sub> = ∑<sub><i>k</i> ≠ <i>i</i>,<i>t</i></sub> <i>y</i><sub><i>kjt</i></sub> / ∑<sub><i>k</i> ≠ <i>i</i>,<i>t</i></sub> <i>n</i><sub><i>kjt</i></sub>. Tests prevented substitution of an unweighted mean of annual percentages and verified that each focal tract contributed neither numerator nor denominator to its comparator.
 
 We estimated 4 complementary outcomes. First, the within-community variance share was the observed-scale within-area component divided by total tract variance using a one-way method-of-moments partition.<sup>25-26</sup> Second, we calculated the median absolute difference between empirical tract and leave-one-out comparator percentile ranks. Third, we measured disagreement across quartiles defined by fixed percentile boundaries at 0.25, 0.50, and 0.75, using average ranks for ties. Fourth, we measured movement into or out of the highest quartile. No magnitude threshold was defined after observing the results.
 
@@ -236,7 +282,7 @@ Analyses used Python 3.13.14 (Python Software Foundation) with pandas 3.0.3, Num
 
 ## Data Availability and Cohort Flow
 
-The community-area resource contained 1848 condition-year records across 77 community areas and 6 years (Table 1). Hypertension records were complete across all 462 area-years. Five of 462 COPD area-year records (1.1%) were suppressed. The source-published median condition-record denominator was 3193 for hypertension and 3163 for COPD. These denominators were geography-period-condition observations, not counts of unique people across the study period.
+The community-area resource contained `r resource_record_n` condition-year records across `r resource_area_n` community areas and `r resource_year_n` years (Table 1). Hypertension records were complete across all `r table_1_value("Hypertension", "Condition-year records, No.")` area-years. `r table_1_count("COPD", "Suppressed, No. (%)")` of `r table_1_value("COPD", "Condition-year records, No.")` COPD area-year records (`r fmt_pct(table_1_percent("COPD", "Suppressed, No. (%)"))`%) were suppressed. The source-published median condition-record denominator was `r format(table_1_count("Hypertension", "CHM condition-record denominator, median (IQR)"), big.mark = ",", scientific = FALSE)` for hypertension and `r format(table_1_count("COPD", "CHM condition-record denominator, median (IQR)"), big.mark = ",", scientific = FALSE)` for COPD. These denominators were geography-period-condition observations, not counts of unique people across the study period.
 
 Among `r flow_value("hypertension", "boundary_tracts")` Chicago-boundary tracts for hypertension, `r flow_value("hypertension", "complete_2022_2024_tracts")` had complete 2022 through 2024 data, `r flow_value("hypertension", "dominant_area_eligible_tracts")` met the dominant-area criterion, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` had another eligible tract in the area. For COPD, the corresponding counts were `r flow_value("copd", "boundary_tracts")`, `r flow_value("copd", "complete_2022_2024_tracts")`, `r flow_value("copd", "dominant_area_eligible_tracts")`, and `r flow_value("copd", "loo_comparator_eligible_tracts")` (Figure 1). The greater COPD attrition reflected unresolved or suppressed values rather than an absence of Chicago tracts.
 
@@ -351,7 +397,7 @@ Tract-level Chicago Health Map measures contained clinically observed geographic
 
 Table 1. Chicago Health Map Community-Area Data Availability, 2019-2024.
 
-The table summarizes 1848 geography-condition-year aggregate records across 77 Chicago community areas. Eligible records had a source-published value and met the stored denominator and suppression rules. Denominators are annual condition-record denominators and must not be summed across years as unique people. IQR indicates interquartile range. COPD indicates chronic obstructive pulmonary disease.
+The table summarizes `r resource_record_n` geography-condition-year aggregate records across `r resource_area_n` Chicago community areas. Eligible records had a source-published value and met the stored denominator and suppression rules. Denominators are annual condition-record denominators and must not be summed across years as unique people. IQR indicates interquartile range. COPD indicates chronic obstructive pulmonary disease.
 
 Table 2. Tract Information Beyond Leave-One-Out Community-Area Summaries, 2022-2024.
 

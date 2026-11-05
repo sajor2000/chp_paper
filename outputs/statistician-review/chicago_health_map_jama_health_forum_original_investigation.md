@@ -213,11 +213,12 @@ patient-level records were used. For each tract and condition, the
 numerator was the annual number of unique CAPriCORN adults with the
 diagnosis, and the denominator was the annual number of unique CAPriCORN
 adults with at least 1 of 39 included conditions who were observed that
-year. MRAIA performed cross-system deduplication within each year. The
-aggregate files did not permit independent verification of person-level
-linkage or identification of people appearing in multiple years. We
-therefore refer to every estimate as an EHR-diagnosed proportion among
-observed CAPriCORN adults, not population prevalence.
+year. The upstream data integration process performed cross-system
+deduplication within each year. The aggregate files did not permit
+independent verification of person-level linkage or identification of
+people appearing in multiple years. We therefore refer to every estimate
+as an EHR-diagnosed proportion among observed CAPriCORN adults, not
+population prevalence.
 
 ## Eligibility and Geographic Linkage
 
@@ -242,12 +243,16 @@ standard population could not be reconciled from the aggregate files.
 ## Primary Estimands
 
 We summed annual numerators and denominators before division. For focal
-tract (i) in community area (j), the pooled tract estimate was
-(p\_{ij}=*t y*{ijt}/*t n*{ijt}). Its community-area comparator excluded
-the focal tract: (p\_{-i,j}=*{ki,t}y*{kjt}/*{ki,t}n*{kjt}). Tests
-prevented substitution of an unweighted mean of annual percentages and
-verified that each focal tract contributed neither numerator nor
-denominator to its comparator.
+tract <i>i</i> in community area <i>j</i>, the pooled tract estimate was
+<i>p</i><sub><i>ij</i></sub> = ∑<sub><i>t</i></sub>
+<i>y</i><sub><i>ijt</i></sub> / ∑<sub><i>t</i></sub>
+<i>n</i><sub><i>ijt</i></sub>. Its community-area comparator excluded
+the focal tract: <i>p</i><sub>−<i>i</i>,<i>j</i></sub> = ∑<sub><i>k</i>
+≠ <i>i</i>,<i>t</i></sub> <i>y</i><sub><i>kjt</i></sub> / ∑<sub><i>k</i>
+≠ <i>i</i>,<i>t</i></sub> <i>n</i><sub><i>kjt</i></sub>. Tests prevented
+substitution of an unweighted mean of annual percentages and verified
+that each focal tract contributed neither numerator nor denominator to
+its comparator.
 
 We estimated 4 complementary outcomes. First, the within-community
 variance share was the observed-scale within-area component divided by
@@ -310,9 +315,9 @@ analysis met the definition of non–human participants research.\]
 
 The community-area resource contained 1848 condition-year records across
 77 community areas and 6 years (Table 1). Hypertension records were
-complete across all 462 area-years. Five of 462 COPD area-year records
+complete across all 462 area-years. 5 of 462 COPD area-year records
 (1.1%) were suppressed. The source-published median condition-record
-denominator was 3193 for hypertension and 3163 for COPD. These
+denominator was 3,193 for hypertension and 3,163 for COPD. These
 denominators were geography-period-condition observations, not counts of
 unique people across the study period.
 
