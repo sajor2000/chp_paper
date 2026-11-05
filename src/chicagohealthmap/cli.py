@@ -83,6 +83,7 @@ from chicagohealthmap.provenance.lineage import (
 from chicagohealthmap.manuscript.contracts import load_manuscript_contracts
 from chicagohealthmap.manuscript.audit import (
     ManuscriptAuditError,
+    audit_manuscript_citations,
     audit_manuscript_control,
 )
 from chicagohealthmap.manuscript.gates import (
@@ -477,6 +478,22 @@ def manuscript_audit_command(
         ValueError,
     ) as error:
         typer.echo(f"Manuscript control audit failed: {error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(json.dumps(asdict(report), indent=2, sort_keys=True))
+
+
+@manuscript_app.command("audit-citations")
+def manuscript_citation_audit_command(
+    main: Path = typer.Option(..., "--main", exists=True, dir_okay=False),
+    companion: Path = typer.Option(..., "--companion", exists=True, dir_okay=False),
+    references: Path = typer.Option(..., "--references", exists=True, dir_okay=False),
+    claims: Path = typer.Option(..., "--claims", exists=True, dir_okay=False),
+) -> None:
+    """Audit manuscript citations and the statistician-companion boundary."""
+    try:
+        report = audit_manuscript_citations(main, companion, references, claims)
+    except (ManuscriptAuditError, OSError, ValueError) as error:
+        typer.echo(f"Manuscript citation audit failed: {error}", err=True)
         raise typer.Exit(code=1) from None
     typer.echo(json.dumps(asdict(report), indent=2, sort_keys=True))
 

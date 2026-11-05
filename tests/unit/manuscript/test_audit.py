@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 from chicagohealthmap.cli import app
 from chicagohealthmap.manuscript.audit import (
     ManuscriptAuditError,
+    audit_manuscript_citations,
     audit_manuscript_control,
     audit_text,
 )
@@ -134,3 +135,80 @@ def test_cli_audit_requires_control_flag() -> None:
 
     assert result.exit_code != 0
     assert "control audit requires --control" in result.output
+
+
+def _write_citation_audit_fixture(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
+    main = tmp_path / "main.Rmd"
+    companion = tmp_path / "companion.Rmd"
+    references = tmp_path / "references.csv"
+    claims = tmp_path / "claims.csv"
+    main.write_text(
+        "isFALSE(manifest$results_authorized)\n"
+        "First claim.<sup>1</sup> Second claim.<sup>2</sup>\n"
+        "Exploratory AUC analyses are reported only in "
+        "`RMD_chm_paper_r_Ashley.html`.\n"
+        "# References\n"
+        "1. First source. doi:10.1000/first\n"
+        "2. Second source. PMID:12345.\n"
+        "# Table Legends\n"
+        "Table 1. Example.\n",
+        encoding="utf-8",
+    )
+    companion.write_text(
+        "isFALSE(manifest$results_authorized)\n"
+        "# Statistical Analysis Module 5: Exploratory Area-Label AUC\n",
+        encoding="utf-8",
+    )
+    pd.DataFrame(
+        [
+            {"reference_number": 1, "doi": "10.1000/first"},
+            {"reference_number": 2, "pmid": "12345"},
+        ]
+    ).to_csv(references, index=False)
+    pd.DataFrame(
+        [
+            {
+                "claim_id": "M09",
+                "manuscript_location": "Statistician review companion",
+                "verification_status": "verified_exact",
+            }
+        ]
+    ).to_csv(claims, index=False)
+    return main, companion, references, claims
+
+
+def test_citation_audit_accepts_ordered_references_and_companion_auc(
+    tmp_path: Path,
+) -> None:
+    report = audit_manuscript_citations(*_write_citation_audit_fixture(tmp_path))
+
+    assert report.references == 2
+    assert report.auc_pointers == 1
+
+
+def test_citation_audit_rejects_reference_order_drift(tmp_path: Path) -> None:
+    main, companion, references, claims = _write_citation_audit_fixture(tmp_path)
+    main.write_text(
+        main.read_text(encoding="utf-8").replace(
+            "First claim.<sup>1</sup> Second claim.<sup>2</sup>",
+            "First claim.<sup>2</sup> Second claim.<sup>1</sup>",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="first appearance"):
+        audit_manuscript_citations(main, companion, references, claims)
+
+
+def test_citation_audit_rejects_numeric_auc_in_main(tmp_path: Path) -> None:
+    main, companion, references, claims = _write_citation_audit_fixture(tmp_path)
+    main.write_text(
+        main.read_text(encoding="utf-8").replace(
+            "Exploratory AUC analyses",
+            "Exploratory AUC 0.939 analyses",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="nonnumeric"):
+        audit_manuscript_citations(main, companion, references, claims)
