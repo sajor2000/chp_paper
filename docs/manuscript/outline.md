@@ -64,16 +64,15 @@ construct/period, reliability/suppression, and uncertainty limitations.
 
 1. **Table 1:** Chicago Health Map community-area data coverage, 2019–2024.
 2. **Figure 1:** Chicago Health Map geographic coverage and data quality.
-3. **Figure 2:** Added geographic information from tract-level measures, with direct
-   tract/community comparisons above secondary CHM-PLACES comparisons.
-4. **Figure 3:** Direct cross-frame classification differences and stability.
-5. **Table 2:** Geographic alignment and direct cross-frame classification differences by condition.
+3. **Table 2:** Primary information-loss estimands for hypertension and COPD with 95% confidence intervals.
 
 ## Supplementary displays
 
 - Source flow, annual resource-quality checks, geographic-resolution sensitivity, concordance,
   uncertainty status, and spatial diagnostic displays support the proposed primary geography aim.
+- The legacy Figure 2 and Figure 3 artifacts are supplement-reserve review displays. They are not
+  main manuscript figures.
 - Cardiometabolic and COPD model coefficients, gates, residuals, influence, temporal, and spatial
-  diagnostics are QC-only model artifacts. They are not part of the five main displays.
+  diagnostics are QC-only model artifacts. They are not part of the three main displays.
 - `table_2_model_readiness_sensitivities.*` is retained as a compatibility alias for the
   geographic Table 2; `etable_2_model_readiness_sensitivities.*` is the model-QC table.

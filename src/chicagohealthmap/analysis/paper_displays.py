@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     import geopandas as gpd  # type: ignore[import-not-found,import-untyped]
 
 
-# The manuscript has exactly five primary displays.  Keeping this contract in
+# The manuscript has exactly three primary displays. Keeping this contract in
 # the display module lets the notebook and export code validate the same order.
-MAIN_DISPLAY_IDS = ("table_1", "figure_1", "figure_2", "figure_3", "table_2")
+MAIN_DISPLAY_IDS = ("table_1", "figure_1", "table_2")
 
 READER_ANALYSIS_NAMES = {
     "C1": "Cardiometabolic joint analysis",
@@ -468,10 +468,21 @@ def build_geographic_main_evidence(
         raise CaseStudyAnalysisError(
             "geographic evidence requires an explicit comparison geography"
         )
-    compare = resolution.loc[
+    resolution_primary = resolution.loc[
         resolution["noncrossing_only"].eq(False)
         & resolution["comparison_geography_type"].eq("chicago_community_area")
-    ].set_index("condition_id")
+    ]
+    if "comparison_role" in resolution_primary:
+        resolution_primary = resolution_primary.loc[
+            resolution_primary["comparison_role"].eq("primary")
+        ]
+    elif "comparability_gate_status" in resolution_primary:
+        resolution_primary = resolution_primary.loc[
+            resolution_primary["comparability_gate_status"].eq(
+                "primary_leave_one_tract_out_rollup"
+            )
+        ]
+    compare = resolution_primary.set_index("condition_id")
     partition_primary = partition
     if "sensitivity_status" in partition:
         partition_primary = partition.loc[partition["sensitivity_status"].eq("primary")]
@@ -481,56 +492,31 @@ def build_geographic_main_evidence(
     auc_column = "auc" if "auc" in auc else "estimate"
     if any(frame.index.has_duplicates for frame in (agree, compare, vpc, auc)):
         raise CaseStudyAnalysisError("geographic evidence has duplicate primary condition rows")
-    moves = transitions.loc[
-        transitions["sensitivity_status"].eq("all_eligible")
-        & transitions["comparison_geography_type"].eq("chicago_community_area")
-        & transitions["transition_state"].isin(
-            ["moves_into_highest_quartile", "moves_out_of_highest_quartile"]
-        )
-    ].pivot(index="condition_id", columns="transition_state", values="tract_count")
-    transition_denominators = (
-        transitions.loc[
-            transitions["sensitivity_status"].eq("all_eligible")
-            & transitions["comparison_geography_type"].eq("chicago_community_area")
-        ]
-        .groupby("condition_id")["tract_count"]
-        .sum()
-    )
-    denominator_by_condition = {}
-    if "mean_annual_source_denominator" in transitions:
-        denominator_by_condition = (
-            transitions.loc[
-                transitions["comparison_geography_type"].eq("chicago_community_area")
-                & transitions["sensitivity_status"].eq("all_eligible")
-            ]
-            .groupby("condition_id")["mean_annual_source_denominator"]
-            .median()
-            .to_dict()
-        )
+    source_frames = (agreement, partition, resolution)
     source_artifacts = (
         "|".join(
             str(frame.get("source_artifact", pd.Series(dtype=object)).dropna().iloc[0])
-            for frame in frames
+            for frame in source_frames
             if "source_artifact" in frame and not frame["source_artifact"].dropna().empty
         )
-        or "agreement|partition|resolution|transitions"
+        or "agreement|partition|resolution"
     )
     source_checksums = (
         "|".join(
             str(frame.get("source_checksum", pd.Series(dtype=object)).dropna().iloc[0])
-            for frame in frames
+            for frame in source_frames
             if "source_checksum" in frame and not frame["source_checksum"].dropna().empty
         )
         or "not_provided_in_frame"
     )
     rows: list[dict[str, object]] = []
     for condition in conditions:
-        into = moves.get("moves_into_highest_quartile", pd.Series(dtype=float)).get(
-            condition, np.nan
-        )
-        out = moves.get("moves_out_of_highest_quartile", pd.Series(dtype=float)).get(
-            condition, np.nan
-        )
+        into = compare.get(
+            "comparison_high_tract_not_high_count", pd.Series(dtype=float)
+        ).get(condition, np.nan)
+        out = compare.get(
+            "tract_high_comparison_not_high_count", pd.Series(dtype=float)
+        ).get(condition, np.nan)
         metrics = {
             "spearman_r": agree.get("spearman_r", pd.Series(dtype=float)).get(condition),
             "weighted_kappa": agree.get("quadratic_weighted_kappa", pd.Series(dtype=float)).get(
@@ -558,16 +544,16 @@ def build_geographic_main_evidence(
             ).get(condition),
             "q4_moves_into_n": into,
             "q4_moves_out_n": out,
-            "q4_movers_n": into + out,
-            "q4_transition_eligible_n": transition_denominators.get(condition, np.nan),
+            "q4_movers_n": compare.get("q4_movement_count", pd.Series(dtype=float)).get(
+                condition, np.nan
+            ),
+            "q4_transition_eligible_n": compare.get(
+                "tract_sample_n", pd.Series(dtype=float)
+            ).get(condition, np.nan),
         }
-        metrics["q4_movers_pct"] = (
-            100 * metrics["q4_movers_n"] / metrics["q4_transition_eligible_n"]
-            if pd.notna(metrics["q4_movers_n"])
-            and pd.notna(metrics["q4_transition_eligible_n"])
-            and metrics["q4_transition_eligible_n"] > 0
-            else np.nan
-        )
+        metrics["q4_movers_pct"] = compare.get(
+            "q4_movement_pct", pd.Series(dtype=float)
+        ).get(condition, np.nan)
         if condition == "diabetes":
             for metric in ("spearman_r", "weighted_kappa", "gwet_ac1"):
                 metrics[metric] = np.nan
@@ -584,7 +570,7 @@ def build_geographic_main_evidence(
                     condition
                 ),
                 **metrics,
-                "estimand": "Cross-source rank alignment and direct tract/community classification difference",
+                "estimand": "Primary leave-one-tract-out information loss with secondary cross-source alignment context",
                 "unit": "condition-specific eligible census tracts",
                 "availability_status": (
                     "complete_metric_availability"
@@ -602,13 +588,13 @@ def build_geographic_main_evidence(
                     "source-specific comparator period retained"
                 ),
                 "comparison_geography_type": "chicago_community_area",
-                "comparability_gate_status": "cross_frame_only_no_literal_aggregation",
+                "comparability_gate_status": "primary_leave_one_tract_out_with_secondary_alignment_context",
                 "comparability_gate_reason": (
-                    "Direct tract and direct community-area CHM values are linked for "
-                    "classification comparison; tract disease values are never aggregated."
+                    "Information-loss fields use the focal-excluded denominator-pooled comparator; "
+                    "cross-source agreement fields remain secondary context."
                 ),
-                "mean_annual_source_denominator": denominator_by_condition.get(condition, np.nan),
-                "denominator_unit": "mean annual CHM condition-record denominators (repeated geography-period units)",
+                "mean_annual_source_denominator": np.nan,
+                "denominator_unit": "condition-specific eligible tracts for the primary leave-one-out comparator",
                 "mixed_extreme_community_area_n": np.nan,
                 "uncertainty_status": (
                     "metric-specific 95% community-area cluster-bootstrap intervals in eTable 7; "
@@ -672,6 +658,174 @@ def build_compact_table_2(evidence: pd.DataFrame) -> pd.DataFrame:
     return table
 
 
+def build_primary_information_loss_table(
+    partition: pd.DataFrame,
+    resolution: pd.DataFrame,
+) -> pd.DataFrame:
+    """Assemble the 4 prespecified leave-one-tract-out estimands per condition."""
+
+    required_partition = {
+        "analysis_id",
+        "condition_id",
+        "sensitivity_status",
+        "eligible_n",
+        "within_variance_share",
+        "ci_low",
+        "ci_high",
+        "bootstrap_replicates",
+        "bootstrap_seed",
+        "results_authorized",
+    }
+    required_resolution = {
+        "condition_id",
+        "comparison_role",
+        "noncrossing_only",
+        "tract_sample_n",
+        "median_absolute_percentile_rank_gap",
+        "median_absolute_percentile_rank_gap_ci_low",
+        "median_absolute_percentile_rank_gap_ci_high",
+        "quartile_disagree_pct",
+        "quartile_disagree_pct_ci_low",
+        "quartile_disagree_pct_ci_high",
+        "q4_movement_pct",
+        "q4_movement_pct_ci_low",
+        "q4_movement_pct_ci_high",
+        "bootstrap_replicates",
+        "bootstrap_seed",
+        "results_authorized",
+    }
+    for label, frame, required in (
+        ("partition", partition, required_partition),
+        ("resolution", resolution, required_resolution),
+    ):
+        missing = sorted(required - set(frame.columns))
+        if missing:
+            raise CaseStudyAnalysisError(
+                f"primary information-loss {label} source is missing columns: {missing}"
+            )
+        if frame["results_authorized"].fillna(True).astype(bool).any():
+            raise CaseStudyAnalysisError(
+                f"primary information-loss {label} source must remain unauthorized"
+            )
+
+    conditions = ("hypertension", "copd")
+    variance = partition.loc[
+        partition["analysis_id"].eq("A1")
+        & partition["sensitivity_status"].eq("primary")
+        & partition["condition_id"].isin(conditions)
+    ].copy()
+    comparison = resolution.loc[
+        resolution["comparison_role"].eq("primary")
+        & ~resolution["noncrossing_only"].astype(bool)
+        & resolution["condition_id"].isin(conditions)
+    ].copy()
+    if len(variance) != 2 or variance["condition_id"].nunique() != 2:
+        raise CaseStudyAnalysisError("primary variance source requires one row per condition")
+    if len(comparison) != 2 or comparison["condition_id"].nunique() != 2:
+        raise CaseStudyAnalysisError("primary resolution source requires one row per condition")
+
+    rows: list[dict[str, object]] = []
+    for condition in conditions:
+        variance_row = variance.loc[variance["condition_id"].eq(condition)].iloc[0]
+        comparison_row = comparison.loc[comparison["condition_id"].eq(condition)].iloc[0]
+        common = {
+            "condition_id": condition,
+            "condition": "Hypertension" if condition == "hypertension" else "COPD",
+            "bootstrap_replicates": int(comparison_row["bootstrap_replicates"]),
+            "bootstrap_seed": int(comparison_row["bootstrap_seed"]),
+            "bootstrap_cluster_unit": "community_area_id",
+            "bootstrap_interval_method": "percentile_2.5_97.5",
+            "confidence_level": 0.95,
+            "comparison_role": "primary_leave_one_tract_out",
+            "results_authorized": False,
+        }
+        rows.append(
+            {
+                **common,
+                "estimand": "Within-community variance share",
+                "eligible_tract_n": int(variance_row["eligible_n"]),
+                "estimate": float(variance_row["within_variance_share"]),
+                "ci_low": float(1 - variance_row["ci_high"]),
+                "ci_high": float(1 - variance_row["ci_low"]),
+                "unit": "proportion",
+            }
+        )
+        for estimand, value_column, low_column, high_column, unit in (
+            (
+                "Median absolute percentile-rank gap",
+                "median_absolute_percentile_rank_gap",
+                "median_absolute_percentile_rank_gap_ci_low",
+                "median_absolute_percentile_rank_gap_ci_high",
+                "rank_proportion",
+            ),
+            (
+                "Quartile disagreement",
+                "quartile_disagree_pct",
+                "quartile_disagree_pct_ci_low",
+                "quartile_disagree_pct_ci_high",
+                "%",
+            ),
+            (
+                "Movement into or out of Q4",
+                "q4_movement_pct",
+                "q4_movement_pct_ci_low",
+                "q4_movement_pct_ci_high",
+                "%",
+            ),
+        ):
+            rows.append(
+                {
+                    **common,
+                    "estimand": estimand,
+                    "eligible_tract_n": int(comparison_row["tract_sample_n"]),
+                    "estimate": float(comparison_row[value_column]),
+                    "ci_low": float(comparison_row[low_column]),
+                    "ci_high": float(comparison_row[high_column]),
+                    "unit": unit,
+                }
+            )
+    result = pd.DataFrame(rows)
+    if len(result) != 8 or result[["condition_id", "estimand"]].duplicated().any():
+        raise CaseStudyAnalysisError("primary information-loss table must contain 8 unique rows")
+    if result["bootstrap_replicates"].lt(1000).any():
+        raise CaseStudyAnalysisError("primary information-loss table requires 1000 bootstraps")
+    return result
+
+
+def build_primary_information_loss_display(primary: pd.DataFrame) -> pd.DataFrame:
+    """Format the primary estimand table without changing its numeric source."""
+
+    required = {
+        "condition",
+        "estimand",
+        "eligible_tract_n",
+        "estimate",
+        "ci_low",
+        "ci_high",
+        "unit",
+    }
+    missing = sorted(required - set(primary.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"primary display source is missing columns: {missing}")
+
+    def format_interval(row: pd.Series) -> str:
+        if row["unit"] == "proportion":
+            return f"{100 * row['estimate']:.1f}% ({100 * row['ci_low']:.1f}%-{100 * row['ci_high']:.1f}%)"
+        if row["unit"] == "%":
+            return f"{row['estimate']:.1f}% ({row['ci_low']:.1f}%-{row['ci_high']:.1f}%)"
+        return f"{row['estimate']:.3f} ({row['ci_low']:.3f}-{row['ci_high']:.3f})"
+
+    display = primary.loc[:, ["condition", "estimand", "eligible_tract_n"]].copy()
+    display["Estimate (95% CI)"] = primary.apply(format_interval, axis=1)
+    return display.rename(
+        columns={
+            "condition": "Condition",
+            "estimand": "Estimand",
+            "eligible_tract_n": "Eligible tracts, No.",
+        }
+    )
+
+
 def build_geographic_consequence_display_data(
     transitions: pd.DataFrame,
     mixed_extremes: pd.DataFrame,
@@ -727,7 +881,7 @@ def build_adjusted_prediction_data(
     primary_frame: pd.DataFrame,
     *,
     points: int = 100,
-    confidence_level: float = 0.975,
+    confidence_level: float = 0.95,
 ) -> pd.DataFrame:
     """Predict C2 life expectancy across observed COPD values at mean covariates."""
 
@@ -743,7 +897,10 @@ def build_adjusted_prediction_data(
     beta, covariance = _hc3_covariance(result.design, result.outcome.to_numpy(dtype=float))
     prediction = prediction_design @ beta
     variance = np.einsum("ij,jk,ik->i", prediction_design, covariance, prediction_design)
-    critical = float(stats.norm.ppf(1 - (1 - confidence_level) / 2))
+    residual_degrees_of_freedom = len(eligible) - result.design.shape[1]
+    critical = float(
+        stats.t.ppf(1 - (1 - confidence_level) / 2, df=residual_degrees_of_freedom)
+    )
     standard_error = np.sqrt(np.maximum(variance, 0))
     return pd.DataFrame(
         {
@@ -752,6 +909,8 @@ def build_adjusted_prediction_data(
             "ci_low": prediction - critical * standard_error,
             "ci_high": prediction + critical * standard_error,
             "confidence_level": confidence_level,
+            "critical_value_distribution": "t_residual_degrees_of_freedom",
+            "residual_degrees_of_freedom": residual_degrees_of_freedom,
             "n": len(eligible),
             "unit": "life_expectancy_years",
             "covariate_standardization": "adjustment_covariates_at_sample_means",

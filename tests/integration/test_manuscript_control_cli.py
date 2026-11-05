@@ -47,3 +47,32 @@ def test_control_plane_initializes_and_fails_closed_before_s7(tmp_path: Path, mo
     audit = runner.invoke(app, ["manuscript", "audit", "--control"])
     assert audit.exit_code == 0
     assert '"failures": []' in audit.output
+
+
+def test_real_statistician_review_citation_audit_cli() -> None:
+    root = Path(__file__).resolve().parents[2]
+    result = CliRunner().invoke(
+        app,
+        [
+            "manuscript",
+            "audit-citations",
+            "--main",
+            str(
+                root
+                / "manuscript"
+                / "chicago_health_map_jama_health_forum_original_investigation.Rmd"
+            ),
+            "--companion",
+            str(root / "notebooks" / "RMD_chm_paper_r_Ashley.Rmd"),
+            "--references",
+            str(root / "manuscript" / "reference_verification.csv"),
+            "--claims",
+            str(root / "manuscript" / "claim_evidence_map.csv"),
+            "--manifest",
+            str(root / "config" / "manuscript" / "results_authorization.json"),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert '"references": 44' in result.output
+    assert '"companion_references": 33' in result.output

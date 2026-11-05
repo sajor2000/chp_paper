@@ -47,6 +47,38 @@ def _dataset() -> pd.DataFrame:
     return frame
 
 
+def _primary_information_loss() -> pd.DataFrame:
+    estimands = (
+        "Within-community variance share",
+        "Median absolute percentile-rank gap",
+        "Quartile disagreement",
+        "Movement into or out of Q4",
+    )
+    rows = []
+    for condition, variance_n, loo_n in (
+        ("hypertension", 722, 720),
+        ("copd", 411, 401),
+    ):
+        for estimand in estimands:
+            rows.append(
+                {
+                    "condition_id": condition,
+                    "estimand": estimand,
+                    "eligible_tract_n": (
+                        variance_n if estimand == "Within-community variance share" else loo_n
+                    ),
+                    "estimate": 0.2,
+                    "ci_low": 0.1,
+                    "ci_high": 0.3,
+                    "confidence_level": 0.95,
+                    "bootstrap_replicates": 1000,
+                    "bootstrap_seed": 20260715,
+                    "results_authorized": False,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def test_data_quality_audit_is_schema_and_period_explicit() -> None:
     dataset = _dataset()
     manifest = {
@@ -133,17 +165,40 @@ def test_master_claim_records_reject_unverified_model_gate() -> None:
             }
         ]
     )
-    resolution = pd.DataFrame(
+    resolution = _primary_information_loss()
+    with pytest.raises(CaseStudyAnalysisError, match="cardiometabolic gate"):
+        build_master_claim_records(readiness, contrasts, resolution)
+
+
+def test_master_claim_records_require_t_based_c2_and_primary_loo_evidence() -> None:
+    readiness = pd.DataFrame(
+        [{"model_id": "C1", "n_complete": 0, "status": "withheld_insufficient_complete_areas"}]
+    )
+    contrasts = pd.DataFrame(
         [
             {
-                "tract_sample_n": 800,
-                "results_authorized": False,
-                "analysis_status": "geographic_resolution_sensitivity",
+                "model_id": "C2",
+                "estimate": -2.6,
+                "ci_low": -4.8,
+                "ci_high": -0.4,
+                "confidence_level": 0.95,
+                "critical_value_distribution": "t_residual_degrees_of_freedom",
+                "residual_degrees_of_freedom": 70,
+                "n": 76,
             }
         ]
     )
-    with pytest.raises(CaseStudyAnalysisError, match="cardiometabolic gate"):
-        build_master_claim_records(readiness, contrasts, resolution)
+    resolution = _primary_information_loss()
+
+    claims = build_master_claim_records(readiness, contrasts, resolution)
+
+    c2 = next(record for record in claims if record["claim_id"] == "C2")
+    geographic = next(record for record in claims if record["claim_id"] == "GR")
+    assert c2["confidence_level"] == pytest.approx(0.95)
+    assert "residual-df t" in c2["method"]
+    assert geographic["eligible_n"] == 722
+    assert "Leave-one-tract-out" in geographic["method"]
+    assert geographic["source_artifact"] == "table_2_geographic_resolution.csv"
 
 
 def test_claim_evidence_audit_requires_complete_unauthorized_records() -> None:
@@ -154,7 +209,7 @@ def test_claim_evidence_audit_requires_complete_unauthorized_records() -> None:
         "estimate": -2.60,
         "ci_low": -4.83,
         "ci_high": -0.37,
-        "confidence_level": 0.975,
+        "confidence_level": 0.95,
         "eligible_n": 76,
         "unit": "life-expectancy years",
         "grain": "Chicago community area",
@@ -162,13 +217,13 @@ def test_claim_evidence_audit_requires_complete_unauthorized_records() -> None:
         "period": "CHM and Atlas 2022-2024",
         "missingness_rule": "Complete case; no imputation of suppressed values",
         "method": "Equal-area OLS with HC3 covariance",
-        "uncertainty": "97.5% confidence interval",
+        "uncertainty": "95% confidence interval",
         "diagnostic": "Adjusted residual Moran I and influence checks",
         "sensitivity_status": "supportive_sensitivity_not_primary",
-        "source_artifact": "table_2_model_readiness_sensitivities.csv",
+        "source_artifact": "etable_2_model_readiness_sensitivities.csv",
         "analysis_status": "freeze_candidate_primary_model_unsecured",
         "authorization": False,
-        "verification_status": "verified_internal_audit",
+        "verification_status": "verified_against_model_result_object",
     }
 
     audit = build_claim_evidence_audit([record], {"C2": "table_2"})

@@ -318,9 +318,9 @@ def build_main_display_reader_guide(
     gates belong in ``model_guidance`` and cannot be attached to a main card.
     """
 
-    ordered = ("table_1", "figure_1", "figure_2", "figure_3", "table_2")
+    ordered = ("table_1", "figure_1", "table_2")
     if set(displays) != set(ordered):
-        raise CaseStudyAnalysisError("reader guide must cover exactly five main displays")
+        raise CaseStudyAnalysisError("reader guide must cover exactly three main displays")
     rows: list[dict[str, Any]] = []
     for display_id in ordered:
         payload = dict(displays[display_id])

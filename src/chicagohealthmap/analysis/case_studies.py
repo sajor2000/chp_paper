@@ -112,6 +112,9 @@ def build_tract_cohort_flow(dataset: pd.DataFrame) -> pd.DataFrame:
     tract["denominator_eligible"] = tract["denominator_numeric"].ge(
         MINIMUM_TRACT_ANNUAL_DENOMINATOR
     )
+    tract["unresolved_numerator"] = (
+        tract["suppression_flag"].astype(bool) | tract["numerator"].isna()
+    )
     tract["observable_after_suppression"] = (
         tract["denominator_eligible"]
         & ~tract["suppression_flag"].astype(bool)
@@ -151,15 +154,255 @@ def build_tract_cohort_flow(dataset: pd.DataFrame) -> pd.DataFrame:
                     group.loc[eligible, "geography_id"].nunique()
                 ),
                 "excluded_denominator_lt_30_or_missing_rows": int(
-                    (~denominator_eligible).sum()
+                    (
+                        ~denominator_eligible
+                        & ~group["unresolved_numerator"].astype(bool)
+                    ).sum()
                 ),
                 "excluded_suppressed_or_missing_numerator_rows": int(
-                    (denominator_eligible & ~observable).sum()
+                    group["unresolved_numerator"].astype(bool).sum()
                 ),
             }
         )
     return pd.DataFrame.from_records(records).sort_values(
         ["condition_id", "time_period"], kind="mergesort", ignore_index=True
+    )
+
+
+def _tract_selection_membership(dataset: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    required = {
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id",
+        "city_inclusion_primary_eligible",
+        "primary_tract_annual_eligible",
+        "max_community_area_weight",
+        "community_area_id",
+    }
+    missing = sorted(required - set(dataset.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"complete tract flow is missing columns: {missing}")
+    focal_conditions = ("hypertension", "copd")
+    boundary = dataset.loc[
+        dataset["geography_type"].eq(TRACT)
+        & dataset["time_period"].astype(str).isin(CONTEMPORARY_YEARS)
+        & dataset["city_inclusion_primary_eligible"].fillna(False).astype(bool)
+    ].copy()
+    boundary["time_period"] = boundary["time_period"].astype(str)
+    if boundary.empty:
+        raise CaseStudyAnalysisError("complete tract flow has no boundary-eligible tracts")
+    for column in ("max_community_area_weight", "community_area_id"):
+        distinct = boundary.groupby("geography_id", dropna=False)[column].nunique(dropna=True)
+        if bool(distinct.gt(1).any()):
+            raise CaseStudyAnalysisError(
+                f"complete tract flow has inconsistent {column} within a tract"
+            )
+    linkage = (
+        boundary.groupby("geography_id", as_index=False, sort=True)
+        .agg(
+            max_community_area_weight=("max_community_area_weight", "first"),
+            community_area_id=("community_area_id", "first"),
+        )
+    )
+    focal = boundary.loc[boundary["condition_id"].isin(focal_conditions)].copy()
+    key = ["geography_id", "time_period", "condition_id"]
+    if focal.duplicated(key).any():
+        raise CaseStudyAnalysisError("complete tract flow has duplicate tract-year-condition rows")
+    skeleton = pd.MultiIndex.from_product(
+        (
+            linkage["geography_id"].tolist(),
+            CONTEMPORARY_YEARS,
+            focal_conditions,
+        ),
+        names=key,
+    ).to_frame(index=False)
+    focal = focal.drop(
+        columns=[
+            "geography_type",
+            "city_inclusion_primary_eligible",
+            "max_community_area_weight",
+            "community_area_id",
+        ]
+    )
+    tract = skeleton.merge(focal, on=key, how="left", validate="one_to_one").merge(
+        linkage,
+        on="geography_id",
+        how="left",
+        validate="many_to_one",
+    )
+    tract["geography_type"] = TRACT
+    tract["city_inclusion_primary_eligible"] = True
+    tract["primary_tract_annual_eligible"] = tract[
+        "primary_tract_annual_eligible"
+    ].fillna(False).astype(bool)
+    grouped = tract.groupby(["condition_id", "geography_id"], sort=True, dropna=False)
+    membership = grouped.agg(
+        annual_rows=("time_period", "nunique"),
+        eligible_annual_rows=("primary_tract_annual_eligible", "sum"),
+        max_community_area_weight=("max_community_area_weight", "first"),
+        community_area_id=("community_area_id", "first"),
+    ).reset_index()
+    membership["complete_2022_2024"] = (
+        membership["annual_rows"].eq(len(CONTEMPORARY_YEARS))
+        & membership["eligible_annual_rows"].eq(len(CONTEMPORARY_YEARS))
+    )
+    membership["dominant_area_eligible"] = (
+        membership["complete_2022_2024"]
+        & pd.to_numeric(membership["max_community_area_weight"], errors="coerce").ge(0.99)
+        & membership["community_area_id"].notna()
+    )
+    peer_counts = (
+        membership.loc[membership["dominant_area_eligible"]]
+        .groupby(["condition_id", "community_area_id"], dropna=False)["geography_id"]
+        .transform("size")
+    )
+    membership["loo_comparator_eligible"] = False
+    membership.loc[membership["dominant_area_eligible"], "loo_comparator_eligible"] = (
+        peer_counts.ge(2).to_numpy()
+    )
+    membership["selection_stage"] = "excluded_incomplete_2022_2024"
+    membership.loc[
+        membership["complete_2022_2024"] & ~membership["dominant_area_eligible"],
+        "selection_stage",
+    ] = "excluded_dominant_area_linkage"
+    membership.loc[
+        membership["dominant_area_eligible"] & ~membership["loo_comparator_eligible"],
+        "selection_stage",
+    ] = "excluded_no_loo_peer"
+    membership.loc[membership["loo_comparator_eligible"], "selection_stage"] = (
+        "primary_loo_eligible"
+    )
+    return tract, membership
+
+
+def build_complete_tract_cohort_flow(dataset: pd.DataFrame) -> pd.DataFrame:
+    """Reconstruct the complete-year, dominant-area, and leave-one-out cohort flow."""
+
+    _, membership = _tract_selection_membership(dataset)
+    records: list[dict[str, object]] = []
+    for condition_id, group in membership.groupby("condition_id", sort=True):
+        complete = group["complete_2022_2024"].astype(bool)
+        dominant = group["dominant_area_eligible"].astype(bool)
+        loo = group["loo_comparator_eligible"].astype(bool)
+        records.append(
+            {
+                "condition_id": condition_id,
+                "boundary_tracts": int(len(group)),
+                "complete_2022_2024_tracts": int(complete.sum()),
+                "excluded_incomplete_2022_2024": int((~complete).sum()),
+                "dominant_area_eligible_tracts": int(dominant.sum()),
+                "excluded_at_dominant_area_linkage": int((complete & ~dominant).sum()),
+                "loo_comparator_eligible_tracts": int(loo.sum()),
+                "excluded_without_loo_peer": int((dominant & ~loo).sum()),
+                "excluded_no_other_eligible_tract_in_area": int((dominant & ~loo).sum()),
+                "dominant_area_threshold": 0.99,
+                "period": "2022-2024",
+                "analysis_status": "statistician_review_cohort_flow",
+                "results_authorized": False,
+            }
+        )
+    return pd.DataFrame.from_records(records).sort_values(
+        "condition_id", kind="mergesort", ignore_index=True
+    )
+
+
+def build_tract_selection_audit(dataset: pd.DataFrame) -> pd.DataFrame:
+    """Compare aggregate characteristics of included and excluded tract cohorts."""
+
+    tract, membership = _tract_selection_membership(dataset)
+    required = {"numerator", "denominator", "suppression_flag", "capture_rate"}
+    missing = sorted(required - set(tract.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"tract selection audit is missing columns: {missing}")
+    audit_rows = tract.merge(
+        membership[["condition_id", "geography_id", "selection_stage"]],
+        on=["condition_id", "geography_id"],
+        how="left",
+        validate="many_to_one",
+    )
+    audit_rows["numerator_numeric"] = pd.to_numeric(audit_rows["numerator"], errors="coerce")
+    audit_rows["denominator_numeric"] = pd.to_numeric(
+        audit_rows["denominator"], errors="coerce"
+    )
+    audit_rows["observable"] = audit_rows["primary_tract_annual_eligible"].astype(bool)
+    audit_rows["eligible_numerator"] = audit_rows["numerator_numeric"].where(
+        audit_rows["observable"]
+    )
+    audit_rows["eligible_denominator"] = audit_rows["denominator_numeric"].where(
+        audit_rows["observable"]
+    )
+    if "reliability_tier" in audit_rows:
+        audit_rows["reliability_available"] = audit_rows["reliability_tier"].notna()
+    else:
+        audit_rows["reliability_available"] = False
+
+    records: list[dict[str, object]] = []
+    stages = (
+        "primary_loo_eligible",
+        "all_excluded_from_primary",
+        "excluded_incomplete_2022_2024",
+        "excluded_dominant_area_linkage",
+        "excluded_no_loo_peer",
+    )
+    for condition_id, condition_rows in audit_rows.groupby("condition_id", sort=True):
+        for stage in stages:
+            if stage == "all_excluded_from_primary":
+                rows = condition_rows.loc[
+                    ~condition_rows["selection_stage"].eq("primary_loo_eligible")
+                ]
+                comparison_group = "excluded"
+            else:
+                rows = condition_rows.loc[condition_rows["selection_stage"].eq(stage)]
+                comparison_group = "included" if stage == "primary_loo_eligible" else "excluded"
+            tract_n = int(rows["geography_id"].nunique())
+            denominator = rows["denominator_numeric"].dropna()
+            eligible_denominator_sum = float(rows["eligible_denominator"].sum(min_count=1))
+            eligible_numerator_sum = float(rows["eligible_numerator"].sum(min_count=1))
+            reliability_by_tract = rows.groupby("geography_id", sort=False)[
+                "reliability_available"
+            ].max()
+            records.append(
+                {
+                    "condition_id": condition_id,
+                    "selection_stage": stage,
+                    "comparison_group": comparison_group,
+                    "tract_n": tract_n,
+                    "tract_year_records": int(len(rows)),
+                    "eligible_tract_year_records": int(rows["observable"].sum()),
+                    "unresolved_or_ineligible_tract_year_records": int(
+                        len(rows) - rows["observable"].sum()
+                    ),
+                    "annual_denominator_median": (
+                        float(denominator.median()) if not denominator.empty else np.nan
+                    ),
+                    "annual_denominator_q1": (
+                        float(denominator.quantile(0.25)) if not denominator.empty else np.nan
+                    ),
+                    "annual_denominator_q3": (
+                        float(denominator.quantile(0.75)) if not denominator.empty else np.nan
+                    ),
+                    "pooled_crude_ehr_percent": (
+                        100 * eligible_numerator_sum / eligible_denominator_sum
+                        if eligible_denominator_sum > 0
+                        else np.nan
+                    ),
+                    "capture_rate_median": (
+                        float(pd.to_numeric(rows["capture_rate"], errors="coerce").median())
+                        if tract_n
+                        else np.nan
+                    ),
+                    "reliability_available_tracts": int(reliability_by_tract.sum()),
+                    "reliability_available_pct": (
+                        100 * float(reliability_by_tract.mean()) if tract_n else np.nan
+                    ),
+                    "analysis_status": "aggregate_selection_diagnostic",
+                    "interpretation": "selection_diagnostic_not_population_representativeness",
+                    "results_authorized": False,
+                }
+            )
+    return pd.DataFrame.from_records(records).sort_values(
+        ["condition_id", "selection_stage"], kind="mergesort", ignore_index=True
     )
 
 

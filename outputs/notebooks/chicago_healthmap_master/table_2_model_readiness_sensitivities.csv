@@ -1,4 +1,9 @@
-Condition,"Tract/community eligible tracts, No.","Exact quartile agreement, No. (%)","Quartile disagreement, No. (%)",Within-community variance share,"Q4 transition eligible tracts, No.","Q4 movers, No. (%)"
-Hypertension,722,467 (64.7),255 (35.3),0.195,722,76 (10.5)
-Combined diabetes components,,—,—,,,—
-COPD,411,205 (49.9),206 (50.1),0.469,411,101 (24.6)
+condition_id,condition,bootstrap_replicates,bootstrap_seed,bootstrap_cluster_unit,bootstrap_interval_method,confidence_level,comparison_role,results_authorized,estimand,eligible_tract_n,estimate,ci_low,ci_high,unit
+hypertension,Hypertension,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Within-community variance share,722,0.195073252049,0.15076865891,0.276202704737,proportion
+hypertension,Hypertension,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Median absolute percentile-rank gap,720,0.0847222222222,0.0799438480544,0.104402359935,rank_proportion
+hypertension,Hypertension,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Quartile disagreement,720,33.75,28.8916430595,43.3992910847,%
+hypertension,Hypertension,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Movement into or out of Q4,720,11.6666666667,6.68299767205,19.975291231,%
+copd,COPD,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Within-community variance share,411,0.469243128461,0.332894492921,0.620926050655,proportion
+copd,COPD,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Median absolute percentile-rank gap,401,0.14463840399,0.125,0.172666311395,rank_proportion
+copd,COPD,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Quartile disagreement,401,52.3690773067,47.2633395522,61.5606121131,%
+copd,COPD,1000,20260715,community_area_id,percentile_2.5_97.5,0.95,primary_leave_one_tract_out,False,Movement into or out of Q4,401,23.4413965087,18.0850335179,33.82004079,%

@@ -25,7 +25,7 @@ def _run(root: Path, output: Path) -> subprocess.CompletedProcess[str]:
         check=False,
         capture_output=True,
         text=True,
-        timeout=240,
+        timeout=600,
     )
 
 
@@ -82,8 +82,6 @@ def test_master_notebook_is_deterministic_and_submission_ready(
     assert manifest["main_display_ids"] == [
         "table_1",
         "figure_1",
-        "figure_2",
-        "figure_3",
         "table_2",
     ]
     assert set(manifest["main_display_artifacts"]) == set(manifest["main_display_ids"])
@@ -92,7 +90,7 @@ def test_master_notebook_is_deterministic_and_submission_ready(
         for artifacts in manifest["main_display_artifacts"].values()
         for artifact in artifacts
     ]
-    assert len(main_artifacts) == len(set(main_artifacts)) == 10
+    assert len(main_artifacts) == len(set(main_artifacts)) == 6
     assert all((first / artifact).is_file() for artifact in main_artifacts)
     assert all((first / name).is_file() for name in manifest["output_sha256"])
     assert manifest["dataset_build_action"] == "rebuilt"
@@ -132,8 +130,13 @@ def test_master_notebook_is_deterministic_and_submission_ready(
     assert (first / "supplement_coefficient_forest.pdf").is_file()
     assert (first / "supplement_model_diagnostics.pdf").is_file()
     aggregation_loss = pd.read_csv(first / "supplement_aggregation_loss.csv")
-    assert len(aggregation_loss) == 4
+    assert len(aggregation_loss) == 8
     assert set(aggregation_loss["condition_id"]) == {"hypertension", "copd"}
+    assert set(aggregation_loss["comparison_role"]) == {
+        "primary",
+        "primary_sensitivity",
+        "secondary_source_export",
+    }
     assert set(aggregation_loss["zip_zcta_sensitivity_status"]) == {"direct_zcta_comparison"}
     consequence = pd.read_csv(first / "supplement_geographic_consequence_transitions.csv")
     assert set(consequence["comparison_geography_type"]) == {
@@ -149,20 +152,12 @@ def test_master_notebook_is_deterministic_and_submission_ready(
     assert table_1["Community areas represented, No."].eq(77).all()
     assert "CHM condition-record denominator, median (IQR)" in table_1
     table_2 = pd.read_csv(first / "table_2_model_readiness_sensitivities.csv")
-    assert table_2["Condition"].tolist() == [
-        "Hypertension",
-        "Combined diabetes components",
-        "COPD",
-    ]
-    assert table_2["Tract/community eligible tracts, No."].iloc[[0, 2]].tolist() == [722, 411]
-    assert pd.isna(table_2["Tract/community eligible tracts, No."].iloc[1])
-    assert table_2["Quartile disagreement, No. (%)"].iloc[[0, 2]].tolist() == [
-        "255 (35.3)", "206 (50.1)"
-    ]
-    assert table_2["Quartile disagreement, No. (%)"].iloc[1] == "—"
-    assert table_2["Q4 movers, No. (%)"].iloc[[0, 2]].tolist() == ["76 (10.5)", "101 (24.6)"]
-    assert table_2["Q4 movers, No. (%)"].iloc[1] == "—"
-    assert not any("Estimate" in column or "Authorization" in column for column in table_2)
+    assert table_2.shape == (8, 15)
+    assert set(table_2["condition_id"]) == {"hypertension", "copd"}
+    assert table_2.groupby("condition_id")["estimand"].nunique().eq(4).all()
+    assert set(table_2["bootstrap_replicates"]) == {1000}
+    assert set(table_2["bootstrap_interval_method"]) == {"percentile_2.5_97.5"}
+    assert not table_2["results_authorized"].any()
     display_review = pd.read_csv(first / "biostatistical_display_review.csv")
     assert len(display_review) == 26
     assert set(display_review.columns) == {

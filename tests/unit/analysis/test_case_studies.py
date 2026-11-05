@@ -5,9 +5,11 @@ import pytest
 
 from chicagohealthmap.analysis.case_studies import (
     CaseStudyAnalysisError,
+    build_complete_tract_cohort_flow,
     build_primary_community_frame,
     build_tract_cohort_flow,
     build_tract_concordance_frame,
+    build_tract_selection_audit,
     classify_discordance,
     summarize_concordance,
     summarize_dataset_shape,
@@ -158,6 +160,33 @@ def test_build_tract_cohort_flow_reconstructs_sequential_exclusions() -> None:
     assert copd_2023["primary_eligible_rows"] == 0
 
 
+def test_build_tract_cohort_flow_attributes_overlapping_failures_to_unresolved() -> None:
+    dataset = _approved_dataset()
+    overlap = (
+        dataset["geography_type"].eq("census_tract")
+        & dataset["condition_id"].eq("copd")
+        & dataset["time_period"].eq("2022")
+    )
+    dataset.loc[overlap, "denominator"] = 29
+    dataset.loc[overlap, "suppression_flag"] = True
+    dataset.loc[overlap, "numerator"] = pd.NA
+    denominator_eligible = pd.to_numeric(dataset["denominator"], errors="coerce").ge(30)
+    dataset["primary_tract_annual_eligible"] = (
+        dataset["geography_type"].eq("census_tract")
+        & denominator_eligible
+        & ~dataset["suppression_flag"].astype(bool)
+        & dataset["numerator"].notna()
+    )
+
+    flow = build_tract_cohort_flow(dataset)
+    row = flow.loc[
+        flow["condition_id"].eq("copd") & flow["time_period"].eq("2022")
+    ].iloc[0]
+
+    assert row["excluded_suppressed_or_missing_numerator_rows"] == 1
+    assert row["excluded_denominator_lt_30_or_missing_rows"] == 0
+
+
 def test_build_tract_cohort_flow_rejects_stale_recorded_eligibility() -> None:
     dataset = _approved_dataset()
     dataset["primary_tract_annual_eligible"] = True
@@ -166,6 +195,87 @@ def test_build_tract_cohort_flow_rejects_stale_recorded_eligibility() -> None:
 
     with pytest.raises(CaseStudyAnalysisError, match="stored tract eligibility disagrees"):
         build_tract_cohort_flow(dataset)
+
+
+def test_complete_flow_and_selection_audit_reconstruct_final_tract_population() -> None:
+    dataset = _approved_dataset()
+    tract = dataset.loc[dataset["geography_type"].eq("census_tract")].copy()
+    second = tract.copy()
+    second["geography_id"] = "17031010200"
+    dataset = pd.concat([dataset, second], ignore_index=True)
+    is_tract = dataset["geography_type"].eq("census_tract")
+    dataset["city_inclusion_primary_eligible"] = is_tract
+    dataset["max_community_area_weight"] = 0.995
+    dataset["community_area_id"] = "01"
+    dataset["reliability_tier"] = "source_tier_1"
+    dataset["primary_tract_annual_eligible"] = (
+        is_tract
+        & pd.to_numeric(dataset["denominator"], errors="coerce").ge(30)
+        & ~dataset["suppression_flag"].astype(bool)
+        & dataset["numerator"].notna()
+    )
+    second_copd_2023 = (
+        dataset["geography_id"].eq("17031010200")
+        & dataset["condition_id"].eq("copd")
+        & dataset["time_period"].eq("2023")
+    )
+    dataset.loc[second_copd_2023, "suppression_flag"] = True
+    dataset.loc[second_copd_2023, "primary_tract_annual_eligible"] = False
+
+    flow = build_complete_tract_cohort_flow(dataset).set_index("condition_id")
+    selection = build_tract_selection_audit(dataset)
+
+    assert flow.loc["hypertension", "boundary_tracts"] == 2
+    assert flow.loc["hypertension", "complete_2022_2024_tracts"] == 2
+    assert flow.loc["hypertension", "dominant_area_eligible_tracts"] == 2
+    assert flow.loc["hypertension", "loo_comparator_eligible_tracts"] == 2
+    assert flow.loc["copd", "complete_2022_2024_tracts"] == 1
+    assert flow.loc["copd", "loo_comparator_eligible_tracts"] == 0
+    assert "geography_id" not in selection.columns
+    copd = selection.loc[selection["condition_id"].eq("copd")].set_index("selection_stage")
+    assert copd.loc["all_excluded_from_primary", "tract_n"] == 2
+    assert copd.loc["excluded_incomplete_2022_2024", "tract_n"] == 1
+    assert copd.loc["excluded_no_loo_peer", "tract_n"] == 1
+    assert copd.loc["primary_loo_eligible", "tract_n"] == 0
+    assert set(selection["results_authorized"]) == {False}
+
+
+def test_complete_flow_counts_boundary_tract_with_no_focal_condition_rows() -> None:
+    dataset = _approved_dataset()
+    tract = dataset.loc[dataset["geography_type"].eq("census_tract")].copy()
+    second = tract.copy()
+    second["geography_id"] = "17031010200"
+    dataset = pd.concat([dataset, second], ignore_index=True)
+    is_tract = dataset["geography_type"].eq("census_tract")
+    dataset["city_inclusion_primary_eligible"] = is_tract
+    dataset["max_community_area_weight"] = 0.995
+    dataset["community_area_id"] = "01"
+    dataset["reliability_tier"] = "source_tier_1"
+    dataset["primary_tract_annual_eligible"] = (
+        is_tract
+        & pd.to_numeric(dataset["denominator"], errors="coerce").ge(30)
+        & ~dataset["suppression_flag"].astype(bool)
+        & dataset["numerator"].notna()
+    )
+    dataset = dataset.loc[
+        ~(
+            dataset["geography_id"].eq("17031010200")
+            & dataset["condition_id"].eq("copd")
+        )
+    ].copy()
+
+    flow = build_complete_tract_cohort_flow(dataset).set_index("condition_id")
+    selection = build_tract_selection_audit(dataset)
+
+    assert flow.loc["copd", "boundary_tracts"] == 2
+    assert flow.loc["copd", "complete_2022_2024_tracts"] == 1
+    assert flow.loc["copd", "excluded_incomplete_2022_2024"] == 1
+    copd = selection.loc[selection["condition_id"].eq("copd")].set_index(
+        "selection_stage"
+    )
+    assert copd.loc["excluded_incomplete_2022_2024", "tract_n"] == 1
+    assert copd.loc["excluded_incomplete_2022_2024", "tract_year_records"] == 3
+    assert copd.loc["excluded_incomplete_2022_2024", "eligible_tract_year_records"] == 0
 
 
 def test_validate_analytic_dataset_rejects_duplicate_primary_key() -> None:

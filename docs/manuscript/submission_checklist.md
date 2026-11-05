@@ -17,3 +17,16 @@ artifact, and issue-ledger disposition before submission.
 | Displays | Tables and figures reconcile with text and use editable/vector outputs | not_assessed |  |  |
 | Disclosure | Funding, conflicts, data sharing, code sharing, and AI-use disclosure complete | not_assessed |  |  |
 | Final read | Human scientific, statistical, JAMA style, and read-aloud passes complete | not_assessed |  |  |
+
+## Submission blockers carried from the statistician review
+
+- `results_authorized=false` remains in force until the independent statistician completes S7.
+- The study owner must supply the exact IRB determination, identifier, waiver or consent language,
+  and governing institution.
+- The source owner must confirm annual denominator eligibility, annual cross-system deduplication,
+  suppression semantics, reliability labels, and the participating-system count.
+- Combined diabetes remains unexecuted until mutual exclusivity and denominator equivalence are
+  documented.
+- Age standardization remains unexecuted because stored age fields do not reconcile with all-age
+  totals and their suppression semantics are not documented.
+- Repository publication and nonpublic-source access terms require study-owner approval.

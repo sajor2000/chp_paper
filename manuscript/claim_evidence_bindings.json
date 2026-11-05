@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "claims": {
+    "M01": {
+      "claim_value_tokens": ["777", "722", "720"],
+      "evidence": {
+        "kind": "csv",
+        "path": "outputs/notebooks/chicago_healthmap_master/supplement_complete_tract_cohort_flow.csv",
+        "rows": [{"where": {"condition_id": "hypertension"}, "expect": {"complete_2022_2024_tracts": 777, "dominant_area_eligible_tracts": 722, "loo_comparator_eligible_tracts": 720, "results_authorized": false}}]
+      },
+      "source_tokens": {"main": ["flow_value(\"hypertension\", \"complete_2022_2024_tracts\")", "flow_value(\"hypertension\", \"dominant_area_eligible_tracts\")", "flow_value(\"hypertension\", \"loo_comparator_eligible_tracts\")"]},
+      "rendered_tokens": {"main": ["777 had complete 2022 through 2024 data, 722 met the dominant-area criterion, and 720 had another eligible tract"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M02": {
+      "claim_value_tokens": ["448", "411", "401"],
+      "evidence": {
+        "kind": "csv",
+        "path": "outputs/notebooks/chicago_healthmap_master/supplement_complete_tract_cohort_flow.csv",
+        "rows": [{"where": {"condition_id": "copd"}, "expect": {"complete_2022_2024_tracts": 448, "dominant_area_eligible_tracts": 411, "loo_comparator_eligible_tracts": 401, "results_authorized": false}}]
+      },
+      "source_tokens": {"main": ["flow_value(\"copd\", \"complete_2022_2024_tracts\")", "flow_value(\"copd\", \"dominant_area_eligible_tracts\")", "flow_value(\"copd\", \"loo_comparator_eligible_tracts\")"]},
+      "rendered_tokens": {"main": ["For COPD, the corresponding counts were 782, 448, 411, and 401"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M03": {
+      "claim_value_tokens": [],
+      "evidence": {
+        "kind": "csv",
+        "path": "outputs/notebooks/chicago_healthmap_master/table_2_model_readiness_sensitivities.csv",
+        "rows": [
+          {"where": {"condition_id": "hypertension", "estimand": "Within-community variance share"}, "expect": {"eligible_tract_n": 722, "estimate": 0.195073252049, "ci_low": 0.15076865891, "ci_high": 0.276202704737}},
+          {"where": {"condition_id": "hypertension", "estimand": "Median absolute percentile-rank gap"}, "expect": {"eligible_tract_n": 720, "estimate": 0.0847222222222, "ci_low": 0.0799438480544, "ci_high": 0.104402359935}},
+          {"where": {"condition_id": "hypertension", "estimand": "Quartile disagreement"}, "expect": {"eligible_tract_n": 720, "estimate": 33.75, "ci_low": 28.8916430595, "ci_high": 43.3992910847}},
+          {"where": {"condition_id": "hypertension", "estimand": "Movement into or out of Q4"}, "expect": {"eligible_tract_n": 720, "estimate": 11.6666666667, "ci_low": 6.68299767205, "ci_high": 19.975291231}}
+        ]
+      },
+      "source_tokens": {"main": ["value(\"hypertension\", \"Within-community variance share\", \"estimate\")", "value(\"hypertension\", \"Quartile disagreement\", \"estimate\")"]},
+      "rendered_tokens": {"main": ["within-community variance share was 19.5% (95% CI, 15.1%-27.6%)", "quartile disagreement was 33.8% (95% CI, 28.9%-43.4%)", "highest-quartile movement was 11.7% (95% CI, 6.7%-20.0%)"]},
+      "references": [25, 26, 27, 28, 29],
+      "reference_support": {"25": "observed-scale variance partition interpretation", "26": "variance-component method", "27": "bootstrap method", "28": "bootstrap implementation and percentile intervals", "29": "cluster bootstrap design"}
+    },
+    "M04": {
+      "claim_value_tokens": [],
+      "evidence": {
+        "kind": "csv",
+        "path": "outputs/notebooks/chicago_healthmap_master/table_2_model_readiness_sensitivities.csv",
+        "rows": [
+          {"where": {"condition_id": "copd", "estimand": "Within-community variance share"}, "expect": {"eligible_tract_n": 411, "estimate": 0.469243128461, "ci_low": 0.332894492921, "ci_high": 0.620926050655}},
+          {"where": {"condition_id": "copd", "estimand": "Median absolute percentile-rank gap"}, "expect": {"eligible_tract_n": 401, "estimate": 0.14463840399, "ci_low": 0.125, "ci_high": 0.172666311395}},
+          {"where": {"condition_id": "copd", "estimand": "Quartile disagreement"}, "expect": {"eligible_tract_n": 401, "estimate": 52.3690773067, "ci_low": 47.2633395522, "ci_high": 61.5606121131}},
+          {"where": {"condition_id": "copd", "estimand": "Movement into or out of Q4"}, "expect": {"eligible_tract_n": 401, "estimate": 23.4413965087, "ci_low": 18.0850335179, "ci_high": 33.82004079}}
+        ]
+      },
+      "source_tokens": {"main": ["value(\"copd\", \"Within-community variance share\", \"estimate\")", "value(\"copd\", \"Quartile disagreement\", \"estimate\")"]},
+      "rendered_tokens": {"main": ["Corresponding COPD estimates were 46.9% (95% CI, 33.3%-62.1%)", "52.4% (95% CI, 47.3%-61.6%)", "23.4% (95% CI, 18.1%-33.8%)"]},
+      "references": [25, 26, 27, 28, 29],
+      "reference_support": {"25": "observed-scale variance partition interpretation", "26": "variance-component method", "27": "bootstrap method", "28": "bootstrap implementation and percentile intervals", "29": "cluster bootstrap design"}
+    },
+    "M05": {
+      "claim_value_tokens": ["1848", "77"],
+      "evidence": {"kind": "csv", "path": "outputs/notebooks/chicago_healthmap_master/table_1_resource_quality.csv", "aggregates": [{"operation": "sum", "field": "Condition-year records, No.", "expect": 1848}, {"operation": "unique", "field": "Community areas represented, No.", "expect": 77}]},
+      "source_tokens": {"main": ["resource_record_n <- sum(table_1$`Condition-year records, No.`)", "resource_area_n <- unique(table_1$`Community areas represented, No.`)"]},
+      "rendered_tokens": {"main": ["The community-area resource contained 1848 condition-year records across 77 community areas"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M06": {
+      "claim_value_tokens": [],
+      "evidence": {
+        "kind": "csv",
+        "path": "outputs/notebooks/chicago_healthmap_master/supplement_binomial_noise_reference.csv",
+        "rows": [
+          {"where": {"condition_id": "hypertension", "metric": "within_variance_share"}, "expect": {"observed_estimate": 0.195510172671, "noise_only_median": 0.036272479776, "observed_minus_noise_median": 0.159237692895, "eligible_tract_n": 720, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "hypertension", "metric": "median_absolute_percentile_rank_gap"}, "expect": {"observed_estimate": 0.0847222222222, "noise_only_median": 0.046527777778, "observed_minus_noise_median": 0.0381944444444, "eligible_tract_n": 720, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "hypertension", "metric": "quartile_disagree_pct"}, "expect": {"observed_estimate": 33.75, "noise_only_median": 14.7222222222, "observed_minus_noise_median": 19.0277777778, "eligible_tract_n": 720, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "hypertension", "metric": "q4_movement_pct"}, "expect": {"observed_estimate": 11.6666666667, "noise_only_median": 5.55555555556, "observed_minus_noise_median": 6.11111111111, "eligible_tract_n": 720, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "copd", "metric": "within_variance_share"}, "expect": {"observed_estimate": 0.46979982508, "noise_only_median": 0.155110327377, "observed_minus_noise_median": 0.314689497703, "eligible_tract_n": 401, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "copd", "metric": "median_absolute_percentile_rank_gap"}, "expect": {"observed_estimate": 0.14463840399, "noise_only_median": 0.084788029925, "observed_minus_noise_median": 0.0598503740648, "eligible_tract_n": 401, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "copd", "metric": "quartile_disagree_pct"}, "expect": {"observed_estimate": 52.3690773067, "noise_only_median": 36.6583541147, "observed_minus_noise_median": 15.710723192, "eligible_tract_n": 401, "replicate_count": 1000, "seed": 20260715}},
+          {"where": {"condition_id": "copd", "metric": "q4_movement_pct"}, "expect": {"observed_estimate": 23.4413965087, "noise_only_median": 16.4588528678, "observed_minus_noise_median": 6.9825436409, "eligible_tract_n": 401, "replicate_count": 1000, "seed": 20260715}}
+        ]
+      },
+      "source_tokens": {"main": ["noise_value(\"hypertension\", \"within_variance_share\", \"eligible_tract_n\")", "noise_value(\"copd\", \"within_variance_share\", \"eligible_tract_n\")", "noise_value(\"hypertension\", \"within_variance_share\", \"observed_minus_noise_median\")", "noise_value(\"hypertension\", \"median_absolute_percentile_rank_gap\", \"observed_minus_noise_median\")", "noise_value(\"hypertension\", \"quartile_disagree_pct\", \"observed_minus_noise_median\")", "noise_value(\"hypertension\", \"q4_movement_pct\", \"observed_minus_noise_median\")", "noise_value(\"copd\", \"within_variance_share\", \"observed_minus_noise_median\")", "noise_value(\"copd\", \"median_absolute_percentile_rank_gap\", \"observed_minus_noise_median\")", "noise_value(\"copd\", \"quartile_disagree_pct\", \"observed_minus_noise_median\")", "noise_value(\"copd\", \"q4_movement_pct\", \"observed_minus_noise_median\")"]},
+      "rendered_tokens": {"main": ["leave-one-tract-out simulation frame of 720 hypertension tracts and 401 COPD tracts", "observed minus noise-only median differences were 15.9 percentage points for within-community variance share, 0.038 percentile-rank units, 19.0 percentage points for quartile disagreement, and 6.1 percentage points for highest-quartile movement", "The corresponding COPD differences were 31.5 percentage points, 0.060, 15.7 percentage points, and 7.0 percentage points"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M07": {
+      "claim_value_tokens": ["33.5%", "52.1%"],
+      "evidence": {"kind": "csv", "path": "outputs/notebooks/chicago_healthmap_master/supplement_empirical_bayes_sensitivity.csv", "rows": [{"where": {"condition_id": "hypertension", "metric": "quartile_disagree_pct"}, "expect": {"shrunken_estimate": 33.4722222222}}, {"where": {"condition_id": "copd", "metric": "quartile_disagree_pct"}, "expect": {"shrunken_estimate": 52.1197007481}}]},
+      "source_tokens": {"main": ["shrinkage_value(\"hypertension\", \"quartile_disagree_pct\", \"shrunken_estimate\")", "shrinkage_value(\"copd\", \"quartile_disagree_pct\", \"shrunken_estimate\")"]},
+      "rendered_tokens": {"main": ["33.5% for hypertension and 52.1% for COPD"]},
+      "references": [30],
+      "reference_support": {"30": "empirical-Bayes sensitivity method"}
+    },
+    "M08": {
+      "claim_value_tokens": ["48.9%", "52.2%"],
+      "evidence": {"kind": "csv", "path": "outputs/notebooks/chicago_healthmap_master/supplement_suppression_scenarios.csv", "rows": [{"where": {"condition_id": "copd", "suppression_scenario": "unresolved_numerator_zero"}, "expect": {"tract_sample_n": 713, "quartile_disagree_pct": 48.9481065919}}, {"where": {"condition_id": "copd", "suppression_scenario": "unresolved_numerator_up_to_nine"}, "expect": {"tract_sample_n": 713, "quartile_disagree_pct": 52.1739130435}}]},
+      "source_tokens": {"main": ["suppression_value(\"copd\", \"unresolved_numerator_zero\", \"quartile_disagree_pct\")", "suppression_value(\"copd\", \"unresolved_numerator_up_to_nine\", \"quartile_disagree_pct\")"]},
+      "rendered_tokens": {"main": ["imputing unresolved numerators as 0 produced 48.9% quartile disagreement, whereas assigning up to 9 produced 52.2%"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M09": {
+      "claim_value_tokens": ["0.939", "0.813"],
+      "evidence": {"kind": "csv", "path": "outputs/notebooks/chicago_healthmap_master/supplement_descriptive_complementarity_methods.csv", "rows": [{"where": {"analysis_id": "A2", "condition_id": "hypertension", "sensitivity_status": "primary"}, "expect": {"auc": 0.939135802469, "eligible_n": 720, "bootstrap_replicates": 1000}}, {"where": {"analysis_id": "A2", "condition_id": "copd", "sensitivity_status": "primary"}, "expect": {"auc": 0.81297029703, "eligible_n": 401, "bootstrap_replicates": 1000}}]},
+      "source_tokens": {"companion": ["# Statistical Analysis Module 5: Exploratory Area-Label AUC", "`Exploratory area-label AUC` = auc"]},
+      "rendered_tokens": {"companion": ["0.939", "0.813"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M10": {
+      "claim_value_tokens": ["1", "39"],
+      "evidence": {"kind": "text", "paths": ["notebooks/RMD_chm_paper_r_Ashley.Rmd"], "tokens": ["annual source-defined CAPriCORN adults with at least 1 of the 39 included conditions", "The study team reports that MRAIA performs cross-system deduplication within year"]},
+      "source_tokens": {"main": ["the denominator was the annual source-defined count of adults with at least 1 of 39 included conditions who were observed that year", "The study team reports that the upstream data integration process deduplicated adults across systems within each year"]},
+      "rendered_tokens": {"main": ["the denominator was the annual source-defined count of adults with at least 1 of 39 included conditions who were observed that year", "The study team reports that the upstream data integration process deduplicated adults across systems within each year"]},
+      "references": [],
+      "reference_support": {}
+    },
+    "M11": {
+      "claim_value_tokens": [],
+      "evidence": {"kind": "references"},
+      "source_tokens": {"main": ["It should supplement, not replace, resident-population data."]},
+      "rendered_tokens": {"main": ["It should supplement, not replace, resident-population data."]},
+      "references": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 37, 38, 39, 40, 41, 42, 43, 44],
+      "reference_support": {"1": "EHR surveillance, representativeness, or small-area interpretation", "2": "EHR surveillance, representativeness, or small-area interpretation", "3": "EHR surveillance, representativeness, or small-area interpretation", "4": "EHR surveillance, representativeness, or small-area interpretation", "5": "EHR surveillance, representativeness, or small-area interpretation", "6": "EHR surveillance, representativeness, or small-area interpretation", "7": "EHR surveillance, representativeness, or small-area interpretation", "8": "EHR surveillance, representativeness, or small-area interpretation", "9": "EHR surveillance, representativeness, or small-area interpretation", "10": "EHR surveillance, representativeness, or small-area interpretation", "11": "EHR surveillance, representativeness, or small-area interpretation", "12": "EHR surveillance, representativeness, or small-area interpretation", "13": "EHR surveillance, representativeness, or small-area interpretation", "14": "EHR surveillance, representativeness, or small-area interpretation", "15": "EHR surveillance, representativeness, or small-area interpretation", "37": "EHR surveillance context and interpretation boundary", "38": "EHR surveillance context and interpretation boundary", "39": "EHR surveillance context and interpretation boundary", "40": "EHR surveillance context and interpretation boundary", "41": "EHR surveillance context and interpretation boundary", "42": "EHR surveillance context and interpretation boundary", "43": "EHR surveillance context and interpretation boundary", "44": "EHR surveillance context and interpretation boundary"}
+    },
+    "M12": {
+      "claim_value_tokens": [],
+      "evidence": {"kind": "references"},
+      "source_tokens": {"main": ["Chicago Health Map is a public interactive website maintained by the Rush Health Equity Data Analytics Studio."]},
+      "rendered_tokens": {"main": ["Chicago Health Map is a public interactive website maintained by the Rush Health Equity Data Analytics Studio."]},
+      "references": [16, 17, 18],
+      "reference_support": {"16": "Chicago Health Map public resource description", "17": "CAPriCORN network description", "18": "Chicago Health Map data methods and resources"}
+    }
+  }
+}

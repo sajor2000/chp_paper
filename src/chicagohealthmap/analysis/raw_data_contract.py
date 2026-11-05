@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml  # type: ignore[import-untyped]
+import pandas as pd  # type: ignore[import-untyped]
 from shapely import from_wkb  # type: ignore[import-untyped]
 
 from chicagohealthmap.analysis.dataset_artifacts import AnalyticDatasetError
@@ -20,6 +21,16 @@ SNAPSHOT = Path("sources/first_party/capricorn/snapshots/2026-05-27")
 ORIGINAL = SNAPSHOT / "original"
 CONTRACT_PATH = Path("config/chm_study_data_contract.yml")
 SIX_COUNTY_FIPS = frozenset({"17031", "17043", "17089", "17097", "17111", "17197"})
+AGE_NUMERATOR_COLUMNS = (
+    "age_18_34",
+    "age_35_44",
+    "age_45_54",
+    "age_55_64",
+    "age_65_74",
+    "age_75_84",
+    "age_85_above",
+)
+AGE_DENOMINATOR_COLUMNS = tuple(f"denom_{column}" for column in AGE_NUMERATOR_COLUMNS)
 
 FACT_COLUMNS = (
     "id",
@@ -162,6 +173,101 @@ def load_study_data_contract(root: Path) -> dict[str, Any]:
     if tuple(columns or ()) != FACT_COLUMNS:
         raise AnalyticDatasetError("study data contract condition-fact columns do not match code")
     return payload
+
+
+def build_age_stratum_reconciliation(
+    root: Path,
+    *,
+    condition_ids: tuple[str, ...] = ("hypertension", "copd"),
+    years: tuple[int, ...] = (2022, 2023, 2024),
+) -> pd.DataFrame:
+    """Summarize whether stored age fields can support direct standardization.
+
+    The output is aggregate-only. It distinguishes the presence of age fields
+    from their additive consistency with the total numerator and denominator.
+    It does not infer suppression semantics or construct standardized estimates.
+    """
+
+    root = root.resolve()
+    path = root / ORIGINAL / "fact_community_area_condition_stats.text"
+    requested = {condition.casefold(): condition.casefold() for condition in condition_ids}
+    requested_years = set(years)
+    numerator_positions = tuple(FACT_COLUMNS.index(column) for column in AGE_NUMERATOR_COLUMNS)
+    denominator_positions = tuple(
+        FACT_COLUMNS.index(column) for column in AGE_DENOMINATOR_COLUMNS
+    )
+    records: dict[str, dict[str, Any]] = {}
+    geographies: dict[str, set[str]] = {condition: set() for condition in requested}
+    observed_years: dict[str, set[int]] = {condition: set() for condition in requested}
+    for condition in requested:
+        records[condition] = {
+            "condition_id": condition,
+            "source_condition_ids": set(),
+            "area_year_rows": 0,
+            "age_fields_complete_rows": 0,
+            "numerator_additive_match_rows": 0,
+            "denominator_additive_match_rows": 0,
+            "zero_age_numerator_cells": 0,
+            "zero_age_denominator_cells": 0,
+            "invalid_age_numeric_rows": 0,
+        }
+
+    for row in _pipe_rows(path, len(FACT_COLUMNS)):
+        condition = row[3].casefold()
+        if condition not in requested:
+            continue
+        try:
+            year = _required_integer(row[2])
+        except ValueError:
+            continue
+        if year not in requested_years:
+            continue
+        record = records[condition]
+        record["source_condition_ids"].add(row[3])
+        record["area_year_rows"] += 1
+        geographies[condition].add(row[1])
+        observed_years[condition].add(year)
+        positions = (*numerator_positions, *denominator_positions)
+        if all(row[position] != "" for position in positions):
+            record["age_fields_complete_rows"] += 1
+        try:
+            numerators = [_required_integer(row[position]) for position in numerator_positions]
+            denominators = [
+                _required_integer(row[position]) for position in denominator_positions
+            ]
+            total_numerator = _required_integer(row[FACT_COLUMNS.index("total_count")])
+            total_denominator = _required_integer(row[FACT_COLUMNS.index("denom_total_count")])
+        except ValueError:
+            record["invalid_age_numeric_rows"] += 1
+            continue
+        record["numerator_additive_match_rows"] += sum(numerators) == total_numerator
+        record["denominator_additive_match_rows"] += sum(denominators) == total_denominator
+        record["zero_age_numerator_cells"] += sum(value == 0 for value in numerators)
+        record["zero_age_denominator_cells"] += sum(value == 0 for value in denominators)
+
+    output_records: list[dict[str, Any]] = []
+    for condition in sorted(records):
+        record = records[condition]
+        output_records.append(
+            {
+                **record,
+                "source_condition_ids": "|".join(sorted(record["source_condition_ids"])),
+                "geography_type": "chicago_community_area",
+                "community_areas": len(geographies[condition]),
+                "years": "|".join(str(year) for year in sorted(observed_years[condition])),
+                "age_strata_per_row": len(AGE_NUMERATOR_COLUMNS),
+                "stratum_suppression_semantics": "unreconciled",
+                "standard_population_status": "not_selected",
+                "analysis_status": "not_run_age_standardization_unreconciled",
+                "interpretation": (
+                    "age_fields_present_but_not_additively_reconciled_with_total_counts"
+                ),
+                "results_authorized": False,
+            }
+        )
+    return pd.DataFrame.from_records(output_records).sort_values(
+        "condition_id", kind="mergesort", ignore_index=True
+    )
 
 
 def _pipe_rows(path: Path, expected_fields: int) -> Iterable[list[str]]:

@@ -22,22 +22,6 @@
       "duplicate_main_evidence": false,
       "editorial_placement": "submitted",
       "first_mention_order": 3,
-      "id": "figure_2"
-    },
-    {
-      "authorization_requirement": "results_authorized=true",
-      "citable_status": "not_citable_pending_authorization",
-      "duplicate_main_evidence": false,
-      "editorial_placement": "submitted",
-      "first_mention_order": 4,
-      "id": "figure_3"
-    },
-    {
-      "authorization_requirement": "results_authorized=true",
-      "citable_status": "not_citable_pending_authorization",
-      "duplicate_main_evidence": false,
-      "editorial_placement": "submitted",
-      "first_mention_order": 5,
       "id": "table_2"
     }
   ],

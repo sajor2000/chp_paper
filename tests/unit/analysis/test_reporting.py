@@ -352,7 +352,7 @@ def test_main_display_reader_guide_is_complete_and_model_separate() -> None:
                     "authorization": "closed",
                     "inference_boundary": "descriptive only",
                 }
-                for display_id in ("figure_1", "figure_2", "figure_3", "table_2")
+                for display_id in ("figure_1", "table_2")
             },
         },
         model_guidance=[{"analysis": "COPD association analysis", "reader_facing": True}],
@@ -360,8 +360,6 @@ def test_main_display_reader_guide_is_complete_and_model_separate() -> None:
     assert [row["display_id"] for row in guide["main_displays"]] == [
         "table_1",
         "figure_1",
-        "figure_2",
-        "figure_3",
         "table_2",
     ]
     required = {
@@ -401,9 +399,9 @@ def test_main_display_reader_guide_rejects_all_model_fields(leaked_field: str) -
             "authorization": "closed",
             "inference_boundary": "descriptive only",
         }
-        for display_id in ("table_1", "figure_1", "figure_2", "figure_3", "table_2")
+        for display_id in ("table_1", "figure_1", "table_2")
     }
-    cards["figure_2"][leaked_field] = "leak"
+    cards["figure_1"][leaked_field] = "leak"
 
     with pytest.raises(CaseStudyAnalysisError, match="cannot contain model fields"):
         build_main_display_reader_guide(cards)

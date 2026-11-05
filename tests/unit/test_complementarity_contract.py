@@ -18,9 +18,13 @@ def test_complementarity_evidence_ledger_has_traceable_claim_contract() -> None:
     assert "caused" not in text.casefold()
 
 
-def test_complementarity_display_ledger_covers_five_main_displays() -> None:
+def test_complementarity_display_ledger_covers_three_main_displays() -> None:
     text = DISPLAY.read_text(encoding="utf-8")
 
-    for display in ("Table 1", "Figure 1", "Figure 2", "Figure 3", "Table 2"):
+    for display in ("Table 1", "Figure 1", "Table 2"):
         assert display in text
+    assert "Reserve Figure S1,Supplement reserve" in text
+    assert "Reserve Figure S2,Supplement reserve" in text
+    assert "Main Figure 2" not in text
+    assert "Main Figure 3" not in text
     assert "results_authorized=false" in text

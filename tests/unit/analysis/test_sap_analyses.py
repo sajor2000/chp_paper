@@ -232,9 +232,12 @@ def test_primary_models_return_scaled_coefficients_and_joint_contrast() -> None:
     )
     assert coefficients.loc["beta_h", "confidence_level"] == pytest.approx(0.95)
     assert coefficients.loc["beta_d", "confidence_level"] == pytest.approx(0.95)
-    assert c2.coefficients.set_index("term").loc["beta_c", "confidence_level"] == pytest.approx(
-        0.975
-    )
+    c2_coefficients = c2.coefficients.set_index("term")
+    assert c2_coefficients.loc["beta_c", "confidence_level"] == pytest.approx(0.95)
+    assert set(c2_coefficients["critical_value_distribution"]) == {
+        "t_residual_degrees_of_freedom"
+    }
+    assert set(c2_coefficients["residual_degrees_of_freedom"]) == {71}
 
 
 def test_adjusted_residuals_are_keyed_to_primary_model_population() -> None:
@@ -420,11 +423,19 @@ def test_sensitivity_contrasts_use_joint_covariance_frozen_iqrs_and_ci_levels() 
     assert result.loc["C1-D", "estimate"] == pytest.approx(beta_c1[2] * d_iqr)
     assert result.loc["C2", "estimate"] == pytest.approx(beta_c2[1] * c_iqr)
     assert result.loc["C1", "confidence_level"] == pytest.approx(0.975)
-    assert result.loc["C2", "confidence_level"] == pytest.approx(0.975)
+    assert result.loc["C2", "confidence_level"] == pytest.approx(0.95)
     assert result.loc["C1-H", "confidence_level"] == pytest.approx(0.95)
     assert result.loc["C1-D", "confidence_level"] == pytest.approx(0.95)
     z = stats.norm.ppf(0.9875)
     assert result.loc["C1", "ci_low"] == pytest.approx(joint - z * np.sqrt(joint_variance))
+    c2_se = np.sqrt(c_iqr**2 * covariance_c2[1, 1])
+    c2_t = stats.t.ppf(0.975, df=len(frame) - 2)
+    assert result.loc["C2", "ci_low"] == pytest.approx(
+        beta_c2[1] * c_iqr - c2_t * c2_se
+    )
+    assert result.loc["C2", "critical_value_distribution"] == (
+        "t_residual_degrees_of_freedom"
+    )
     assert set(result["analysis_status"]) == {"supported_sensitivity_not_primary"}
     assert set(result["interpretation"]) == {"noncausal_ecological_association"}
     assert set(result["n"]) == {77}
@@ -557,6 +568,27 @@ def test_influence_at_n70_runs_n69_leave_one_out_with_frozen_iqr() -> None:
     assert len(areas) == 70
     assert areas["leave_one_out_estimate"].notna().all()
     assert summary.iloc[0]["areas_retained_in_principal_fit"] == 70
+
+
+def test_c2_influence_interval_uses_95_percent_residual_df_t_critical_value() -> None:
+    import chicagohealthmap.analysis.sap_analyses as module
+
+    frame = _model_frame()
+    eligible = frame.loc[frame["copd_exposure_complete"]].copy()
+    fit = module._fit_model(eligible, [EXPOSURES["C2"][0]])
+    iqr = np.percentile(eligible[EXPOSURES["C2"][0]], 75) - np.percentile(
+        eligible[EXPOSURES["C2"][0]], 25
+    )
+    contrast = np.array([0.0, iqr])
+    estimate = float(contrast @ fit["beta"])
+    standard_error = float(np.sqrt(contrast @ fit["covariance"] @ contrast))
+    critical = stats.t.ppf(0.975, df=len(eligible) - fit["design"].shape[1])
+    low, high = module._contrast_interval(
+        fit, "C2", {EXPOSURES["C2"][0]: iqr}, 0.95
+    )
+
+    assert low == pytest.approx(estimate - critical * standard_error)
+    assert high == pytest.approx(estimate + critical * standard_error)
 
 
 def _temporal_dataset(n: int = 77) -> pd.DataFrame:

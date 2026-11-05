@@ -18,9 +18,13 @@ This draft is noncontrolling and does **not** supersede CHM-SAP-001 until those 
 - **Aim (classification):** measurement comparison / informatics resource evaluation (not association, prediction, or validation against a gold standard).
 - **Central question:** Do CHM census-tract EHR-diagnosed proportions add geographic information beyond Chicago community-area labels?
 - **Population:** source-defined eligible, geocoded CAPriCORN adults in contributing systems,
-  2019–2024. A documented diagnosis contributes to the condition numerator; it does not define
-  the denominator.
-- **Geography:** City of Chicago — **866 census tracts** (2024 TIGER vintage) and **77 community areas**. (CHM source records span the six-county region; analysis is restricted to Chicago.)
+  2019–2024. The annual denominator is the source-defined count of CAPriCORN adults with at least
+  1 of the 39 included conditions who were observed during that year. A documented focal diagnosis
+  contributes to the numerator. The study team reports within-year cross-system deduplication, which
+  cannot be independently verified from the aggregate files.
+- **Geography:** City of Chicago tracts under the frozen representative-point boundary rule and
+  the city's 77 community areas. CHM source records span the six-county region, but this analysis
+  is restricted to Chicago.
 - **Primary period:** denominator-pooled **2022–2024**; annual 2019–2024 for temporal description/sensitivity.
 - **Conditions:** hypertension and COPD are displayed because their current source semantics and
   denominators support the governed comparisons. Combined diabetes remains not run. No condition
@@ -58,7 +62,7 @@ Every analysis below supports exactly one claim. Analyses with no claim are out 
 
 ## 4. Measures and operational definitions
 
-- **Primary measure:** direct exported EHR-diagnosed proportion = 100 × numerator / denominator. Label: "EHR-diagnosed proportion among observed CAPriCORN adults." Terms *prevalence, incidence, risk* are prohibited. Age standardization was not run because governed age-stratum inputs are unavailable; it requires new governed inputs and an approved deviation.
+- **Primary measure:** direct exported EHR-diagnosed proportion = 100 × numerator / denominator. Label: "EHR-diagnosed proportion among observed CAPriCORN adults." Terms *prevalence, incidence, risk* are prohibited. Age standardization was not run because the stored age-stratum fields do not reconcile additively with the all-age totals, their suppression semantics are undocumented, and no compatible standard population has been approved.
 - **Pooling:** sum eligible 2022 through 2024 numerators and divide by the corresponding summed denominators. An unweighted mean of annual percentages is a sensitivity analysis only.
 - **PLACES comparator:** crude/age-adjusted status, model vintage, and observation period recorded per measure; used for concordance/discordance only, never as validation of accuracy.
 - **Reliability gating:** reliability qualification remains withheld and is not used to define a primary tract subset. Any future tier-restricted analysis requires a governed qualification decision; equity notes remain descriptive.
@@ -76,8 +80,10 @@ Every analysis below supports exactly one claim. Analyses with no claim are out 
    and do not require PLACES.
 2. **CHM-PLACES comparison population:** CHM-eligible tracts with a compatible PLACES estimate and
    documented comparator period. Missing PLACES data exclude a tract only from A3 through A5.
-3. **Direct cross-frame population:** eligible direct tract and linked direct community-area CHM
-   records. This is a linked classification comparison, not literal tract aggregation.
+3. **Primary tract-to-area population:** complete eligible tracts with dominant community-area
+   overlap of at least 0.99 and at least 1 other eligible tract in the same area. Each focal tract
+   is compared with a denominator-pooled community-area estimate constructed from the other
+   eligible tracts. Source-published community-area values are a secondary sensitivity.
 4. **Temporal population:** tracts with eligible 2019–2024 observations (annual sensitivity).
 
 Flow counts report exclusions separately: invalid/unmatched geography or vintage, suppressed numerator, missing denominator, failed reliability, missing comparator.
@@ -93,7 +99,7 @@ Flow counts report exclusions separately: invalid/unmatched geography or vintage
 | A3 | 2 | Do CHM and PLACES rank areas the same way? | Spearman rank correlation (primary); Pearson (supportive) | tract | Spearman ρ with bootstrap CI | per-condition; reliability-gated |
 | A4 | 3 | Do CHM and PLACES agree categorically? | Exact quartile agreement and quadratic weighted κ; supplementary unweighted Gwet AC1 | tract | Exact agreement, weighted κ, and nominal AC1 sensitivity | SA4 tertile cut; marginal-distribution check; AC2 sign-off item |
 | A5 | 2 | Are divergences larger than available uncertainty inputs imply? | Share of tracts discordant beyond combined uncertainty | tract | Monte-Carlo propagation only if compatible PLACES CIs and ACS MOEs are governed; otherwise not run | SA5 analytic-approximation cross-check if inputs become available |
-| A6 | 1, 2 | Does direct tract classification differ from linked direct coarse-area classification? | Absolute rank gap, exact quartile disagreement, and Q4 movement | tract linked to CA or ZCTA | Rank each direct source at its own grain, then link classifications | noncrossing, annual, ZCTA, alternative categories |
+| A6 | 1, 2 | Does tract classification differ from a focal-excluded area summary? | Absolute rank gap, exact quartile disagreement, and Q4 movement | tract linked to CA | Compare the tract with the summed numerators divided by summed denominators from the other eligible tracts in its area | noncrossing, annual, source-published CA, ZCTA, alternative categories |
 | A7 | 4 | Is there supplementary community-area spatial structure? | Global and local spatial association | community area in current implementation | Local Moran I, bivariate local Moran I, and Getis-Ord Gi* with queen weights, 9999 conditional permutations, and within-family BH FDR | Spatial scan not run. No tract hotspot claim |
 
 All p-values are secondary to estimates and CIs. Descriptive summaries and prespecified diagnostics are not multiplicity-corrected; the local-cluster tests in A7 use FDR control (see §8).
@@ -106,14 +112,13 @@ All p-values are secondary to estimates and CIs. Descriptive summaries and presp
 
 **Source complementarity (A3–A5).** Concordance between CHM and PLACES tract measures is summarized by Spearman rank correlation (primary; Pearson supportive) and categorical quartile agreement by weighted κ and Gwet's AC1. Because CHM (diagnosed-among-observed) and PLACES (modeled population) are non-equivalent estimands, neither is treated as a gold standard. Monte-Carlo uncertainty propagation is labeled not run unless compatible governed PLACES confidence intervals and ACS margins of error are available.
 
-**Scale sensitivity (A6).** Within each condition-year, assign tract quartiles among eligible
-linked tract records and community-area quartiles once among eligible direct community-area
-records; then propagate the latter label to linked tracts. Community values are never duplicated
-before ranking. Ties preserve equality at a boundary; fewer than 4 nonempty rank groups produces
-`not_assignable_insufficient_or_tied_distribution`. The heterogeneity and concordance metrics are
-recomputed at tract and community-area scales (and ZIP groupings if they can be constructed cleanly
-from source records), quantifying direct cross-frame classification differences rather than literal
-aggregation [Thomas 2024; Jones & Kulldorff 2012].
+**Scale sensitivity (A6).** Pool each tract across years by summing numerators and denominators
+before division. For each focal tract, construct the primary area comparator from the other
+eligible tracts in its dominant community area by the same ratio-of-sums rule. Rank tract and
+focal-excluded area values within the eligible condition-specific frame. Ties use average ranks,
+and quartiles use fixed percentile-rank boundaries at 0.25, 0.50, and 0.75. Source-published
+community-area and ZCTA labels are secondary sensitivities because their weighting rules and
+condition-varying denominators are not documented as equivalent to the tract rollup.
 
 **Local spatial structure (A7).** The current implementation reports community-area local Moran I, bivariate local Moran I, and standard Getis-Ord Gi* on row-standardized queen-contiguity weights. Each test uses 9999 conditional permutations that hold the focal value fixed while permuting neighbor values. Two-sided permutation P values are centered on the conditional permutation distribution. Benjamini-Hochberg adjustment is applied within each condition-period-statistic family. A spatial scan statistic and tract-level local clustering were not run.
 
@@ -123,7 +128,7 @@ All spatial software uses documented PySAL components (`libpysal`, `esda`) or an
 
 ## 8. Multiplicity
 
-A1 and A6 define the proposed primary descriptive family. They emphasize estimates, confidence intervals, and explicit denominators. No single omnibus P value is used. A2 through A5 and A7 are secondary or supplementary. Benjamini-Hochberg false-discovery-rate control is applied within each implemented A7 condition-period-statistic family. This amendment does not alter the separate C1/C2 confidence-interval rule.
+A1 and A6 define the proposed primary descriptive family. They emphasize estimates, 95% community-area cluster-bootstrap percentile intervals, and explicit denominators. No single omnibus P value is used. A2 through A5 and A7 are secondary or supplementary. Benjamini-Hochberg false-discovery-rate control is applied within each implemented A7 condition-period-statistic family. C1 remains unexecuted. Supplementary C2 coefficients and contrasts use 95% HC3 intervals with residual-degrees-of-freedom t critical values.
 
 ---
 
@@ -165,8 +170,8 @@ Figures use color-vision-safe, grayscale-distinguishable encodings; suppressed/m
 | D6 | MAUP scale-sensitivity across tract/CA/(ZIP) | Coarsening preserves detection but destroys localization | Thomas 2024 (PMID 39806634); Jones & Kulldorff 2012 (PMC3480474) |
 | D7 | Local Moran I, bivariate local Moran I, and standard Getis-Ord Gi* with queen weights | Standard local spatial association statistics with an explicit conditional randomization scheme | Anselin 1995, doi:10.1111/j.1538-4632.1995.tb00338.x; Getis and Ord 1992, doi:10.1111/j.1538-4632.1992.tb00261.x |
 | D8 | BH FDR within each condition-period-statistic family | Controls the expected false-discovery proportion within each declared family | Benjamini and Hochberg 1995, doi:10.1111/j.2517-6161.1995.tb02031.x |
-| D9 | Do not age-standardize the current CHM measure | Governed age-stratum numerators and denominators are unavailable. A new standardized estimand requires new inputs and an approved deviation | No citation added until a standardization analysis is specified |
-| D10 | Do not reliability-gate the primary population until the source algorithm is approved | Capture and reliability strata are reported as sensitivity information. They are not evidence of representativeness | CONSCIENCE reliability framework (internal); Chen 2022 (PMID 35945537) |
+| D9 | Do not age-standardize the current CHM measure | Stored age fields are present but do not reconcile with all-age totals, suppression semantics are undocumented, and no standard population is approved | No citation added until a standardization analysis is specified |
+| D10 | Do not reliability-gate the primary population until the source algorithm is approved | Capture and source-supplied reliability strata are sensitivity information, not evidence of representativeness | Chicago Health Map public glossary; Chen 2022 (PMID 35945537) |
 
 ---
 
@@ -195,7 +200,7 @@ STROBE + RECORD (routinely collected data), STROBE-Equity, and SAGER as applicab
 
 ## 15. Relationship to CHM-SAP-001
 
-- **Retained:** both governed community-area life-expectancy analyses, their VIF/readiness gates, the 97.5% primary CI family, and `results_authorized=false`.
+- **Retained:** both governed community-area life-expectancy analyses as supplementary analyses, their VIF/readiness gates, 95% residual-degrees-of-freedom t intervals for C2, and `results_authorized=false`.
 - **Proposed primary:** direct tract-to-community exact agreement, disagreement, highest-quartile movement, and within-community variance share.
 - **Secondary or supplementary:** ZCTA sensitivity, descriptive AUC, CHM-PLACES agreement, uncertainty propagation when inputs permit it, local spatial diagnostics, and life-expectancy models.
 - **Not authorized:** A1 through A7 do not become manuscript-importable results until the open decisions in Section 13 are resolved, the amendment is signed, and S7 is complete.

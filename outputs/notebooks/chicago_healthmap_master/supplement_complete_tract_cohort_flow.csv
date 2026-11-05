@@ -1,0 +1,3 @@
+condition_id,boundary_tracts,complete_2022_2024_tracts,excluded_incomplete_2022_2024,dominant_area_eligible_tracts,excluded_at_dominant_area_linkage,loo_comparator_eligible_tracts,excluded_without_loo_peer,excluded_no_other_eligible_tract_in_area,dominant_area_threshold,period,analysis_status,results_authorized
+copd,782,448,334,411,37,401,10,10,0.99,2022-2024,statistician_review_cohort_flow,False
+hypertension,782,777,5,722,55,720,2,2,0.99,2022-2024,statistician_review_cohort_flow,False

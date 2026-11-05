@@ -56,9 +56,11 @@ def _():
 @app.cell
 def _():
     from chicagohealthmap.analysis.case_studies import (
+        build_complete_tract_cohort_flow,
         build_primary_community_frame,
         build_tract_cohort_flow,
         build_tract_concordance_frame,
+        build_tract_selection_audit,
         classify_discordance,
         load_analytic_dataset,
         summarize_concordance,
@@ -66,14 +68,25 @@ def _():
     )
 
     return (
+        build_complete_tract_cohort_flow,
         build_primary_community_frame,
         build_tract_cohort_flow,
         build_tract_concordance_frame,
+        build_tract_selection_audit,
         classify_discordance,
         load_analytic_dataset,
         summarize_concordance,
         summarize_resource_quality,
     )
+
+
+@app.cell
+def _():
+    from chicagohealthmap.analysis.raw_data_contract import (
+        build_age_stratum_reconciliation,
+    )
+
+    return (build_age_stratum_reconciliation,)
 
 
 @app.cell
@@ -87,8 +100,11 @@ def _():
         compute_discriminatory_accuracy,
         compute_variance_partition,
         propagate_uncertainty_discordance,
+        summarize_binomial_noise_reference,
         summarize_community_area_aggregation_loss,
         summarize_concordance_metrics,
+        summarize_empirical_bayes_shrinkage,
+        summarize_suppression_scenarios,
         summarize_within_community_heterogeneity,
     )
 
@@ -101,8 +117,11 @@ def _():
         compute_discriminatory_accuracy,
         compute_variance_partition,
         propagate_uncertainty_discordance,
+        summarize_binomial_noise_reference,
         summarize_community_area_aggregation_loss,
         summarize_concordance_metrics,
+        summarize_empirical_bayes_shrinkage,
+        summarize_suppression_scenarios,
         summarize_within_community_heterogeneity,
     )
 
@@ -149,10 +168,11 @@ def _():
 def _():
     from chicagohealthmap.analysis.paper_displays import (
         build_compact_table_1,
-        build_compact_table_2,
         build_geographic_consequence_display_data,
         build_geographic_main_evidence,
         build_flow_summary,
+        build_primary_information_loss_display,
+        build_primary_information_loss_table,
         build_resolution_heatmap_data,
         confidence_interval_label,
         draw_map_panel,
@@ -161,10 +181,11 @@ def _():
 
     return (
         build_compact_table_1,
-        build_compact_table_2,
         build_flow_summary,
         build_geographic_consequence_display_data,
         build_geographic_main_evidence,
+        build_primary_information_loss_display,
+        build_primary_information_loss_table,
         build_resolution_heatmap_data,
         confidence_interval_label,
         draw_map_panel,
@@ -425,7 +446,7 @@ def _(mo):
        publication claim.
     2. **Executable SAP:** governed data assembly followed by Statistical Analysis Modules 1 through
        6. Each module precedes the code that implements it.
-    3. **Results in display order:** Table 1, Figure 1, Figure 2, Figure 3, and Table 2. Every display
+    3. **Results in display order:** Table 1, Figure 1, and Table 2, followed by supplementary review figures. Every display
        is followed by a biostatistical interpretation and an explicit limitation.
     4. **Supplementary analyses:** diagnostic, robustness, outcome-model, spatial, and unrun-analysis
        records. These cannot replace the primary geographic evidence.
@@ -523,7 +544,7 @@ def _(mo):
     | ID | Decision | Review disposition and scientific reason | Required statistician action |
     |---|---|---|---|
     | D1 | Pooled CHM measure | **Keep.** Sum eligible annual numerators and denominators before division. An unweighted mean changes the estimand when denominators differ. | Approve the pooled proportion and annual-mean sensitivity. |
-    | D2 | Primary geographic evidence | **Narrow.** Use within-area variance share, absolute percentile-rank gap, exact quartile disagreement, and Q4 movement. Direct tract and community-area exports are compared across frames and are not literal aggregation-loss estimates. | Approve the 4 co-primary descriptive measures and claim language. |
+    | D2 | Primary geographic evidence | **Change completed.** Use within-area variance share, absolute percentile-rank gap, exact quartile disagreement, and Q4 movement. The primary comparator pools the other eligible tracts in the focal tract's community area. Source-published area values are a secondary sensitivity. | Approve the 4 co-primary descriptive measures and claim language. |
     | D3 | Quartile boundaries | **Change completed.** Q1 is rank at most 0.25, Q2 is greater than 0.25 through 0.50, Q3 is greater than 0.50 through 0.75, and Q4 is greater than 0.75. One function now governs all analyses. | Confirm the boundary and average-tie rule. |
     | D4 | Analysis populations | **Change completed.** A1 and A2 use CHM-complete tracts. CHM-PLACES agreement uses a separate pairwise-complete frame. Missing PLACES data cannot exclude a tract from a CHM-only estimand. | Confirm frame separation and denominator reporting. |
     | D5 | Variance partition | **Keep.** Use an observed-scale one-way method-of-moments estimator. Report the within-area complement. Mixed-model REML is a sensitivity only because the primary estimand is a descriptive partition of tract estimates.<sup>10</sup> | Approve the estimator and whether a REML sensitivity is required. |
@@ -531,7 +552,7 @@ def _(mo):
     | D7 | Area-label AUC | **Narrow.** Retain only as an exploratory separation statistic. Recompute the empirical Q4 threshold in every cluster replicate. It is not prediction or external validation.<sup>11</sup> | Approve exploratory retention or remove it. |
     | D8 | Ordinal agreement | **Narrow.** Exact agreement and quadratic weighted kappa are the ordinal summaries. Unweighted Gwet AC1 remains a supplementary nominal sensitivity and is not co-primary.<sup>8,9</sup> | Approve AC1 retention or request weighted AC2. |
     | D9 | Capture and reliability | **Add to interpretation.** Report capture and source reliability strata without treating either as proof of representativeness. The source reliability algorithm remains a semantic sign-off item. | Approve the reliability rule and the primary sensitivity subset. |
-    | D10 | HC3 outcome models | **Keep as supplementary.** Use the locked adjustment set and HC3 covariance. Normal and t critical values require an explicit sensitivity comparison because the community-area sample is small.<sup>13</sup> | Select the final critical-value rule. |
+    | D10 | HC3 outcome models | **Change completed.** Keep C2 supplementary, use the locked adjustment set and HC3 covariance, and report 95% intervals with residual-degrees-of-freedom t critical values because the community-area sample is small.<sup>13</sup> | Confirm the fixed t-based interval rule. |
     | D11 | Spatial analyses | **Narrow.** Global and local spatial statistics are supplementary. Queen weights are primary, 9999 permutations are used, and false-discovery-rate families are declared before testing.<sup>14-17</sup> | Approve topology, permutation, and multiplicity definitions. |
     | D12 | Combined diabetes | **Do not run.** Mutual exclusivity, denominator equivalence, phenotype mapping, and period alignment are unresolved. | Approve semantics or retain the blocker. |
     | D13 | ZCTA comparison | **Keep as sensitivity.** Use Census ZCTAs and do not describe them as USPS ZIP Codes. | Approve the secondary geography. |
@@ -545,11 +566,11 @@ def _(mo):
     mo.md(r"""
     ### Manuscript display map
 
-    The main paper uses 5 displays in citation order: Table 1 (CHM community-area coverage),
-    Figure 1 (geographic coverage and data quality), Figure 2 (tract alignment and classification
-    differences), Figure 3 (direct cross-frame classification differences and stability), and Table 2 (compact
-    cross-condition evidence). The notebook renders Tables 1 and 2 as Great Tables HTML and
-    exports editable CSV files; it renders Figures 1 through 3 as deterministic PDF and PNG files.
+    The main paper uses 3 displays in citation order: Table 1 (CHM community-area coverage),
+    Figure 1 (geographic coverage and data quality), and Table 2 (compact cross-condition evidence).
+    The tract-alignment and finite-denominator review graphics are supplementary figures G1 and G2.
+    The notebook renders Tables 1 and 2 as Great Tables HTML and exports editable CSV files. It
+    renders the main and supplementary figures as deterministic PDF and PNG files.
     Model coefficients, residual diagnostics, and unrun analyses remain numbered supplementary
     artifacts so the main narrative does not duplicate or overstate evidence.
     """)
@@ -1095,12 +1116,75 @@ def _(dataset_path, load_analytic_dataset):
 
 
 @app.cell
-def _(analytic, build_tract_cohort_flow, output_dir):
+def _(
+    analytic,
+    build_complete_tract_cohort_flow,
+    build_tract_cohort_flow,
+    build_tract_selection_audit,
+    output_dir,
+):
     tract_cohort_flow = build_tract_cohort_flow(analytic)
     tract_cohort_flow.to_csv(
         output_dir / "supplement_tract_cohort_flow.csv", index=False
     )
-    return (tract_cohort_flow,)
+    complete_tract_cohort_flow = build_complete_tract_cohort_flow(analytic)
+    complete_tract_cohort_flow.to_csv(
+        output_dir / "supplement_complete_tract_cohort_flow.csv", index=False
+    )
+    tract_selection_audit = build_tract_selection_audit(analytic)
+    tract_selection_audit.to_csv(
+        output_dir / "supplement_tract_selection_audit.csv", index=False
+    )
+    return complete_tract_cohort_flow, tract_cohort_flow, tract_selection_audit
+
+
+@app.cell
+def _(build_age_stratum_reconciliation, output_dir, project_root):
+    age_stratum_reconciliation = build_age_stratum_reconciliation(project_root)
+    age_stratum_reconciliation.to_csv(
+        output_dir / "supplement_age_stratum_reconciliation.csv", index=False
+    )
+    return (age_stratum_reconciliation,)
+
+
+@app.cell
+def _(
+    age_stratum_reconciliation,
+    build_great_table,
+    complete_tract_cohort_flow,
+    mo,
+    tract_selection_audit,
+):
+    _flow = build_great_table(
+        complete_tract_cohort_flow,
+        title="Complete-year and leave-one-out tract cohort flow",
+        subtitle="Counts after annual eligibility, dominant-area linkage, and comparator construction",
+        notes=("Counts are census tracts, not patients.", "The leave-one-out stage requires at least one other eligible tract in the same area."),
+        table_id="complete_tract_cohort_flow",
+    )
+    _selection = build_great_table(
+        tract_selection_audit,
+        title="Included-versus-excluded tract selection audit",
+        subtitle="Aggregate diagnostics for the condition-specific analytic populations",
+        notes=("The pooled crude percentage uses observable eligible tract-years only.", "These summaries describe selection and do not establish population representativeness."),
+        table_id="tract_selection_audit",
+    )
+    _age = build_great_table(
+        age_stratum_reconciliation,
+        title="Age-stratum field reconciliation",
+        subtitle="Field presence is separated from additive consistency with stored totals",
+        notes=("Age fields exist for all reviewed community-area condition-years.", "Direct standardization remains unexecuted because stratum counts do not reconcile with totals and suppression semantics are unresolved."),
+        table_id="age_stratum_reconciliation",
+    )
+    mo.vstack(
+        [
+            mo.md("### Cohort selection and age-standardization gates"),
+            mo.Html(_flow.as_raw_html()),
+            mo.Html(_selection.as_raw_html()),
+            mo.Html(_age.as_raw_html()),
+        ]
+    )
+    return
 
 
 @app.cell
@@ -1225,6 +1309,9 @@ def _():
         "00_master_analytic_dataset_source_join_manifest.json",
         "supplement_data_quality_audit.csv",
         "supplement_tract_cohort_flow.csv",
+        "supplement_complete_tract_cohort_flow.csv",
+        "supplement_tract_selection_audit.csv",
+        "supplement_age_stratum_reconciliation.csv",
     )
     return (master_dataset_gallery,)
 
@@ -1276,7 +1363,7 @@ def _(mo):
     suppressed, observed-zero, and reliability-withheld states remained distinct; none was
     imputed. Resource summaries used counts and source-row denominators, without inferential
     intervals. Supplementary community-area outcome models used y_i = alpha + beta x_i + gamma
-    Z_i + error_i, HC3 covariance, and two-sided 97.5% primary intervals; they remain outside the
+    Z_i + error_i, HC3 covariance, and two-sided 95% residual-degrees-of-freedom t intervals; they remain outside the
     main geographic result and unauthorized. Reliability qualification remains withheld pending
     a governed rule; no result supports causal or population-prevalence inference.
     """)
@@ -1545,9 +1632,8 @@ def _(mo):
     populations. Adult population is used only in prespecified weighting sensitivities.
 
     OLS coefficients use HC3 covariance because the area sample is small and heteroscedasticity is
-    plausible.<sup>13</sup> Primary exposure contrasts use 2-sided 97.5% normal-theory intervals;
-    other coefficients use 95% intervals. The statistician must approve the normal rather than t
-    critical values. Rank deficiency, fewer than 70 complete areas, exposure support below 10
+    plausible.<sup>13</sup> C2 coefficients and contrasts use 2-sided 95% intervals with
+    residual-degrees-of-freedom t critical values. Rank deficiency, fewer than 70 complete areas, exposure support below 10
     distinct values, correlation above 0.80, or maximum VIF above 5 blocks the primary model.
     """)
     return
@@ -2042,27 +2128,26 @@ def _(build_great_table, descriptive_status_display, etable_7_path, mo):
 
 @app.cell
 def _(mo):
-    mo.md("""
-    ### Statistical Analysis Module 4: direct cross-frame classification consequences
+    mo.md(r"""
+    ### Statistical Analysis Module 4: tract information beyond community-area labels
 
     | Review item | Prespecified rule |
     |---|---|
-    | Scientific question | How often does a tract's classification differ from the classification of its linked direct community-area or ZCTA measure? |
+    | Scientific question | How much tract-level information is lost when a focal tract is represented by the other eligible tracts in its community area? |
     | Estimands | Absolute percentile-rank gap, exact quartile disagreement, opposite-extreme classification, Q4 entry, Q4 exit, and coexistence of high and low tracts within a coarse area. |
-    | Population and unit | CHM-complete tracts linked to a dominant direct community-area or direct ZCTA record. The unit is a tract. |
-    | Variables and denominator | Direct pooled tract, community-area, and ZCTA CHM values. Condition-specific eligible tract counts and mean annual source denominators are reported separately. |
-    | Mathematical definition | A tract moves into Q4 when its direct tract rank is at most 0.75 and its linked direct coarse-area rank is greater than 0.75. It moves out when the reverse holds. |
+    | Population and unit | CHM-complete hypertension and COPD tracts linked to a dominant community area containing at least 2 eligible tracts. The unit is a tract. |
+    | Variables and denominator | Pooled tract numerators and denominators and the sums from all other eligible tracts in the dominant community area. |
+    | Mathematical definition | The comparator is $100(\sum_j n_j-n_i)/(\sum_j d_j-d_i)$. A Q4 movement occurs when the focal tract and focal-excluded area summary differ in highest-quartile membership. |
     | Estimator and uncertainty | Descriptive counts and percentages with community-area cluster percentile intervals for primary community-area comparisons. |
-    | Assumptions and diagnostics | Direct exports at each geography represent sufficiently comparable CHM constructs. Coarse values are ranked once at their own geography before linkage. Crossing status and linkage dominance are audited. |
-    | Missingness and suppression | Both direct CHM frames must be complete for the condition. Suppressed values are excluded. No tract disease value is geographically aggregated or imputed. |
-    | Sensitivities | Noncrossing tracts, direct ZCTA labels, annual classifications, 2-of-3-year persistence, and alternative rank categories. |
-    | Interpretation and references | This is a linked cross-frame comparison, not literal aggregation loss. ZCTAs are Census statistical areas, not USPS ZIP Codes. Classification change does not identify prevalence, cause, predictive superiority, or service need.<sup>18,19,22</sup> |
+    | Assumptions and diagnostics | The focal tract contributes to neither comparator count. Annual and pooled values use ratios of sums. Finite-denominator noise is evaluated with 1000 annual binomial simulations. |
+    | Missingness and suppression | The complete-case primary analysis excludes suppressed or unresolved counts. Numerator scenarios of 0 and `min(9, denominator)` are scenarios, not formal bounds. |
+    | Sensitivities | Empirical-Bayes shrinkage, noncrossing tracts, source-published community-area values, direct ZCTA labels, reliability strata, and annual stability. |
+    | Interpretation and references | The result quantifies retained geographic resolution within the observed EHR frame. It does not identify population prevalence, cause, predictive superiority, or service need.<sup>18,19,22,30</sup> |
 
     The machine-readable artifact retains its legacy filename
     `supplement_aggregation_loss.csv` for reproducibility. Its rows explicitly state
-    `cross_frame_only_no_literal_aggregation`. The paper and table titles use “direct cross-frame
-    classification differences.” Community-area and ZCTA rows retain the audit status labels
-    `geographic_resolution_sensitivity` and `direct_zcta_comparison`.
+    `primary_leave_one_tract_out_rollup`. Source-published community-area and ZCTA rows are
+    explicitly secondary sensitivities and retain their audit labels.
     """)
     return
 
@@ -2073,18 +2158,27 @@ def _(
     dataset_path,
     pd,
     sha256,
+    summarize_binomial_noise_reference,
     summarize_community_area_aggregation_loss,
+    summarize_empirical_bayes_shrinkage,
+    summarize_suppression_scenarios,
     tract_chm_direct,
     tract_chm_direct_noncrossing,
 ):
     aggregation_loss = pd.concat(
         [
-            summarize_community_area_aggregation_loss(analytic, tract_chm_direct).assign(
-                noncrossing_only=False
-            ),
             summarize_community_area_aggregation_loss(
-                analytic, tract_chm_direct_noncrossing
-            ).assign(noncrossing_only=True),
+                analytic, tract_chm_direct, comparator="leave_one_tract_out_rollup"
+            ).assign(noncrossing_only=False, comparison_role="primary"),
+            summarize_community_area_aggregation_loss(
+                analytic, tract_chm_direct_noncrossing, comparator="leave_one_tract_out_rollup",
+            ).assign(noncrossing_only=True, comparison_role="primary_sensitivity"),
+            summarize_community_area_aggregation_loss(
+                analytic, tract_chm_direct, comparator="source_published_direct"
+            ).assign(noncrossing_only=False, comparison_role="secondary_source_export"),
+            summarize_community_area_aggregation_loss(
+                analytic, tract_chm_direct_noncrossing, comparator="source_published_direct",
+            ).assign(noncrossing_only=True, comparison_role="secondary_source_export"),
         ],
         ignore_index=True,
         sort=False,
@@ -2092,7 +2186,10 @@ def _(
     aggregation_loss["zip_zcta_sensitivity_status"] = "direct_zcta_comparison"
     aggregation_loss["source_artifact"] = dataset_path.name
     aggregation_loss["source_checksum"] = sha256(dataset_path.read_bytes()).hexdigest()
-    return (aggregation_loss,)
+    binomial_noise_reference = summarize_binomial_noise_reference(analytic, tract_chm_direct, n_replicates=1000, seed=20260715)
+    empirical_bayes_sensitivity = summarize_empirical_bayes_shrinkage(tract_chm_direct)
+    suppression_scenarios = summarize_suppression_scenarios(analytic)
+    return aggregation_loss, binomial_noise_reference, empirical_bayes_sensitivity, suppression_scenarios
 
 
 @app.cell
@@ -2394,31 +2491,43 @@ def _(
 @app.cell
 def _(
     aggregation_loss,
+    binomial_noise_reference,
     bootstrap,
     complementarity_summary,
+    empirical_bayes_sensitivity,
     geographic_resolution_matrix,
     heterogeneity_summary,
     output_dir,
+    suppression_scenarios,
 ):
-    complementarity_summary.to_csv(
-        output_dir / "supplement_tract_complementarity.csv", index=False, float_format="%.12g"
-    )
+    complementarity_summary.to_csv(output_dir / "supplement_tract_complementarity.csv", index=False, float_format="%.12g")
     heterogeneity_summary.to_csv(
         output_dir / "supplement_within_community_heterogeneity.csv",
         index=False,
         float_format="%.12g",
     )
-    aggregation_loss.to_csv(
-        output_dir / "supplement_aggregation_loss.csv", index=False, float_format="%.12g"
+    aggregation_loss.to_csv(output_dir / "supplement_aggregation_loss.csv", index=False, float_format="%.12g")
+    binomial_noise_reference.to_csv(
+        output_dir / "supplement_binomial_noise_reference.csv",
+        index=False,
+        float_format="%.12g",
+    )
+    empirical_bayes_sensitivity.to_csv(
+        output_dir / "supplement_empirical_bayes_sensitivity.csv",
+        index=False,
+        float_format="%.12g",
+    )
+    suppression_scenarios.to_csv(
+        output_dir / "supplement_suppression_scenarios.csv",
+        index=False,
+        float_format="%.12g",
     )
     geographic_resolution_matrix.to_csv(
         output_dir / "supplement_geographic_resolution_matrix.csv",
         index=False,
         float_format="%.12g",
     )
-    bootstrap.to_csv(
-        output_dir / "supplement_concordance_bootstrap.csv", index=False, float_format="%.12g"
-    )
+    bootstrap.to_csv(output_dir / "supplement_concordance_bootstrap.csv", index=False, float_format="%.12g")
     return
 
 
@@ -2434,7 +2543,7 @@ def _(mo):
     | Population and unit | Community areas with complete direct CHM exposure, life expectancy, and locked covariates. The unit is a community area. |
     | Variables and denominator | Life expectancy, CHM diagnosed proportion, percentage aged 65 years or older, percentage female, percentage below the federal poverty level, and pooled 2022-2024 capture. Adult population is used only for prespecified weighting sensitivities. |
     | Mathematical definition | $LE_i=\alpha+\beta X_i+\gamma^T Z_i+\epsilon_i$. Exposures are scaled by the frozen IQR and covariates by 1 SD. |
-    | Estimator and uncertainty | Unweighted OLS with HC3 covariance.<sup>13</sup> The current code uses normal critical values. A t-critical-value sensitivity is required for sign-off. |
+    | Estimator and uncertainty | Unweighted OLS with HC3 covariance and 2-sided 95% intervals using residual-degrees-of-freedom t critical values.<sup>13</sup> |
     | Assumptions and diagnostics | Linear conditional mean, full rank, adequate support, acceptable VIF, residual behavior, leverage, Cook distance, leave-one-area-out influence, and residual Moran I are reviewed. |
     | Missingness and suppression | Complete community areas only. Do not impute life expectancy or disease measures. A model with fewer than 70 areas, insufficient exposure support, or failed semantic gates is withheld. |
     | Sensitivities | Population weighting, capture strata, annual and leave-one-year-out exposures, disruption period, influential-area omission, and spatial-error model. |
@@ -2530,7 +2639,7 @@ def _(review_values):
         "primary_findings": f"In this ecological repeated-period analysis, tract and community-area quartiles disagreed for {_h['quartile_disagree_count']:.0f} of {int(_h['resolution_eligible_n'])} hypertension tracts ({_h['quartile_disagree_pct']:.1f}%) and {_c['quartile_disagree_count']:.0f} of {int(_c['resolution_eligible_n'])} COPD tracts ({_c['quartile_disagree_pct']:.1f}%). The community-area labels moved {_h['q4_movers_n']:.0f} and {_c['q4_movers_n']:.0f} tracts, respectively, into or out of the highest quartile.",
         "primary_abstract": f"Direct tract and linked community-area quartiles disagreed for {_h['quartile_disagree_count']:.0f} of {int(_h['resolution_eligible_n'])} hypertension tracts ({_h['quartile_disagree_pct']:.1f}%) and {_c['quartile_disagree_count']:.0f} of {int(_c['resolution_eligible_n'])} COPD tracts ({_c['quartile_disagree_pct']:.1f}%). Within-community variation accounted for {_h['within_variance_share']:.3f} of observed tract variation in hypertension and {_c['within_variance_share']:.3f} in COPD. Community-area labels moved {_h['q4_movers_n']:.0f} of {int(_h['q4_transition_eligible_n'])} hypertension tracts ({_h['q4_movers_pct']:.1f}%) and {_c['q4_movers_n']:.0f} of {int(_c['q4_transition_eligible_n'])} COPD tracts ({_c['q4_movers_pct']:.1f}%) into or out of the highest quartile. Primary cluster-bootstrap intervals remain pending statistician approval and are not reported here.",
         "geographic_metrics": f"For hypertension, exact tract/community quartile agreement was {_h['exact_quartile_agreement_count']:.0f} of {int(_h['resolution_eligible_n'])} tracts ({_h['exact_quartile_agreement_pct']:.1f}%), the within-community variance share was {_h['within_variance_share']:.3f}, and {_h['q4_movers_n']:.0f} of {int(_h['q4_transition_eligible_n'])} tracts ({_h['q4_movers_pct']:.1f}%) moved into or out of Q4. Corresponding COPD estimates were {_c['exact_quartile_agreement_count']:.0f} of {int(_c['resolution_eligible_n'])} ({_c['exact_quartile_agreement_pct']:.1f}%), {_c['within_variance_share']:.3f}, and {_c['q4_movers_n']:.0f} of {int(_c['q4_transition_eligible_n'])} ({_c['q4_movers_pct']:.1f}%).",
-        "c2": f"Among {int(_c2['n'])} eligible community areas, a 1-IQR higher recorded COPD proportion was associated with {_c2['estimate']:.2f} years of life expectancy (97.5% CI, {_c2['ci_low']:.2f} to {_c2['ci_high']:.2f}) after adjustment. Residual Moran I was {_m['observed_i']:.3f} (permutation P={_m['permutation_p_value']:.4f}); the spatial-error estimate was {_s['estimate']:.2f} years and did not change direction.",
+        "c2": f"Among {int(_c2['n'])} eligible community areas, a 1-IQR higher recorded COPD proportion was associated with {_c2['estimate']:.2f} years of life expectancy (95% residual-df t CI, {_c2['ci_low']:.2f} to {_c2['ci_high']:.2f}) after adjustment. Residual Moran I was {_m['observed_i']:.3f} (permutation P={_m['permutation_p_value']:.4f}); the spatial-error estimate was {_s['estimate']:.2f} years and did not change direction.",
         "c1": "The prespecified C1 model was not run because mutual exclusivity and denominator equivalence for the 2 diabetes components remain unapproved. No coefficient, confidence interval, influence result, or residual diagnostic was estimated.",
     }
     return (review_summary,)
@@ -2693,7 +2802,7 @@ def _(review_summary):
 @app.cell
 def _(mo):
     mo.md("""
-    #### Figure 2. Added geographic information from tract-level measures
+    #### eFigure S1. Source-published cross-frame alignment sensitivity
 
     The top row compares direct tract quartiles with direct community-area quartiles, the primary
     geographic-resolution comparison. The bottom row compares CHM and PLACES percentile ranks as
@@ -2713,7 +2822,7 @@ def _(figure_2):
 @app.cell
 def _(mo, review_summary):
     mo.md(f"""
-    **Results, Figure 2:** {review_summary["alignment"]}
+    **Results, eFigure S1:** {review_summary["alignment"]}
     """)
     return
 
@@ -2721,7 +2830,7 @@ def _(mo, review_summary):
 @app.cell
 def _(mo, review_summary):
     mo.md(f"""
-    **Biostatistical interpretation, Figure 2:** {review_summary["alignment"]} Direct cross-frame
+    **Biostatistical interpretation, eFigure S1:** {review_summary["alignment"]} Direct cross-frame
     disagreement and within-area variance address added geographic information. PLACES rank
     correlation addresses cross-source ordering and is secondary. PLACES is not a criterion
     standard, metric-specific denominators differ, and tracts within the same community area are
@@ -2734,7 +2843,7 @@ def _(mo, review_summary):
 @app.cell
 def _(mo):
     mo.md("""
-    **Coauthor interpretation, Figure 2:** Community-area labels concealed more tract variation
+    **Coauthor interpretation, eFigure S1:** Community-area labels concealed more tract variation
     for COPD than for hypertension. The secondary PLACES comparison showed that cross-source
     alignment also differed by condition. Neither comparison establishes which source or
     geographic level is correct.
@@ -2813,9 +2922,9 @@ def _(
 @app.cell
 def _(figure_3, mo):
     mo.md("""
-    #### Figure 3. Direct cross-frame classification differences and stability
+    #### eFigure S2. Direct cross-frame classification differences and stability
 
-    Figure 3 reports condition-specific Q4 transitions, represented mean annual source
+    eFigure S2 reports condition-specific Q4 transitions, represented mean annual source
     denominators, community areas containing both Q1 and Q4 tracts, annual Q4 overlap, and the
     noncrossing-tract sensitivity. Denominators are repeated source observations, not unique
     people. The annual and noncrossing quantities are different descriptive stability measures.
@@ -2827,7 +2936,7 @@ def _(figure_3, mo):
 @app.cell
 def _(mo, review_summary):
     mo.md(f"""
-    **Results, Figure 3:** {review_summary["classification"]}
+    **Results, eFigure S2:** {review_summary["classification"]}
     """)
     return
 
@@ -2835,7 +2944,7 @@ def _(mo, review_summary):
 @app.cell
 def _(mo, review_summary):
     mo.md(f"""
-    **Biostatistical interpretation, Figure 3:** {review_summary["classification"]} Q4 movement, annual
+    **Biostatistical interpretation, eFigure S2:** {review_summary["classification"]} Q4 movement, annual
     Jaccard overlap, and noncrossing disagreement are separate descriptive estimands. Mean annual
     source denominators are repeated condition records, not unique people. Add a patient-deduplicated
     denominator if available and prespecify which stability metric will support the final claim.
@@ -2846,7 +2955,7 @@ def _(mo, review_summary):
 @app.cell
 def _(mo):
     mo.md("""
-    **Coauthor interpretation, Figure 3:** Highest-quartile membership differed when direct tract
+    **Coauthor interpretation, eFigure S2:** Highest-quartile membership differed when direct tract
     classifications were compared with linked direct community-area classifications, and annual membership was only partly stable. These patterns show the
     consequence of geographic labeling, not individual movement or a change in clinical status.
     """)
@@ -2906,8 +3015,8 @@ def _(pd, review_summary):
     _rows = [
         ("Table 1", review_summary["resource"], "Records are not unique patients; reliability and denominator semantics are unresolved.", "Obtain source eligibility, deduplication, denominator, and reliability rules."),
         ("Figure 1", review_summary["coverage"], "Capture is metadata, not a sampling probability; suppression varies by condition.", "Add the governed capture definition and a patient-deduplicated flow if available."),
-        ("Figure 2", review_summary["alignment"], "PLACES is not a truth standard; metric-specific samples differ; tracts cluster within areas.", "Approve 1000 cluster-bootstrap replicates, tie rules, and compatible source-uncertainty analysis."),
-        ("Figure 3", review_summary["classification"], "Q4 movement, Jaccard overlap, and noncrossing disagreement are different estimands.", "Prespecify the claim-supporting stability metric and add unique-person denominators if available."),
+        ("eFigure S1", review_summary["alignment"], "PLACES is not a truth standard; metric-specific samples differ; tracts cluster within areas.", "Approve 1000 cluster-bootstrap replicates, tie rules, and compatible source-uncertainty analysis."),
+        ("eFigure S2", review_summary["classification"], "Q4 movement, Jaccard overlap, and noncrossing disagreement are different estimands.", "Prespecify the claim-supporting stability metric and add unique-person denominators if available."),
         ("Table 2", review_summary["geographic_metrics"], "The metrics measure different constructs and cannot be ranked on one accuracy scale.", "Add approved cluster-bootstrap intervals and retain metric-specific denominators."),
     ]
     main_display_review = pd.DataFrame(_rows, columns=["Display", "Review result", "Main limitation", "Needed supplement or decision"])
@@ -2940,7 +3049,7 @@ def _(pd, review_summary):
         ("eFigure 4", review_summary["alignment"], "Cross-source agreement lacks joint source-uncertainty propagation.", "Add approved cluster intervals and source-uncertainty analysis when inputs exist."),
         ("eFigure 5", "Local Moran I and Getis-Ord Gi* counts before and after FDR control.", "Findings depend on topology, permutation count, and FDR family.", "Approve weights, 9999 permutations, local statistics, and family boundaries."),
         ("eFigure 6", review_summary["c1"], "No C1 analytic population exists while combined-diabetes semantics remain unapproved.", "Document mutual exclusivity and denominator equivalence before any C1 fit."),
-        ("eFigure 7", review_summary["c2"], "Ecological coefficients are noncausal and CIs omit source-measurement error.", "Approve z vs t critical values and inspect the full covariance and diagnostics."),
+        ("eFigure 7", review_summary["c2"], "Ecological coefficients are noncausal and CIs omit source-measurement error.", "Confirm the residual-df t interval rule and inspect the full covariance and diagnostics."),
         ("eFigure 8", "C2 residual, Q-Q, leverage, and Cook-distance diagnostics for 76 areas.", "Graphical diagnostics have limited power in a small spatial sample.", "Review flagged areas, residual shape, and influence thresholds with leave-one-area-out results."),
         ("eFigure 9", "C2 temporal, weighting, capture, and influence sensitivity estimates.", "Sensitivity variants do not eliminate ecological or selection bias.", "Identify the prespecified minimum set for the final supplement."),
         ("eFigure 10", review_summary["c2"], "The spatial-error fit uses one primary topology and a bounded maximum-likelihood estimate of lambda.", "Approve queen, rook, and connected-distance weights plus the spatial-error estimator."),
@@ -3099,8 +3208,8 @@ def _(mo):
     The secondary ecological model was y_i = alpha + beta x_i + gamma Z_i + error_i for one
     community area. Alpha is the centered intercept, beta is the life-expectancy difference per
     frozen-IQR CHM exposure, and gamma contains slopes for age 65 years or older, female sex,
-    poverty, and pooled 2022–2024 EHR capture. HC3 covariance was used. Primary contrasts used
-    97.5% CIs. The cardiometabolic joint contrast was not run because combined diabetes semantics
+    poverty, and pooled 2022–2024 EHR capture. HC3 covariance was used. C2 coefficients and contrasts used
+    95% residual-degrees-of-freedom t CIs. The cardiometabolic joint contrast was not run because combined diabetes semantics
     remain unapproved. The COPD
     contrast used residual Moran diagnostics and prespecified spatial-error sensitivity. All
     tests were two-sided; missing values were not imputed.
@@ -3205,8 +3314,8 @@ def _(mo, review_summary):
 
     #### Analysis population and uncertainty
 
-    {review_summary["c2"]} The 97.5% HC3 interval reflects the 2-estimand primary multiplicity
-    plan. It does not address source-measurement error, unmeasured ecological confounding, or all
+    {review_summary["c2"]} The 95% HC3 t interval describes a supplementary ecological association.
+    It does not address source-measurement error, unmeasured ecological confounding, or all
     forms of spatial dependence. The estimate is visible for independent statistical review and
     remains ineligible for manuscript import.
     """)
@@ -3801,8 +3910,9 @@ def _(
 @app.cell
 def _(
     aggregation_loss,
-    build_compact_table_2,
     build_geographic_main_evidence,
+    build_primary_information_loss_display,
+    build_primary_information_loss_table,
     complementarity_summary,
     descriptive_complementarity_results,
     geographic_consequence_transitions,
@@ -3813,8 +3923,12 @@ def _(
         aggregation_loss,
         geographic_consequence_transitions,
     )
-    table_2 = build_compact_table_2(geographic_main_evidence)
-    return geographic_main_evidence, table_2
+    primary_information_loss = build_primary_information_loss_table(
+        descriptive_complementarity_results,
+        aggregation_loss,
+    )
+    table_2 = build_primary_information_loss_display(primary_information_loss)
+    return geographic_main_evidence, primary_information_loss, table_2
 
 
 @app.cell
@@ -3831,24 +3945,14 @@ def _(geographic_main_evidence, output_dir):
 def _(build_great_table, output_dir, table_2):
     _table = build_great_table(
         table_2,
-        title="Table 2. Geographic alignment and classification differences by condition",
-        subtitle="Complete-period direct tract CHM measures and linked community-area labels",
+        title="Table 2. Tract information beyond leave-one-out community-area summaries",
+        subtitle="Primary 2022-2024 estimates with 95% community-area cluster-bootstrap intervals",
         notes=(
-            "All classification metrics use tracts with complete eligible 2022-2024 CHM records and a dominant community-area link of at least 0.99.",
-            "Exact agreement and disagreement use the tract/community comparison denominator. Q4 movers use the separately reported transition-eligible denominator.",
-            "The within-community variance share is the complement of the observed-scale method-of-moments VPC.",
+            "Each focal tract is compared with a denominator-pooled estimate from other eligible tracts in its dominant community area.",
+            "The variance-share denominator includes all dominant-area eligible tracts. Rank and classification estimands require another eligible tract in the area.",
+            "Intervals are percentile 95% intervals from 1000 community-area cluster-bootstrap replicates.",
         ),
         table_id="table_2_geographic_resolution",
-        spanners={
-            "Direct classification": (
-                "Exact quartile agreement, No. (%)",
-                "Quartile disagreement, No. (%)",
-            ),
-            "Cross-scale consequences": (
-                "Within-community variance share",
-                "Q4 movers, No. (%)",
-            ),
-        },
     )
     table_2_html = _table.as_raw_html()
     table_2.to_csv(output_dir / "table_2_geographic_resolution.csv", index=False, float_format="%.12g")
@@ -3856,8 +3960,12 @@ def _(build_great_table, output_dir, table_2):
 
 
 @app.cell
-def _(output_dir, table_2, table_2_html):
-    table_2.to_csv(output_dir / "table_2_model_readiness_sensitivities.csv", index=False, float_format="%.12g")
+def _(output_dir, primary_information_loss, table_2_html):
+    primary_information_loss.to_csv(
+        output_dir / "table_2_model_readiness_sensitivities.csv",
+        index=False,
+        float_format="%.12g",
+    )
     page = f"<!doctype html><html><body>{table_2_html}</body></html>"
     _ = (output_dir / "table_2_geographic_resolution.html").write_text(page, encoding="utf-8")
     _ = (output_dir / "table_2_model_readiness_sensitivities.html").write_text(page, encoding="utf-8")
@@ -3935,17 +4043,19 @@ def _(mo, table_2_html):
 @app.cell
 def _(
     MAIN_DISPLAY_IDS,
-    aggregation_loss,
     build_claim_evidence_audit,
     build_master_claim_records,
     output_dir,
+    primary_information_loss,
     primary_rows,
     readiness,
 ):
-    claim_records = build_master_claim_records(readiness, primary_rows, aggregation_loss)
+    claim_records = build_master_claim_records(
+        readiness, primary_rows, primary_information_loss
+    )
     claim_evidence_audit = build_claim_evidence_audit(
         claim_records,
-        {"C1": MAIN_DISPLAY_IDS[2], "C2": MAIN_DISPLAY_IDS[3], "GR": "eTable_8"},
+        {"C1": "eTable_2", "C2": "eTable_2", "GR": "Table_2"},
     )
     claim_evidence_audit.to_csv(output_dir / "supplement_claim_evidence_audit.csv", index=False)
     return
@@ -3958,7 +4068,7 @@ def _(mo):
 
     The combined cardiometabolic model was not run because diabetes-component semantics remain
     unapproved. The COPD
-    adjusted association remains a candidate secondary estimate with a governed 97.5% HC3
+    adjusted association remains a candidate secondary estimate with a governed 95% residual-df t HC3
     interval. Neither outcome-model analysis changes the primary geographic interpretation or
     the closed authorization state.
     """)
@@ -4058,6 +4168,7 @@ def _(
 
 @app.cell
 def _(
+    MAIN_DISPLAY_IDS,
     build_main_display_reader_guide,
     c1_result_narrative,
     c2_result_narrative,
@@ -4066,7 +4177,8 @@ def _(
     reader_cards,
     results_authorized,
 ):
-    guide = build_main_display_reader_guide(reader_cards, model_guidance=[
+    primary_reader_cards = {display_id: reader_cards[display_id] for display_id in MAIN_DISPLAY_IDS}
+    guide = build_main_display_reader_guide(primary_reader_cards, model_guidance=[
         {"analysis_name": "Cardiometabolic joint analysis", "status": "not run; combined diabetes semantics unapproved", "authorization": bool(results_authorized), "narrative": c1_result_narrative.get("coauthor", "")},
         {"analysis_name": "COPD association analysis", "status": "candidate estimate; not authorized for manuscript import", "authorization": bool(results_authorized), "narrative": c2_result_narrative.get("coauthor", "")},
     ])
@@ -4120,9 +4232,15 @@ def _(efigure_specs, etable_specs):
     reproducibility_files = (
         "supplement_data_quality_audit.csv",
         "supplement_tract_cohort_flow.csv",
+        "supplement_complete_tract_cohort_flow.csv",
+        "supplement_tract_selection_audit.csv",
+        "supplement_age_stratum_reconciliation.csv",
         "supplement_claim_evidence_audit.csv",
         "supplement_geographic_resolution_matrix.csv", "supplement_geographic_main_evidence.csv",
         "supplement_aggregation_loss.csv",
+        "supplement_binomial_noise_reference.csv",
+        "supplement_empirical_bayes_sensitivity.csv",
+        "supplement_suppression_scenarios.csv",
         "supplement_robustness_summary.csv",
         "supplement_adjusted_diagnostic_data.csv",
         "supplement_alternative_spatial_weights.csv",
@@ -4146,6 +4264,7 @@ def _(efigure_specs, etable_specs):
 
 @app.cell
 def _(
+    MAIN_DISPLAY_IDS,
     build_editorial_display_manifest,
     build_supplement_registry,
     json,
@@ -4156,7 +4275,7 @@ def _(
 ):
     supplement_registry = build_supplement_registry(numbered_displays, reproducibility_files)
     editorial_display_manifest = build_editorial_display_manifest(numbered_displays, results_authorized=bool(results_authorized))
-    main_ids = tuple(f"{kind}_{index}" for kind, index in (("table", 1), ("figure", 1), ("figure", 2), ("figure", 3), ("table", 2)))
+    main_ids = tuple(MAIN_DISPLAY_IDS)
     main_entries = [{"id": display_id, "editorial_placement": "submitted", "citable_status": "not_citable_pending_authorization", "authorization_requirement": "results_authorized=true", "first_mention_order": index, "duplicate_main_evidence": False} for index, display_id in enumerate(main_ids, start=1)]
     editorial_payload = {"main_manuscript": main_entries, "supplementary": editorial_display_manifest}
     _editorial_json = json.dumps(editorial_payload, indent=2, sort_keys=True) + "\n"
@@ -4434,7 +4553,7 @@ def _(mo):
     counts, percentages, ranks, and rank gaps. Alpha, beta, and gamma remain in the coefficient
     supplement, not in figures. Color scales use exact units and visible labels; missing,
     suppression, and qualification withholding are separate encodings. Table 2 reports the COPD
-    97.5% HC3 interval and the combined-diabetes not-run status. Figures show no
+    95% residual-df t HC3 interval and the combined-diabetes not-run status. Figures show no
     cardiometabolic estimate. Legends state source
     roles, geography, period, n, and CI meaning. All displays are descriptive, noncausal, and
     subject to the closed authorization gate.
@@ -4482,8 +4601,6 @@ def _():
     MAIN_DISPLAY_IDS = (
         "table_1",
         "figure_1",
-        "figure_2",
-        "figure_3",
         "table_2",
     )
     return (MAIN_DISPLAY_IDS,)
@@ -4890,7 +5007,7 @@ def _(conditions, draw_figure_2_column, plt, tract_percentile):
     for _column, condition in enumerate(conditions):
         draw_figure_2_column(axes_2[0, _column], axes_2[1, _column], condition, _column, tract_percentile)
     figure_2.suptitle(
-        "Figure 2. Added geographic information from tract-level measures"
+        "eFigure S1. Source-published cross-frame alignment sensitivity"
     )
     return (figure_2,)
 
@@ -5010,14 +5127,14 @@ def _(geographic_consequence_panels, mixed_area_map, plt):
     draw_mixed_area_map(axes_3[1, 0], mixed_area_map)
     draw_stability_panel(axes_3[1, 1], geographic_consequence_panels["annual"],
                          geographic_consequence_panels["noncrossing"])
-    figure_3.suptitle("Figure 3. Direct cross-frame classification differences and stability")
+    figure_3.suptitle("eFigure S2. Direct cross-frame classification differences and stability")
     return (figure_3,)
 
 
 @app.cell
 def _(mo):
     mo.md("""
-    Figure 3 translates cross-scale classification differences into tract counts, repeated mean
+    eFigure S2 translates cross-scale classification differences into tract counts, repeated mean
     annual source denominators, mixed-extreme community areas, and sensitivity results. Source
     denominators are not unique people. Annual Jaccard percentages describe overlap in Q4 tract
     membership; the star markers show noncrossing-tract quartile disagreement, not the same
@@ -5701,7 +5818,7 @@ def _(mo):
     22. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
     23. Chicago Health Atlas. [Life expectancy, indicator VRLE](https://chicagohealthatlas.org/indicators/VRLE). Originating source: Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
     24. City of Chicago. [Boundaries-Community Areas, dataset igwz-8jzy](https://data.cityofchicago.org/d/igwz-8jzy). Accessed July 14, 2026.
-    25. CONSCIENCE Project. [ChicagoHealthMap.com: CONnecting SCIence—ENgaging Chicago for Equity](https://chicagohealthmap.com). Chicago, IL: Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed July 13, 2026. Methods statements were preserved in the governed July 13, 2026 archive snapshot.
+    25. Chicago Health Map. [ChicagoHealthMap.com](https://chicagohealthmap.com). Chicago, IL: Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed July 13, 2026. Methods statements were preserved in the governed July 13, 2026 archive snapshot.
 
     References 1 through 7 were verified through PubMed or full-text evidence records. References
     8 through 19 were verified against primary journal records. Data-source citations reproduce
@@ -5840,6 +5957,9 @@ def _(supplement_figure_stems):
         "supplement_tract_complementarity.csv",
         "supplement_within_community_heterogeneity.csv",
         "supplement_aggregation_loss.csv",
+        "supplement_binomial_noise_reference.csv",
+        "supplement_empirical_bayes_sensitivity.csv",
+        "supplement_suppression_scenarios.csv",
         "supplement_geographic_resolution_matrix.csv", "supplement_geographic_main_evidence.csv",
         "supplement_geographic_consequence_details.csv",
         "supplement_geographic_consequence_transitions.csv",
@@ -5854,6 +5974,9 @@ def _(supplement_figure_stems):
         "etable_7_descriptive_complementarity_methods.html",
         "supplement_claim_evidence_audit.csv",
         "supplement_concordance_bootstrap.csv",
+        "supplement_complete_tract_cohort_flow.csv",
+        "supplement_tract_selection_audit.csv",
+        "supplement_age_stratum_reconciliation.csv",
         *[f"supplement_{stem}.{suffix}" for stem in supplement_figure_stems
           for suffix in ("png", "pdf")],
     ]
@@ -5871,7 +5994,12 @@ def _(output_dir, output_names):
     missing_outputs = [name for name in output_names if not (output_dir / name).is_file()]
     if missing_outputs:
         raise ValueError(f"notebook output inventory incomplete: {missing_outputs}")
-    allowed_outputs = {*output_names, "notebook_run_manifest.json"}
+    optional_review_exports = {
+        "00_master_analytic_dataset.csv.gz",
+        "00_master_analytic_review_extract.csv",
+        "supplement_hcs_chm_hypertension.csv",
+    }
+    allowed_outputs = {*output_names, "notebook_run_manifest.json", *optional_review_exports}
     unexpected_outputs = sorted(
         path.name
         for path in output_dir.iterdir()
@@ -5894,6 +6022,7 @@ def _(Path, project_root):
         project_root / "src/chicagohealthmap/analysis/tract_complementarity.py",
         project_root / "src/chicagohealthmap/analysis/paper_audit.py",
         project_root / "src/chicagohealthmap/analysis/paper_displays.py",
+        project_root / "src/chicagohealthmap/analysis/raw_data_contract.py",
     ]
     return analysis_source_paths, notebook_path
 
@@ -6041,8 +6170,6 @@ def _(
                 (
                     ["table_1_resource_quality.csv", "table_1_resource_quality.html"],
                     ["figure_1_data_flow_coverage.png", "figure_1_submission.pdf"],
-                    ["figure_2_cardiometabolic_patterns.png", "figure_2_submission.pdf"],
-                    ["figure_3_copd_patterns.png", "figure_3_submission.pdf"],
                     ["table_2_geographic_resolution.csv", "table_2_geographic_resolution.html"],
                 ),
                 strict=True,

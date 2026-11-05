@@ -176,16 +176,24 @@ def _fit_adjusted_models(
             *("1 SD" for _ in ADJUSTMENT_COVARIATES),
         ]
         critical_primary = float(stats.norm.ppf(0.9875))
+        c2_residual_df = len(transformed) - design.shape[1]
         rows: list[dict[str, Any]] = []
         for index, (term, role, scale_label) in enumerate(
             zip(term_names, roles, scales, strict=True)
         ):
-            coefficient_confidence = 0.975 if role == "exposure" and model_id == "C2" else 0.95
-            critical = (
-                critical_primary
-                if coefficient_confidence == 0.975
-                else float(stats.norm.ppf(0.975))
-            )
+            coefficient_confidence = 0.95
+            if model_id == "C2":
+                critical = float(stats.t.ppf(0.975, df=c2_residual_df))
+                critical_distribution = "t_residual_degrees_of_freedom"
+                residual_df: int | pd._libs.missing.NAType = c2_residual_df
+            else:
+                critical = (
+                    critical_primary
+                    if role == "exposure" and coefficient_confidence == 0.975
+                    else float(stats.norm.ppf(0.975))
+                )
+                critical_distribution = "standard_normal"
+                residual_df = pd.NA
             standard_error = float(np.sqrt(covariance[index, index]))
             estimate = float(beta[index])
             rows.append(
@@ -202,6 +210,8 @@ def _fit_adjusted_models(
                     "unit": "life_expectancy_years",
                     "n": len(transformed),
                     "covariance_type": "HC3",
+                    "critical_value_distribution": critical_distribution,
+                    "residual_degrees_of_freedom": residual_df,
                     "analysis_status": analysis_status,
                     "primary_estimand_executed": primary_estimand_executed,
                     "results_authorized": False,
@@ -261,7 +271,7 @@ def _fit_adjusted_models(
                     beta,
                     covariance,
                     len(complete),
-                    0.975,
+                    0.95,
                     analysis_status,
                     primary_estimand_executed,
                 )
@@ -360,7 +370,18 @@ def _primary_contrast_record(
     if variance < 0 or not np.isfinite(variance):
         raise CaseStudyAnalysisError(f"{estimand_id} contrast covariance is not estimable")
     standard_error = float(np.sqrt(variance))
-    critical = float(stats.norm.ppf(1 - (1 - confidence_level) / 2))
+    residual_degrees_of_freedom = n - len(beta)
+    if model_id == "C2":
+        critical = float(
+            stats.t.ppf(
+                1 - (1 - confidence_level) / 2,
+                df=residual_degrees_of_freedom,
+            )
+        )
+        critical_distribution = "t_residual_degrees_of_freedom"
+    else:
+        critical = float(stats.norm.ppf(1 - (1 - confidence_level) / 2))
+        critical_distribution = "standard_normal"
     return {
         "estimand_id": estimand_id,
         "model_id": model_id,
@@ -371,6 +392,10 @@ def _primary_contrast_record(
         "confidence_level": confidence_level,
         "n": n,
         "covariance_type": "HC3",
+        "critical_value_distribution": critical_distribution,
+        "residual_degrees_of_freedom": (
+            residual_degrees_of_freedom if model_id == "C2" else pd.NA
+        ),
         "estimator": "unweighted_ols",
         "adjustment_set": "pct_age_65_plus|pct_female|pct_below_fpl|capture_rate_mean_2022_2024",
         "analysis_status": analysis_status,
@@ -612,7 +637,9 @@ def fit_minimally_adjusted_sensitivities(frame: pd.DataFrame) -> pd.DataFrame:
             )
             for estimand_id, contrast in c1_contrasts.items()
         )
-    records.append(_contrast_record("C2", c2, np.array([0.0, c_iqr]), 0.975, np.nan, np.nan, c_iqr))
+    records.append(
+        _contrast_record("C2", c2, np.array([0.0, c_iqr]), 0.95, np.nan, np.nan, c_iqr)
+    )
     order = {"C1": 0, "C1-H": 1, "C1-D": 2, "C2": 3}
     return pd.DataFrame.from_records(records).sort_values(
         "estimand_id", key=lambda values: values.map(order), kind="mergesort"
@@ -673,7 +700,10 @@ def summarize_influence(frame: pd.DataFrame, model_id: str) -> tuple[pd.DataFram
 
     frozen_iqrs = {exposure: _iqr(complete[exposure]) for exposure in exposures}
     original = _contrast_estimate(fit, model_id, frozen_iqrs)
-    principal_low, principal_high = _contrast_interval(fit, model_id, frozen_iqrs, 0.975)
+    confidence_level = 0.975 if model_id == "C1" else 0.95
+    principal_low, principal_high = _contrast_interval(
+        fit, model_id, frozen_iqrs, confidence_level
+    )
     leave_one_out = np.array(
         [_leave_one_out_estimate(complete, model_id, index, frozen_iqrs) for index in range(n)],
         dtype=float,
@@ -704,7 +734,7 @@ def summarize_influence(frame: pd.DataFrame, model_id: str) -> tuple[pd.DataFram
             exclude_fit = _fit_model(unflagged, exposures, minimum_n=len(exposures) + 2)
             exclude_flagged_estimate = _contrast_estimate(exclude_fit, model_id, frozen_iqrs)
             exclude_flagged_low, exclude_flagged_high = _contrast_interval(
-                exclude_fit, model_id, frozen_iqrs, 0.975
+                exclude_fit, model_id, frozen_iqrs, confidence_level
             )
             exclude_flagged_status = "supported_sensitivity_not_primary"
         except (CaseStudyAnalysisError, np.linalg.LinAlgError, ValueError):
@@ -1008,7 +1038,13 @@ def _contrast_record(
     if variance < 0 or not np.isfinite(variance):
         raise CaseStudyAnalysisError(f"{estimand_id} contrast covariance is not estimable")
     standard_error = float(np.sqrt(variance))
-    critical = float(stats.norm.ppf(1 - (1 - confidence_level) / 2))
+    is_c2 = estimand_id == "C2"
+    residual_degrees_of_freedom = len(fit["data"]) - fit["design"].shape[1]
+    critical = float(
+        stats.t.ppf(1 - (1 - confidence_level) / 2, df=residual_degrees_of_freedom)
+        if is_c2
+        else stats.norm.ppf(1 - (1 - confidence_level) / 2)
+    )
     return {
         "estimand_id": estimand_id,
         "model_id": "C1_unadjusted" if estimand_id.startswith("C1") else "C2_unadjusted",
@@ -1022,6 +1058,12 @@ def _contrast_record(
         "diabetes_iqr": diabetes_iqr,
         "copd_iqr": copd_iqr,
         "covariance_type": "HC3",
+        "critical_value_distribution": (
+            "t_residual_degrees_of_freedom" if is_c2 else "standard_normal"
+        ),
+        "residual_degrees_of_freedom": (
+            residual_degrees_of_freedom if is_c2 else pd.NA
+        ),
         "estimator": "unweighted_ols",
         "adjustment_set": "unadjusted",
         "analysis_status": "supported_sensitivity_not_primary",
@@ -1056,7 +1098,12 @@ def _contrast_interval(
     variance = float(contrast @ fit["covariance"] @ contrast)
     if variance < 0 or not np.isfinite(variance):
         raise CaseStudyAnalysisError("influence contrast covariance is not estimable")
-    critical = float(stats.norm.ppf(1 - (1 - confidence_level) / 2))
+    residual_degrees_of_freedom = len(fit["data"]) - fit["design"].shape[1]
+    critical = float(
+        stats.t.ppf(1 - (1 - confidence_level) / 2, df=residual_degrees_of_freedom)
+        if model_id == "C2"
+        else stats.norm.ppf(1 - (1 - confidence_level) / 2)
+    )
     half_width = critical * np.sqrt(variance)
     return estimate - half_width, estimate + half_width
 
@@ -1463,7 +1510,7 @@ def _temporal_model_records(
                             estimand,
                             fit,
                             contrast,
-                            0.975 if estimand in {"C1", "C2"} else 0.95,
+                            0.975 if estimand == "C1" else 0.95,
                             iqrs.get(HYPERTENSION, np.nan),
                             iqrs.get(DIABETES, np.nan),
                             iqrs.get(COPD, np.nan),
@@ -1479,7 +1526,7 @@ def _temporal_model_records(
                     "standard_error": np.nan,
                     "ci_low": np.nan,
                     "ci_high": np.nan,
-                    "confidence_level": 0.975 if estimand in {"C1", "C2"} else 0.95,
+                    "confidence_level": 0.975 if estimand == "C1" else 0.95,
                 }
                 for estimand in estimands
             ]

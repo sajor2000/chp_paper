@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd  # type: ignore[import-untyped]
 import pytest
+from scipy import stats  # type: ignore[import-untyped]
 
 from chicagohealthmap.analysis.robustness import (
     COMMON_ROBUSTNESS_COLUMNS,
@@ -155,12 +156,49 @@ def test_weighted_adjusted_hc3_matches_independent_statsmodels() -> None:
         sm.add_constant(transformed, has_constant="add"),
         weights=frame["acs_adult_population"],
     ).fit(cov_type="HC3")
-    critical = 2.241402727604947  # standard-normal 97.5% two-sided interval
+    critical = stats.t.ppf(0.975, df=len(frame) - len(fit.params))
 
     assert row["estimate"] == pytest.approx(fit.params["copd"], rel=1e-10)
     assert row["ci_low"] == pytest.approx(fit.params["copd"] - critical * fit.bse["copd"], rel=1e-9)
     assert row["target_population"] == "population_weighted_community_area_adult_population"
     assert row["estimator"] == "population_weighted_ols_hc3"
+    assert row["confidence_level"] == pytest.approx(0.95)
+    assert row["critical_value_distribution"] == "t_residual_degrees_of_freedom"
+    assert row["residual_degrees_of_freedom"] == len(frame) - len(fit.params)
+
+
+def test_no_capture_c2_sensitivity_matches_independent_statsmodels() -> None:
+    import statsmodels.api as sm
+
+    frame = _model_frame()
+    summary = build_governed_robustness_summary(frame)
+    row = summary.loc[
+        summary["model"].eq("C2") & summary["variant"].eq("no_capture_adjustment")
+    ].iloc[0]
+    exposure = frame["copd_ehr_percent_2022_2024"]
+    transformed = pd.DataFrame(
+        {
+            "copd": (exposure - exposure.mean())
+            / (exposure.quantile(0.75) - exposure.quantile(0.25)),
+            "age": (frame["pct_age_65_plus"] - frame["pct_age_65_plus"].mean())
+            / frame["pct_age_65_plus"].std(ddof=1),
+            "female": (frame["pct_female"] - frame["pct_female"].mean())
+            / frame["pct_female"].std(ddof=1),
+            "poverty": (frame["pct_below_fpl"] - frame["pct_below_fpl"].mean())
+            / frame["pct_below_fpl"].std(ddof=1),
+        }
+    )
+    fit = sm.OLS(
+        frame["life_expectancy_mean_2022_2024"],
+        sm.add_constant(transformed, has_constant="add"),
+    ).fit(cov_type="HC3")
+    critical = stats.t.ppf(0.975, df=len(frame) - len(fit.params))
+
+    assert row["estimate"] == pytest.approx(fit.params["copd"], rel=1e-10)
+    assert row["ci_low"] == pytest.approx(fit.params["copd"] - critical * fit.bse["copd"], rel=1e-9)
+    assert row["ci_high"] == pytest.approx(fit.params["copd"] + critical * fit.bse["copd"], rel=1e-9)
+    assert row["adjustment_set"] == "pct_age_65_plus|pct_female|pct_below_fpl"
+    assert row["eligible_n"] == len(frame)
 
 
 def test_adjusted_influence_quartiles_and_na_rows_share_schema() -> None:

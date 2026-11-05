@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from chicagohealthmap.analysis.tract_complementarity import (
+    _leave_one_tract_out_comparator,
     _quartile_bins,
     _rank_quartile,
     _rerank_concordance,
@@ -23,6 +24,7 @@ from chicagohealthmap.analysis.tract_complementarity import (
     percentile_rank,
     parse_places_confidence_interval,
     summarize_community_area_aggregation_loss,
+    summarize_binomial_noise_reference,
     summarize_concordance_metrics,
     summarize_annual_consequence_stability,
     summarize_within_community_heterogeneity,
@@ -169,7 +171,9 @@ def test_community_area_aggregation_loss_quantifies_rank_reclassification() -> N
     tract_frame = build_tract_percentile_concordance(
         analytic, noncrossing_only=False, capture_cut_points=CUTS
     )
-    summary = summarize_community_area_aggregation_loss(analytic, tract_frame)
+    summary = summarize_community_area_aggregation_loss(
+        analytic, tract_frame, comparator="source_published_direct"
+    )
 
     row = summary.loc[summary["condition_id"].eq("hypertension")].iloc[0]
     assert int(row["tract_sample_n"]) == 3
@@ -179,10 +183,125 @@ def test_community_area_aggregation_loss_quantifies_rank_reclassification() -> N
     assert row["q4_movement_pct"] == pytest.approx(0)
     assert row["quartile_disagree_pct_ci_low"] <= row["quartile_disagree_pct"]
     assert row["quartile_disagree_pct_ci_high"] >= row["quartile_disagree_pct"]
-    assert row["bootstrap_rank_rule"] == "recomputed_within_each_cluster_resample"
+    assert row["bootstrap_rank_rule"] == (
+        "source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts"
+    )
     assert row["analysis_status"] == "geographic_resolution_sensitivity"
     assert row["interpretation_label"] == "tract_resolution_not_area_prevalence"
     assert row["results_authorized"] is False
+
+
+def test_leave_one_tract_out_comparator_excludes_focal_counts() -> None:
+    tract_frame = build_tract_percentile_concordance(
+        _rows(), noncrossing_only=False, capture_cut_points=CUTS
+    )
+
+    compared = _leave_one_tract_out_comparator(tract_frame).set_index("geography_id")
+
+    assert set(compared.index) == {"t1", "t2"}
+    assert compared.loc["t1", "ehr_rank"] == pytest.approx(0.5)
+    assert compared.loc["t2", "ehr_rank"] == pytest.approx(1.0)
+    assert compared.loc["t1", "community_ehr_percent"] == pytest.approx(20.0)
+    assert compared.loc["t2", "community_ehr_percent"] == pytest.approx(10.0)
+    assert compared.loc["t1", "loo_area_numerator"] == pytest.approx(
+        tract_frame.set_index("geography_id").loc["t2", "numerator"]
+    )
+    assert compared.loc["t2", "loo_area_numerator"] == pytest.approx(
+        tract_frame.set_index("geography_id").loc["t1", "numerator"]
+    )
+
+
+def test_leave_one_tract_out_uses_ratio_of_sums_with_unequal_peer_denominators() -> None:
+    frame = pd.DataFrame(
+        {
+            "geography_id": ["a", "b", "c", "singleton"],
+            "community_area_id": ["01", "01", "01", "02"],
+            "condition_id": ["hypertension"] * 4,
+            "numerator": [10.0, 40.0, 90.0, 1.0],
+            "denominator": [100.0, 200.0, 300.0, 10.0],
+            "ehr_percent": [10.0, 20.0, 30.0, 10.0],
+        }
+    )
+
+    compared = _leave_one_tract_out_comparator(frame).set_index("geography_id")
+
+    assert set(compared.index) == {"a", "b", "c"}
+    assert compared.loc["a", "community_ehr_percent"] == pytest.approx(26.0)
+    assert compared.loc["b", "community_ehr_percent"] == pytest.approx(25.0)
+    assert compared.loc["c", "community_ehr_percent"] == pytest.approx(50 / 300 * 100)
+    assert compared.loc["a", "community_ehr_percent"] != pytest.approx(25.0)
+
+
+def test_noise_reference_includes_all_four_primary_information_loss_estimands() -> None:
+    rows: list[dict[str, object]] = []
+    pooled: list[dict[str, object]] = []
+    for area_index, area in enumerate(("01", "02", "03"), start=1):
+        for tract_index in (1, 2):
+            tract = f"t{area_index}{tract_index}"
+            denominator = 200 + 10 * tract_index
+            annual_numerator = 10 * area_index + 2 * tract_index
+            for year in ("2022", "2023", "2024"):
+                rows.append(
+                    {
+                        "geography_type": "census_tract",
+                        "geography_id": tract,
+                        "time_period": year,
+                        "condition_id": "hypertension",
+                        "numerator": annual_numerator,
+                        "denominator": denominator,
+                        "suppression_flag": False,
+                        "community_area_id": area,
+                    }
+                )
+            pooled.append(
+                {
+                    "geography_id": tract,
+                    "community_area_id": area,
+                    "condition_id": "hypertension",
+                    "numerator": 3 * annual_numerator,
+                    "denominator": 3 * denominator,
+                    "ehr_percent": 100 * annual_numerator / denominator,
+                }
+            )
+    tract_frame = pd.DataFrame(pooled)
+    tract_frame["ehr_rank"] = percentile_rank(tract_frame["ehr_percent"])
+
+    result = summarize_binomial_noise_reference(
+        pd.DataFrame(rows), tract_frame, n_replicates=50, seed=42
+    )
+
+    assert {
+        "within_variance_share",
+        "median_absolute_percentile_rank_gap",
+        "quartile_disagree_pct",
+        "q4_movement_pct",
+    } <= set(result["metric"])
+    assert result["replicate_count"].eq(50).all()
+    assert result["seed"].eq(42).all()
+    assert result["eligible_tract_n"].eq(6).all()
+    assert result["population_note"].str.contains("simulation_frame").all()
+    assert result["observed_minus_noise_median"].notna().all()
+    indexed = result.set_index("metric")
+    assert indexed.loc[
+        "median_absolute_percentile_rank_gap", "observed_estimate"
+    ] == pytest.approx(1 / 6)
+    assert indexed.loc[
+        "median_absolute_percentile_rank_gap", "noise_only_median"
+    ] == pytest.approx(1 / 6)
+    assert indexed.loc["quartile_disagree_pct", "observed_estimate"] == pytest.approx(
+        200 / 3
+    )
+    assert indexed.loc["quartile_disagree_pct", "noise_only_median"] == pytest.approx(
+        200 / 3
+    )
+    assert indexed.loc["q4_movement_pct", "observed_estimate"] == pytest.approx(0)
+    assert indexed.loc["q4_movement_pct", "noise_only_median"] == pytest.approx(0)
+    assert indexed.loc["within_variance_share", "observed_estimate"] == pytest.approx(
+        0.005035065635677016
+    )
+    assert indexed.loc["within_variance_share", "noise_only_median"] == pytest.approx(
+        0.06909697613616989
+    )
 
 
 def test_direct_community_rank_frame_preserves_direct_measure_grain() -> None:
