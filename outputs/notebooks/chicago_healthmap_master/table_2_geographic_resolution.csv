@@ -1,9 +1,9 @@
-condition_id,estimand,eligible_tract_n,estimate,ci_low,ci_high,unit,condition,uncertainty,results_authorized,manuscript_import_allowed
-copd,Within-community variance share,411,0.469243128461,0.332894492921,0.620926050655,proportion,COPD,95% community-area cluster-bootstrap percentile interval,False,False
-copd,Median absolute percentile-rank gap,401,0.144972119579,0.125,0.172666311395,percentile-rank units,COPD,95% community-area cluster-bootstrap percentile interval,False,False
-copd,Quartile disagreement,401,52.8678304239,47.2633395522,61.5606121131,%,COPD,95% community-area cluster-bootstrap percentile interval,False,False
-copd,Movement into or out of Q4,401,23.6907730673,18.0850335179,33.82004079,%,COPD,95% community-area cluster-bootstrap percentile interval,False,False
-hypertension,Within-community variance share,722,0.195073252049,0.15076865891,0.276202704737,proportion,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
-hypertension,Median absolute percentile-rank gap,720,0.0841797476147,0.0799438480544,0.104402359935,percentile-rank units,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
-hypertension,Quartile disagreement,720,34.0277777778,28.8916430595,43.3992910847,%,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
-hypertension,Movement into or out of Q4,720,11.8055555556,6.68299767205,19.975291231,%,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
+Condition,Estimand,"Eligible tracts, No.",Estimate (95% CI)
+Hypertension,Within-community variance share,722,19.5% (15.1%-27.6%)
+Hypertension,Median absolute percentile-rank gap,720,0.085 (0.080-0.104)
+Hypertension,Quartile disagreement,720,33.8% (28.9%-43.4%)
+Hypertension,Movement into or out of Q4,720,11.7% (6.7%-20.0%)
+COPD,Within-community variance share,411,46.9% (33.3%-62.1%)
+COPD,Median absolute percentile-rank gap,401,0.145 (0.125-0.173)
+COPD,Quartile disagreement,401,52.4% (47.3%-61.6%)
+COPD,Movement into or out of Q4,401,23.4% (18.1%-33.8%)

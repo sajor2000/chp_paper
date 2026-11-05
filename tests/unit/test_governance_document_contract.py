@@ -113,6 +113,16 @@ def test_governance_ledgers_bind_every_named_artifact_and_required_fields() -> N
     )
 
 
+def test_governance_ledgers_use_current_c2_interval_contract() -> None:
+    evidence = _text(DOCS / "chm_complementarity_evidence_ledger.md")
+    display = _text(DOCS / "chm_complementarity_display_ledger.csv")
+
+    assert "97.5%" not in evidence
+    assert "97.5%" not in display
+    assert "95% residual-df t" in evidence
+    assert "95% residual-df t" in display
+
+
 def test_results_manifest_preserves_false_authorization_and_journal_verification_trail() -> None:
     manifest = json.loads(
         (ROOT / "config/manuscript/results_authorization.json").read_text(encoding="utf-8")

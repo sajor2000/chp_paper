@@ -9,6 +9,7 @@ from chicagohealthmap.analysis.raw_data_contract import (
     RawDataAudit,
     assert_primary_tract_contract,
     audit_first_party_snapshot,
+    build_age_stratum_reconciliation,
     load_study_data_contract,
 )
 
@@ -78,3 +79,22 @@ def test_assertion_wrapper_returns_verified_audit() -> None:
     audit = assert_primary_tract_contract(ROOT)
 
     assert audit.primary_tract_contract_passed is True
+
+
+def test_age_stratum_reconciliation_distinguishes_presence_from_usability() -> None:
+    reconciliation = build_age_stratum_reconciliation(ROOT).set_index("condition_id")
+
+    assert set(reconciliation.index) == {"copd", "hypertension"}
+    assert set(reconciliation["area_year_rows"]) == {231}
+    assert set(reconciliation["community_areas"]) == {77}
+    assert set(reconciliation["age_fields_complete_rows"]) == {231}
+    assert reconciliation.loc["copd", "numerator_additive_match_rows"] == 2
+    assert reconciliation.loc["hypertension", "numerator_additive_match_rows"] == 0
+    assert reconciliation.loc["copd", "denominator_additive_match_rows"] == 16
+    assert reconciliation.loc["hypertension", "denominator_additive_match_rows"] == 15
+    assert reconciliation.loc["copd", "zero_age_numerator_cells"] == 1274
+    assert reconciliation.loc["hypertension", "zero_age_numerator_cells"] == 107
+    assert set(reconciliation["analysis_status"]) == {
+        "not_run_age_standardization_unreconciled"
+    }
+    assert set(reconciliation["results_authorized"]) == {False}

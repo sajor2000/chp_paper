@@ -75,4 +75,4 @@ geography_id,cooks_distance,leverage,externally_studentized_residual,cooks_thres
 74,0.0200884027125,0.0180202686066,1.49185067885,0.0526315789474,0.0526315789474,3,False,False,False,False,-6.32635761839,False,0.00951279394162,False,area,,,,,,,,,,,,,,,,,,,,,
 75,0.00333852530523,0.0215512661486,0.54797649277,0.0526315789474,0.0526315789474,3,False,False,False,False,-6.29594069489,False,0.00465908897064,False,area,,,,,,,,,,,,,,,,,,,,,
 77,0.00279979990606,0.0149748981031,0.604295443019,0.0526315789474,0.0526315789474,3,False,False,False,False,-6.25181910715,False,0.00238150373764,False,area,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,model_summary,C2,-6.26674337993,76,2,4,-6.56743056157,-6.12834442665,False,False,False,False,-6.67172996111,72,supported_sensitivity_not_primary,-7.79035099717,-5.55310892506,True,6.4624727172,True,False,supported_sensitivity_not_primary
+,,,,,,,,,,,,,,,model_summary,C2,-6.26674337993,76,2,4,-6.56743056157,-6.12834442665,False,False,False,False,-6.67172996111,72,supported_sensitivity_not_primary,-7.66709740706,-5.67636251517,True,6.4624727172,True,False,supported_sensitivity_not_primary

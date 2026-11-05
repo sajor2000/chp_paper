@@ -95,7 +95,7 @@
     },
     "figure_2_cardiometabolic_patterns.png": {
       "color_vision_palette_review": "cividis_and_RdBu_r_with_grayscale_distinguishable_states",
-      "file_size_bytes": 231742,
+      "file_size_bytes": 230734,
       "grayscale_renderable": true,
       "pixel_height": 1383,
       "pixel_width": 2124,
@@ -103,23 +103,23 @@
         "deuteranopia": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.20614884181355822
+          "pixel_standard_deviation": 0.20598579328302713
         },
         "grayscale": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.20614884181355822
+          "pixel_standard_deviation": 0.20598579328302713
         },
         "protanopia": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.20614884181355822
+          "pixel_standard_deviation": 0.20598579328302713
         }
       }
     },
     "figure_3_copd_patterns.png": {
       "color_vision_palette_review": "cividis_and_RdBu_r_with_grayscale_distinguishable_states",
-      "file_size_bytes": 215550,
+      "file_size_bytes": 216281,
       "grayscale_renderable": true,
       "pixel_height": 1463,
       "pixel_width": 2024,
@@ -127,17 +127,17 @@
         "deuteranopia": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.25994585324011465
+          "pixel_standard_deviation": 0.2600327684062359
         },
         "grayscale": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.24530036669567282
+          "pixel_standard_deviation": 0.2453929830255069
         },
         "protanopia": {
           "luminance_range": 1.0,
           "nonblank": true,
-          "pixel_standard_deviation": 0.25622200506652854
+          "pixel_standard_deviation": 0.25631040045039793
         }
       }
     }

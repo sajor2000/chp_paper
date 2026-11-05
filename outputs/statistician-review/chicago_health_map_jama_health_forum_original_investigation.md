@@ -39,7 +39,7 @@ proportions is no longer visible?
 Findings:
 
 In this ecological study, community-area summaries changed quartile
-classification for 34.0% of 720 hypertension tracts and 52.9% of 401
+classification for 33.8% of 720 hypertension tracts and 52.4% of 401
 chronic obstructive pulmonary disease tracts. Within-community variation
 accounted for 19.5% and 46.9% of observed tract variation, respectively.
 
@@ -77,8 +77,10 @@ Chicago, Illinois.
 ## Participants
 
 Adults observed in participating Chicago Area Patient-Centered Outcomes
-Research Network systems. The annual denominator included unique network
-adults with at least 1 of 39 conditions.
+Research Network systems. The annual denominator used source-defined
+adults with at least 1 of 39 conditions. The study team reports annual
+cross-system deduplication, which could not be independently verified
+from aggregate files.
 
 ## Exposures
 
@@ -99,11 +101,11 @@ Chicago Health Map included 1848 community-area condition-year records.
 The primary analysis included 720 hypertension tracts and 401 chronic
 obstructive pulmonary disease (COPD) tracts. For hypertension,
 within-community variance share was 19.5% (95% CI, 15.1%-27.6%). Median
-absolute rank difference was 0.084 (95% CI, 0.080-0.104), quartile
-disagreement was 34.0% (95% CI, 28.9%-43.4%), and highest-quartile
-movement was 11.8% (95% CI, 6.7%-20.0%). Corresponding COPD estimates
-were 46.9% (95% CI, 33.3%-62.1%), 0.145 (95% CI, 0.125-0.173), 52.9%
-(95% CI, 47.3%-61.6%), and 23.7% (95% CI, 18.1%-33.8%).
+absolute rank difference was 0.085 (95% CI, 0.080-0.104), quartile
+disagreement was 33.8% (95% CI, 28.9%-43.4%), and highest-quartile
+movement was 11.7% (95% CI, 6.7%-20.0%). Corresponding COPD estimates
+were 46.9% (95% CI, 33.3%-62.1%), 0.145 (95% CI, 0.125-0.173), 52.4%
+(95% CI, 47.3%-61.6%), and 23.4% (95% CI, 18.1%-33.8%).
 
 ## Conclusions and Relevance
 
@@ -210,15 +212,15 @@ map changed policy or resource decisions.
 
 The analytic unit was a geography-condition-year aggregate. No
 patient-level records were used. For each tract and condition, the
-numerator was the annual number of unique CAPriCORN adults with the
-diagnosis, and the denominator was the annual number of unique CAPriCORN
+numerator was the annual source-defined count of adults with the
+diagnosis, and the denominator was the annual source-defined count of
 adults with at least 1 of 39 included conditions who were observed that
-year. The upstream data integration process performed cross-system
-deduplication within each year. The aggregate files did not permit
-independent verification of person-level linkage or identification of
-people appearing in multiple years. We therefore refer to every estimate
-as an EHR-diagnosed proportion among observed CAPriCORN adults, not
-population prevalence.
+year. The study team reports that the upstream data integration process
+deduplicated adults across systems within each year. The aggregate files
+did not permit independent verification of person-level linkage or
+identification of people appearing in multiple years. We therefore refer
+to every estimate as an EHR-diagnosed proportion among observed
+CAPriCORN adults, not population prevalence.
 
 ## Eligibility and Geographic Linkage
 
@@ -236,9 +238,10 @@ We treated unresolved zero-or-suppressed values as informative
 missingness. The primary analysis used complete cases. Scenario analyses
 replaced an unresolved numerator with 0 or with the smaller of 9 and the
 denominator. These scenarios were not interpreted as formal bounds.
-Age-standardized estimates were not computed because age-stratum
-denominators, stratum-specific suppression behavior, and a compatible
-standard population could not be reconciled from the aggregate files.
+Age-standardized estimates were not computed. Stored age-stratum fields
+were present, but their sums rarely matched the all-age totals, their
+suppression semantics were undocumented, and no compatible standard
+population had been approved.
 
 ## Primary Estimands
 
@@ -304,10 +307,11 @@ All CIs were 2-sided 95% intervals.
 
 ## Ethics
 
-\[Insert the exact institutional review board determination, approval or
+The final institutional review board determination, approval or
 exemption identifier, consent or waiver determination, and governing
-institution. Confirm the data-sharing restrictions and whether the
-analysis met the definition of non–human participants research.\]
+institution have not been supplied for this review draft. The study
+owner must confirm these items before submission. The aggregate nature
+of the analytic files is not used to infer an ethics determination.
 
 # Results
 
@@ -324,43 +328,57 @@ unique people across the study period.
 Among 782 Chicago-boundary tracts for hypertension, 777 had complete
 2022 through 2024 data, 722 met the dominant-area criterion, and 720 had
 another eligible tract in the area. For COPD, the corresponding counts
-were 777, 448, 411, and 401 (Figure 1). The greater COPD attrition
-reflected unresolved or suppressed values rather than an absence of
-Chicago tracts.
+were 782, 448, 411, and 401 (Figure 1). The greater COPD attrition
+reflected unresolved or suppressed values and tracts without a
+focal-condition source row, not exclusion from the common Chicago
+boundary.
+
+For COPD, the 401 included tracts had a median annual denominator of
+409, compared with 289 among the 381 excluded tracts. Excluded COPD
+tracts contributed 779 unresolved or ineligible tract-year records. The
+COPD results therefore describe a more selected tract sample than the
+hypertension results. These aggregate comparisons do not identify the
+direction or magnitude of selection bias.
 
 ## Primary Geographic-Resolution Estimates
 
 For hypertension, within-community variation accounted for 19.5% (95%
 CI, 15.1%-27.6%) of observed tract variation (Table 2). The median
-absolute percentile-rank difference was 0.084 (95% CI, 0.080-0.104).
-Community-area summaries assigned 34.0% (95% CI, 28.9%-43.4%) of tracts
-to a different quartile and changed highest-quartile status for 11.8%
+absolute percentile-rank difference was 0.085 (95% CI, 0.080-0.104).
+Community-area summaries assigned 33.8% (95% CI, 28.9%-43.4%) of tracts
+to a different quartile and changed highest-quartile status for 11.7%
 (95% CI, 6.7%-20.0%).
 
 For COPD, within-community variation accounted for 46.9% (95% CI,
 33.3%-62.1%) of tract variation. The median absolute rank difference was
-0.145 (95% CI, 0.125-0.173). Quartile disagreement affected 52.9% (95%
+0.145 (95% CI, 0.125-0.173). Quartile disagreement affected 52.4% (95%
 CI, 47.3%-61.6%) of tracts, and highest-quartile status changed for
-23.7% (95% CI, 18.1%-33.8%).
+23.4% (95% CI, 18.1%-33.8%).
 
 Exploratory AUC analyses are reported only in the statistician review
 companion, `RMD_chm_paper_r_Ashley.html`.
 
 ## Sensitivity Analyses
 
-The observed information-loss estimates exceeded the median noise-only
-reference for both conditions. Noise-only quartile disagreement was
-14.7% for hypertension and 36.7% for COPD, compared with observed values
-of 34.0% and 52.9%. Empirical-Bayes shrinkage produced
-quartile-disagreement estimates of 33.8% for hypertension and 52.1% for
-COPD, close to the unshrunk results. The primary estimate and
-finite-denominator review graphics are reported in the statistician
-review companion.
+For the noise comparison, all 4 metrics were recomputed in the
+leave-one-tract-out simulation frame of 720 hypertension tracts and 401
+COPD tracts. The variance-share noise contrast therefore used a narrower
+population than the primary variance-share estimate. For hypertension,
+observed minus noise-only median differences were 15.9 percentage points
+for within-community variance share, 0.038 percentile-rank units, 19.0
+percentage points for quartile disagreement, and 6.1 percentage points
+for highest-quartile movement. The corresponding COPD differences were
+31.5 percentage points, 0.060, 15.7 percentage points, and 7.0
+percentage points. These contrasts describe excess over the simulation
+median and are not bias-corrected estimates. Empirical-Bayes shrinkage
+produced quartile-disagreement estimates of 33.5% for hypertension and
+52.1% for COPD. The primary estimate and finite-denominator review
+graphics are reported in the statistician review companion.
 
 Suppression scenarios did not change hypertension estimates. For COPD,
 imputing unresolved numerators as 0 produced 48.9% quartile
-disagreement, whereas assigning up to 9 produced 52.3%. Corresponding
-highest-quartile movement was 17.0% and 16.7%. These scenarios included
+disagreement, whereas assigning up to 9 produced 52.2%. Corresponding
+highest-quartile movement was 16.8% and 16.5%. These scenarios included
 713 tracts and therefore changed both the values and the analytic
 population. Source-published community-area, noncrossing-tract, ZCTA,
 reliability-stratified, cross-source, and annual analyses are reported
@@ -371,14 +389,15 @@ rather than independent standards.
 
 In this worked use case of Chicago Health Map, community-area summaries
 retained broad geographic signal but did not retain all clinically
-observed tract variation. The information loss was larger for COPD than
-hypertension across the variance, rank, quartile, and highest-quartile
-estimands. The finding persisted after empirical-Bayes shrinkage and
-remained greater than the median differences expected from the study’s
-finite denominators. These results support a supplementary role for
-small-area health-system data: they can identify variation within common
-public reporting units that merits investigation with population-based
-and community evidence.
+observed tract variation. The estimated magnitudes differed between COPD
+and hypertension, but the study did not prespecify or estimate
+between-condition contrasts. Empirical-Bayes shrinkage and
+finite-denominator simulations tested how much the result depended on
+unstable crude proportions. The simulation contrasts were descriptive
+and did not remove measurement error. These results support a
+supplementary role for small-area health-system data: they can identify
+variation within common public reporting units that merits investigation
+with population-based and community evidence.
 
 The results do not imply that tract estimates are more accurate than
 community-area estimates. The leave-one-out design answered a narrower
@@ -393,26 +412,25 @@ utilization.<sup>7-15,37-44</sup>
 
 COPD and hypertension differed in data completeness and estimated
 information loss. COPD had more unresolved or suppressed tract-years,
-fewer complete tracts, and wider uncertainty. Its larger tract-community
+fewer complete tracts, and wider uncertainty. Its tract-community
 differences therefore coexist with a more selected analytic frame.
-Hypertension had near-complete tract availability and showed smaller but
-precisely estimated within-area differences. The study did not assign a
-threshold for practical importance, and neither pattern establishes
+Hypertension had near-complete tract availability and also showed
+within-area differences. The study did not assign a threshold for
+practical importance, test a between-condition contrast, or establish
 where services are needed. A tract flagged by this analysis is a place
 where the EHR-derived description differs from its area’s summary, not
 evidence of underdiagnosis, poor care, disease burden, or an
 intervention target.
 
 The noise simulation addressed one source of measurement uncertainty.
-Observed quartile disagreement exceeded the central noise-only
-distributions, so denominator size alone did not reproduce the
-tract-community differences under the simulation assumptions. The
-simulation assumed binomial variation around the leave-one-out area
-probability and did not represent diagnostic misclassification,
-health-system selection, geocoding error, cross-year dependence, or
-changes in participating institutions. Shrinkage stabilized crude
-proportions under a beta-binomial model but could not correct the EHR
-population to the resident population.
+The observed-minus-simulation contrasts quantified how far each primary
+metric lay above or below the noise-only median. The simulation assumed
+binomial variation around the leave-one-out area probability and did not
+represent diagnostic misclassification, health-system selection,
+extra-binomial variation, geocoding error, spatial dependence,
+cross-year dependence, or changes in participating institutions.
+Shrinkage stabilized crude proportions under a beta-binomial model but
+could not correct the EHR population to the resident population.
 
 Chicago Health Map can complement public health data when each source
 retains its own inferential boundary. Population surveys, vital records,
@@ -443,15 +461,17 @@ resource allocation, or health outcomes.
 The denominator included adults observed in participating systems who
 had at least 1 of 39 conditions. It did not represent all Chicago
 residents, all health care users, or all adults with the focal
-condition. Annual cross-system deduplication was performed upstream, but
-the aggregate files could not verify linkage or identify people observed
-in multiple years.
+condition. The study team reports that annual cross-system deduplication
+was performed upstream, but the aggregate files could not verify linkage
+or identify people observed in multiple years.
 
-The measures were crude. Available aggregate data did not support
-defensible age standardization, and differences in tract composition
-could contribute to the observed variation. Unresolved and suppressed
-records were informative, particularly for COPD. The scenario analyses
-changed the analytic population and were not formal bounds.
+The measures were crude. Age fields were present, but they did not
+additively reconcile with the all-age totals and their suppression
+semantics were undocumented. Available aggregate data therefore did not
+support defensible age standardization, and differences in tract
+composition could contribute to the observed variation. Unresolved and
+suppressed records were informative, particularly for COPD. The scenario
+analyses changed the analytic population and were not formal bounds.
 
 Geographic assignment depended on geocoding, boundary vintages, and the
 0.99 dominant-area rule. Results may differ with other neighborhood
@@ -494,10 +514,11 @@ state that no external funding was received.\]
 study design, data collection, analysis, manuscript preparation, and
 publication decisions.\]
 
-**Data Sharing Statement:** Aggregate analytic artifacts, code, and
-public-source manifests are available in the study repository. \[Insert
-the approved statement governing access to nonpublic Chicago Health Map
-source extracts and confirm whether a repository URL may be published.\]
+**Data Sharing Statement:** Code and aggregate review artifacts are
+maintained in the study repository. Publication of the repository URL
+and access terms for nonpublic Chicago Health Map source extracts remain
+pending study-owner confirmation. Restricted source extracts will not be
+released without approval.
 
 **Additional Contributions:** \[Insert acknowledgments and confirm
 written permission from named nonauthors.\]
@@ -1004,6 +1025,102 @@ Estimate (95% CI)
 
 <td style="text-align:left;">
 
+Hypertension
+</td>
+
+<td style="text-align:left;">
+
+Within-community variance share
+</td>
+
+<td style="text-align:right;">
+
+722
+</td>
+
+<td style="text-align:right;">
+
+19.5% (15.1%-27.6%)
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Hypertension
+</td>
+
+<td style="text-align:left;">
+
+Median absolute percentile-rank gap
+</td>
+
+<td style="text-align:right;">
+
+720
+</td>
+
+<td style="text-align:right;">
+
+0.085 (0.080-0.104)
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Hypertension
+</td>
+
+<td style="text-align:left;">
+
+Quartile disagreement
+</td>
+
+<td style="text-align:right;">
+
+720
+</td>
+
+<td style="text-align:right;">
+
+33.8% (28.9%-43.4%)
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Hypertension
+</td>
+
+<td style="text-align:left;">
+
+Movement into or out of Q4
+</td>
+
+<td style="text-align:right;">
+
+720
+</td>
+
+<td style="text-align:right;">
+
+11.7% (6.7%-20.0%)
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
 COPD
 </td>
 
@@ -1067,7 +1184,7 @@ Quartile disagreement
 
 <td style="text-align:right;">
 
-52.9% (47.3%-61.6%)
+52.4% (47.3%-61.6%)
 </td>
 
 </tr>
@@ -1091,103 +1208,7 @@ Movement into or out of Q4
 
 <td style="text-align:right;">
 
-23.7% (18.1%-33.8%)
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Hypertension
-</td>
-
-<td style="text-align:left;">
-
-Within-community variance share
-</td>
-
-<td style="text-align:right;">
-
-722
-</td>
-
-<td style="text-align:right;">
-
-19.5% (15.1%-27.6%)
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Hypertension
-</td>
-
-<td style="text-align:left;">
-
-Median absolute percentile-rank gap
-</td>
-
-<td style="text-align:right;">
-
-720
-</td>
-
-<td style="text-align:right;">
-
-0.084 (0.080-0.104)
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Hypertension
-</td>
-
-<td style="text-align:left;">
-
-Quartile disagreement
-</td>
-
-<td style="text-align:right;">
-
-720
-</td>
-
-<td style="text-align:right;">
-
-34.0% (28.9%-43.4%)
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Hypertension
-</td>
-
-<td style="text-align:left;">
-
-Movement into or out of Q4
-</td>
-
-<td style="text-align:right;">
-
-720
-</td>
-
-<td style="text-align:right;">
-
-11.8% (6.7%-20.0%)
+23.4% (18.1%-33.8%)
 </td>
 
 </tr>

@@ -936,29 +936,81 @@ def _rank_quartile_array(values: np.ndarray) -> np.ndarray:
     ).astype(int)
 
 
+def _resolution_metric_values(
+    tract_rank: Iterable[float], comparator_rank: Iterable[float]
+) -> dict[str, float]:
+    tract_values = np.asarray(list(tract_rank), dtype=float)
+    comparator_values = np.asarray(list(comparator_rank), dtype=float)
+    if tract_values.size == 0 or tract_values.size != comparator_values.size:
+        raise CaseStudyAnalysisError("resolution metrics require equal nonempty rank vectors")
+    tract_quartile = _rank_quartile_array(tract_values)
+    comparator_quartile = _rank_quartile_array(comparator_values)
+    gap = np.abs(tract_values - comparator_values)
+    return {
+        "median_absolute_percentile_rank_gap": float(np.median(gap)),
+        "mean_absolute_percentile_rank_gap": float(np.mean(gap)),
+        "quartile_disagree_pct": float(100 * np.mean(tract_quartile != comparator_quartile)),
+        "q4_movement_pct": float(
+            100 * np.mean((tract_quartile == 4) != (comparator_quartile == 4))
+        ),
+    }
+
+
+def _leave_one_tract_out_comparator(tract_frame: pd.DataFrame) -> pd.DataFrame:
+    """Construct denominator-pooled area comparators that exclude each focal tract."""
+
+    required = {
+        "geography_id",
+        "community_area_id",
+        "condition_id",
+        "numerator",
+        "denominator",
+        "ehr_percent",
+    }
+    missing = sorted(required - set(tract_frame.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"leave-one-tract-out comparator is missing columns: {missing}")
+    work = tract_frame.copy()
+    work["numerator"] = pd.to_numeric(work["numerator"], errors="coerce")
+    work["denominator"] = pd.to_numeric(work["denominator"], errors="coerce")
+    if work[["numerator", "denominator"]].isna().any().any():
+        raise CaseStudyAnalysisError("leave-one-tract-out comparator requires finite counts")
+    if (work["denominator"] <= 0).any() or (work["numerator"] < 0).any():
+        raise CaseStudyAnalysisError("leave-one-tract-out comparator has invalid counts")
+    grouped = work.groupby(["condition_id", "community_area_id"], sort=True)
+    work["area_tract_n"] = grouped["geography_id"].transform("size")
+    work["area_numerator_sum"] = grouped["numerator"].transform("sum")
+    work["area_denominator_sum"] = grouped["denominator"].transform("sum")
+    work["loo_area_numerator"] = work["area_numerator_sum"] - work["numerator"]
+    work["loo_area_denominator"] = work["area_denominator_sum"] - work["denominator"]
+    work = work.loc[work["area_tract_n"].ge(2) & work["loo_area_denominator"].gt(0)].copy()
+    if work.empty:
+        raise CaseStudyAnalysisError("leave-one-tract-out comparator has no eligible tracts")
+    work["ehr_rank"] = work.groupby("condition_id", sort=False)["ehr_percent"].transform(
+        percentile_rank
+    )
+    work["community_ehr_percent"] = (
+        100 * work["loo_area_numerator"] / work["loo_area_denominator"]
+    )
+    work["community_rank"] = work.groupby("condition_id", sort=False)[
+        "community_ehr_percent"
+    ].transform(percentile_rank)
+    return work
+
+
 def summarize_community_area_aggregation_loss(
-    dataset: pd.DataFrame, tract_frame: pd.DataFrame
+    dataset: pd.DataFrame,
+    tract_frame: pd.DataFrame,
+    *,
+    comparator: str = "leave_one_tract_out_rollup",
 ) -> pd.DataFrame:
-    """Compare direct tract ranks with linked direct community-area ranks.
+    """Compare tract ranks with a leave-one-out rollup or source-published area rank.
 
-    The public function name is retained for artifact compatibility. The estimand is
-    a direct cross-frame classification difference, not literal aggregation loss.
+    The public function name is retained for artifact compatibility. The primary
+    estimand uses denominator-pooled tract counts and excludes the focal tract from
+    its linked community-area comparator. The source-published area export is a
+    secondary sensitivity because its weighting algorithm is not documented here.
     """
-
-    def metrics(tract_rank: object, community_rank: object) -> dict[str, float]:
-        tract_values = np.asarray(tract_rank, dtype=float)
-        community_values = np.asarray(community_rank, dtype=float)
-        tract_quartile = _rank_quartile_array(tract_values)
-        community_quartile = _rank_quartile_array(community_values)
-        gap = np.abs(tract_values - community_values)
-        return {
-            "median_absolute_percentile_rank_gap": float(np.median(gap)),
-            "mean_absolute_percentile_rank_gap": float(np.mean(gap)),
-            "quartile_disagree_pct": float(100 * np.mean(tract_quartile != community_quartile)),
-            "q4_movement_pct": float(
-                100 * np.mean((tract_quartile == 4) != (community_quartile == 4))
-            ),
-        }
 
     required = {
         "condition_id",
@@ -972,62 +1024,78 @@ def summarize_community_area_aggregation_loss(
     missing = sorted(required - set(tract_frame.columns))
     if missing:
         raise CaseStudyAnalysisError(f"cross-frame tract comparison is missing columns: {missing}")
-    community = build_direct_ehr_rank_frame(dataset, "chicago_community_area")
-    community = community.rename(
-        columns={"geography_id": "community_area_id", "ehr_percent": "community_ehr_percent"}
-    )
-    community["community_area_id"] = community["community_area_id"].astype(str).str.zfill(2)
+    if comparator not in {"leave_one_tract_out_rollup", "source_published_direct"}:
+        raise CaseStudyAnalysisError(f"unsupported community-area comparator: {comparator}")
+    community = None
+    if comparator == "source_published_direct":
+        community = build_direct_ehr_rank_frame(dataset, "chicago_community_area")
+        community = community.rename(
+            columns={"geography_id": "community_area_id", "ehr_percent": "community_ehr_percent"}
+        )
+        community["community_area_id"] = community["community_area_id"].astype(str).str.zfill(2)
     records: list[dict[str, object]] = []
     rng = np.random.default_rng(BOOTSTRAP_SEED)
     for condition, tract_group in tract_frame.groupby("condition_id", sort=True):
-        comparison = community.loc[community["condition_id"].eq(condition)].copy()
-        if comparison.empty:
-            continue
-        comparison = comparison.rename(columns={"ehr_rank": "community_rank"})
-        merged = tract_group.merge(
-            comparison[["community_area_id", "community_ehr_percent", "community_rank"]],
-            on="community_area_id",
-            how="inner",
-            validate="many_to_one",
-        )
+        if comparator == "leave_one_tract_out_rollup":
+            merged = _leave_one_tract_out_comparator(tract_group)
+        else:
+            assert community is not None
+            comparison = community.loc[community["condition_id"].eq(condition)].copy()
+            if comparison.empty:
+                continue
+            comparison = comparison.rename(columns={"ehr_rank": "community_rank"})
+            merged = tract_group.merge(
+                comparison[["community_area_id", "community_ehr_percent", "community_rank"]],
+                on="community_area_id",
+                how="inner",
+                validate="many_to_one",
+            )
         if merged.empty:
             continue
+        merged["ehr_rank"] = merged.groupby("condition_id", sort=False)[
+            "ehr_percent"
+        ].transform(percentile_rank)
         tract_rank = merged["ehr_rank"].astype(float)
         community_rank = merged["community_rank"].astype(float)
         tract_quartile = _rank_quartile(tract_rank)
         community_quartile = _rank_quartile(community_rank)
-        point = metrics(tract_rank, community_rank)
+        point = _resolution_metric_values(tract_rank, community_rank)
         bootstrap: dict[str, list[float]] = {name: [] for name in point}
         area_ids = np.array(sorted(merged["community_area_id"].astype(str).unique()))
         area_lookup = {area: index for index, area in enumerate(area_ids)}
         row_area = np.array(
             [area_lookup[area] for area in merged["community_area_id"].astype(str)], dtype=int
         )
-        tract_values = merged["ehr_percent"].to_numpy(dtype=float)
-        area_values = np.array(
-            [
-                merged.loc[
-                    merged["community_area_id"].astype(str).eq(area), "community_ehr_percent"
-                ].iloc[0]
-                for area in area_ids
-            ],
-            dtype=float,
+        area_comparator_values = (
+            merged.groupby(merged["community_area_id"].astype(str), sort=True)[
+                "community_ehr_percent"
+            ]
+            .first()
+            .reindex(area_ids)
+            .to_numpy(dtype=float)
         )
+        tract_values = merged["ehr_percent"].to_numpy(dtype=float)
         for _ in range(BOOTSTRAP_REPLICATES):
             sampled = rng.integers(0, len(area_ids), size=len(area_ids))
             multiplicity = np.bincount(sampled, minlength=len(area_ids))
             row_index = np.repeat(np.arange(len(merged)), multiplicity[row_area])
-            sampled_area_index = np.repeat(np.arange(len(area_ids)), multiplicity)
             replicate_tract_rank = stats.rankdata(
                 tract_values[row_index], method="average"
             ) / len(row_index)
-            sampled_area_rank = stats.rankdata(
-                area_values[sampled_area_index], method="average"
-            ) / len(sampled_area_index)
-            rank_by_area = np.empty(len(area_ids), dtype=float)
-            rank_by_area[sampled_area_index] = sampled_area_rank
-            replicate_metrics = metrics(
-                replicate_tract_rank, rank_by_area[row_area[row_index]]
+            if comparator == "source_published_direct":
+                sampled_area_ranks = stats.rankdata(
+                    area_comparator_values[sampled], method="average"
+                ) / len(sampled)
+                rank_by_area = np.full(len(area_ids), np.nan, dtype=float)
+                rank_by_area[sampled] = sampled_area_ranks
+                replicate_comparator_rank = rank_by_area[row_area[row_index]]
+            else:
+                replicate_comparator_rank = stats.rankdata(
+                    merged["community_ehr_percent"].to_numpy(dtype=float)[row_index],
+                    method="average",
+                ) / len(row_index)
+            replicate_metrics = _resolution_metric_values(
+                replicate_tract_rank, replicate_comparator_rank
             )
             for name, value in replicate_metrics.items():
                 bootstrap[name].append(value)
@@ -1039,11 +1107,17 @@ def summarize_community_area_aggregation_loss(
             else None
         )
         exact_agreement = tract_quartile.eq(community_quartile)
+        tract_high_comparison_not_high = (tract_quartile == 4) & (community_quartile < 4)
+        comparison_high_tract_not_high = (community_quartile == 4) & (tract_quartile < 4)
         records.append(
             {
                 "condition_id": str(condition),
                 "comparison_geography_type": "chicago_community_area",
-                "comparison_geography_label": "dominant_direct_community_area",
+                "comparison_geography_label": (
+                    "leave_one_tract_out_denominator_pooled_community_area"
+                    if comparator == "leave_one_tract_out_rollup"
+                    else "dominant_source_published_direct_community_area"
+                ),
                 "tract_sample_n": int(len(merged)),
                 "comparison_geography_n": int(merged["community_area_id"].nunique()),
                 "spearman_tract_value_vs_comparison_value": (
@@ -1070,6 +1144,9 @@ def summarize_community_area_aggregation_loss(
                     np.quantile(bootstrap["quartile_disagree_pct"], 0.975)
                 ),
                 "q4_movement_pct": point["q4_movement_pct"],
+                "q4_movement_count": int(
+                    (tract_high_comparison_not_high | comparison_high_tract_not_high).sum()
+                ),
                 "q4_movement_pct_ci_low": float(
                     np.quantile(bootstrap["q4_movement_pct"], 0.025)
                 ),
@@ -1090,7 +1167,10 @@ def summarize_community_area_aggregation_loss(
                     ).mean()
                 ),
                 "tract_high_comparison_not_high_count": int(
-                    ((tract_quartile == 4) & (community_quartile < 4)).sum()
+                    tract_high_comparison_not_high.sum()
+                ),
+                "comparison_high_tract_not_high_count": int(
+                    comparison_high_tract_not_high.sum()
                 ),
                 "tract_low_comparison_not_low_count": int(
                     ((tract_quartile == 1) & (community_quartile > 1)).sum()
@@ -1099,16 +1179,27 @@ def summarize_community_area_aggregation_loss(
                 "crossing_sensitivity": str(merged["crossing_sensitivity"].iloc[0]),
                 "analysis_status": "geographic_resolution_sensitivity",
                 "interpretation_label": "tract_resolution_not_area_prevalence",
-                "comparability_gate_status": "cross_frame_only_no_literal_aggregation",
+                "comparability_gate_status": (
+                    "primary_leave_one_tract_out_rollup"
+                    if comparator == "leave_one_tract_out_rollup"
+                    else "secondary_source_published_cross_frame"
+                ),
                 "comparability_gate_reason": (
-                    "Direct tract and direct community-area CHM values are compared as linked "
-                    "cross-frame classifications; tract disease values are not aggregated."
+                    "The focal tract is excluded from a numerator-and-denominator pooled "
+                    "community-area comparator."
+                    if comparator == "leave_one_tract_out_rollup"
+                    else "The source-published community-area weighting algorithm is not "
+                    "documented; this direct cross-frame result is a sensitivity only."
                 ),
                 "bootstrap_requested_replicates": BOOTSTRAP_REPLICATES,
                 "bootstrap_replicates": BOOTSTRAP_REPLICATES,
                 "bootstrap_seed": BOOTSTRAP_SEED,
                 "bootstrap_cluster_unit": "community_area_id",
-                "bootstrap_rank_rule": "recomputed_within_each_cluster_resample",
+                "bootstrap_rank_rule": (
+                    "source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts"
+                    if comparator == "source_published_direct"
+                    else "recomputed_within_each_cluster_resample"
+                ),
                 "bootstrap_interval_method": "percentile_2.5_97.5",
                 "zip_zcta_sensitivity_status": "not_run_no_tract_zcta_crosswalk",
                 "results_authorized": False,
@@ -1117,6 +1208,247 @@ def summarize_community_area_aggregation_loss(
     output = pd.DataFrame.from_records(records)
     output["results_authorized"] = pd.Series(False, index=output.index, dtype=object)
     return output
+
+
+def summarize_binomial_noise_reference(
+    dataset: pd.DataFrame,
+    tract_frame: pd.DataFrame,
+    *,
+    n_replicates: int = BOOTSTRAP_REPLICATES,
+    seed: int = BOOTSTRAP_SEED,
+) -> pd.DataFrame:
+    """Simulate finite-denominator noise under annual leave-one-out area probabilities."""
+
+    if n_replicates < 1 or seed < 0:
+        raise CaseStudyAnalysisError("noise simulation requires positive replicates and seed")
+    required = {
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id",
+        "numerator",
+        "denominator",
+        "suppression_flag",
+        "community_area_id",
+    }
+    missing = sorted(required - set(dataset.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"noise simulation is missing columns: {missing}")
+    eligible_pairs = tract_frame[["geography_id", "condition_id"]].drop_duplicates()
+    annual = dataset.loc[
+        dataset["geography_type"].eq("census_tract")
+        & dataset["time_period"].astype(str).isin(CONTEMPORARY_YEARS)
+        & ~dataset["suppression_flag"].astype(bool),
+        [
+            "geography_id",
+            "time_period",
+            "condition_id",
+            "community_area_id",
+            "numerator",
+            "denominator",
+        ],
+    ].merge(eligible_pairs, on=["geography_id", "condition_id"], how="inner")
+    annual["numerator"] = pd.to_numeric(annual["numerator"], errors="coerce")
+    annual["denominator"] = pd.to_numeric(annual["denominator"], errors="coerce")
+    annual = annual.loc[
+        annual["numerator"].ge(0) & annual["denominator"].ge(30)
+    ].copy()
+    annual_group = annual.groupby(
+        ["condition_id", "time_period", "community_area_id"], sort=True
+    )
+    annual["area_numerator_sum"] = annual_group["numerator"].transform("sum")
+    annual["area_denominator_sum"] = annual_group["denominator"].transform("sum")
+    annual["null_probability"] = (
+        (annual["area_numerator_sum"] - annual["numerator"])
+        / (annual["area_denominator_sum"] - annual["denominator"])
+    )
+    annual = annual.loc[
+        annual["null_probability"].between(0, 1, inclusive="both")
+        & (annual["area_denominator_sum"] - annual["denominator"]).gt(0)
+    ].copy()
+    complete = annual.groupby(["condition_id", "geography_id"])["time_period"].transform(
+        "nunique"
+    )
+    annual = annual.loc[complete.eq(len(CONTEMPORARY_YEARS))].copy()
+    rng = np.random.default_rng(seed)
+    records: list[dict[str, object]] = []
+    for condition, condition_annual in annual.groupby("condition_id", sort=True):
+        eligible_ids = set(condition_annual["geography_id"].astype(str))
+        baseline = tract_frame.loc[
+            tract_frame["condition_id"].eq(condition)
+            & tract_frame["geography_id"].astype(str).isin(eligible_ids)
+        ].copy()
+        observed = _leave_one_tract_out_comparator(baseline)
+        observed_metrics = _resolution_metric_values(
+            observed["ehr_rank"], observed["community_rank"]
+        )
+        observed_metrics["within_variance_share"] = 1.0 - _moment_vpc(
+            observed, "ehr_percent"
+        )
+        simulated: dict[str, list[float]] = {name: [] for name in observed_metrics}
+        failed_variance_replicates = 0
+        for _ in range(n_replicates):
+            replicate = condition_annual.copy()
+            replicate["simulated_numerator"] = rng.binomial(
+                replicate["denominator"].astype(int).to_numpy(),
+                replicate["null_probability"].to_numpy(dtype=float),
+            )
+            pooled = replicate.groupby(
+                ["geography_id", "community_area_id", "condition_id"],
+                as_index=False,
+                sort=True,
+            ).agg(
+                numerator=("simulated_numerator", "sum"),
+                denominator=("denominator", "sum"),
+            )
+            pooled["ehr_percent"] = 100 * pooled["numerator"] / pooled["denominator"]
+            pooled["ehr_rank"] = percentile_rank(pooled["ehr_percent"])
+            compared = _leave_one_tract_out_comparator(pooled)
+            resolution_values = _resolution_metric_values(
+                compared["ehr_rank"], compared["community_rank"]
+            )
+            try:
+                resolution_values["within_variance_share"] = 1.0 - _moment_vpc(
+                    compared, "ehr_percent"
+                )
+            except CaseStudyAnalysisError:
+                failed_variance_replicates += 1
+            for metric, value in resolution_values.items():
+                simulated[metric].append(value)
+        if len(simulated["within_variance_share"]) < 0.95 * n_replicates:
+            raise CaseStudyAnalysisError(
+                "fewer than 95% of noise-only variance replicates were estimable"
+            )
+        for metric, simulated_values in simulated.items():
+            records.append(
+                {
+                    "condition_id": str(condition),
+                    "metric": metric,
+                    "observed_estimate": observed_metrics[metric],
+                    "noise_only_median": float(np.median(simulated_values)),
+                    "noise_only_ci_low": float(np.quantile(simulated_values, 0.025)),
+                    "noise_only_ci_high": float(np.quantile(simulated_values, 0.975)),
+                    "observed_minus_noise_median": observed_metrics[metric]
+                    - float(np.median(simulated_values)),
+                    "eligible_tract_n": int(observed["geography_id"].nunique()),
+                    "replicate_count": n_replicates,
+                    "failed_replicate_count": (
+                        failed_variance_replicates if metric == "within_variance_share" else 0
+                    ),
+                    "seed": seed,
+                    "simulation_model": "annual_binomial_leave_one_tract_out_area_probability",
+                    "interpretation": "finite_denominator_noise_reference_not_measurement_error_correction",
+                    "population_note": (
+                        "all_metrics_recomputed_in_leave_one_tract_out_simulation_frame;"
+                        "variance_share_population_may_be_narrower_than_primary"
+                    ),
+                    "results_authorized": False,
+                }
+            )
+    return pd.DataFrame.from_records(records)
+
+
+def summarize_empirical_bayes_shrinkage(tract_frame: pd.DataFrame) -> pd.DataFrame:
+    """Compare primary metrics with beta-binomial empirical-Bayes posterior means."""
+
+    records: list[dict[str, object]] = []
+    for condition, group in tract_frame.groupby("condition_id", sort=True):
+        work = group.copy()
+        numerator = pd.to_numeric(work["numerator"], errors="coerce").to_numpy(dtype=float)
+        denominator = pd.to_numeric(work["denominator"], errors="coerce").to_numpy(dtype=float)
+        if not np.isfinite(np.column_stack([numerator, denominator])).all():
+            raise CaseStudyAnalysisError("empirical-Bayes sensitivity requires finite counts")
+        rate = numerator / denominator
+        pooled_mean = float(numerator.sum() / denominator.sum())
+        observed_variance = float(np.var(rate, ddof=1))
+        binomial_variance = float(np.mean(rate * (1 - rate) / denominator))
+        between_variance = max(observed_variance - binomial_variance, 1e-8)
+        concentration = pooled_mean * (1 - pooled_mean) / between_variance - 1
+        concentration = float(np.clip(concentration, 2.0, 1_000_000.0))
+        alpha = pooled_mean * concentration
+        beta = (1 - pooled_mean) * concentration
+        work["unshrunk_numerator"] = numerator
+        work["ehr_percent"] = 100 * (numerator + alpha) / (denominator + alpha + beta)
+        work["numerator"] = work["ehr_percent"] * denominator / 100
+        work["ehr_rank"] = percentile_rank(work["ehr_percent"])
+        compared = _leave_one_tract_out_comparator(work)
+        values = _resolution_metric_values(compared["ehr_rank"], compared["community_rank"])
+        for metric, value in values.items():
+            records.append(
+                {
+                    "condition_id": str(condition),
+                    "metric": metric,
+                    "shrunken_estimate": value,
+                    "prior_mean": pooled_mean,
+                    "prior_concentration": concentration,
+                    "estimator": "beta_binomial_empirical_bayes_method_of_moments",
+                    "analysis_role": "sensitivity_unshrunk_estimate_primary",
+                    "results_authorized": False,
+                }
+            )
+    return pd.DataFrame.from_records(records)
+
+
+def summarize_suppression_scenarios(dataset: pd.DataFrame) -> pd.DataFrame:
+    """Recompute leave-one-out metrics under low and high unresolved-count scenarios."""
+
+    required = {
+        "geography_type",
+        "geography_id",
+        "time_period",
+        "condition_id",
+        "condition_family",
+        "numerator",
+        "denominator",
+        "suppression_flag",
+        "community_area_id",
+        "max_community_area_weight",
+    }
+    missing = sorted(required - set(dataset.columns))
+    if missing:
+        raise CaseStudyAnalysisError(f"suppression scenario is missing columns: {missing}")
+    source = dataset.loc[
+        dataset["geography_type"].eq("census_tract")
+        & dataset["time_period"].astype(str).isin(CONTEMPORARY_YEARS)
+        & dataset["condition_id"].isin({"hypertension", "copd"})
+        & pd.to_numeric(dataset["max_community_area_weight"], errors="coerce").ge(
+            DOMINANT_ASSIGNMENT_THRESHOLD
+        )
+    ].copy()
+    source["denominator"] = pd.to_numeric(source["denominator"], errors="coerce")
+    source["numerator"] = pd.to_numeric(source["numerator"], errors="coerce")
+    source = source.loc[source["denominator"].ge(30)].copy()
+    unresolved = source["suppression_flag"].astype(bool) | source["numerator"].isna()
+    records: list[pd.DataFrame] = []
+    for scenario, replacement in {
+        "unresolved_numerator_zero": pd.Series(0.0, index=source.index),
+        "unresolved_numerator_up_to_nine": np.minimum(9.0, source["denominator"]),
+    }.items():
+        working = source.copy()
+        working.loc[unresolved, "numerator"] = replacement.loc[unresolved]
+        pooled = working.groupby(
+            ["geography_id", "community_area_id", "condition_id"],
+            as_index=False,
+            sort=True,
+        ).agg(
+            numerator=("numerator", "sum"),
+            denominator=("denominator", "sum"),
+            eligible_years=("time_period", "nunique"),
+        )
+        pooled = pooled.loc[pooled["eligible_years"].eq(len(CONTEMPORARY_YEARS))].copy()
+        pooled["ehr_percent"] = 100 * pooled["numerator"] / pooled["denominator"]
+        pooled["ehr_rank"] = pooled.groupby("condition_id", sort=False)["ehr_percent"].transform(
+            percentile_rank
+        )
+        pooled["assignment_rule"] = "dominant_community_area_max_overlay_weight_gte_0.99"
+        pooled["crossing_sensitivity"] = "all_eligible"
+        summary = summarize_community_area_aggregation_loss(
+            dataset, pooled, comparator="leave_one_tract_out_rollup"
+        )
+        summary["suppression_scenario"] = scenario
+        summary["scenario_role"] = "informative_missingness_scenario_not_formal_bound"
+        records.append(summary)
+    return pd.concat(records, ignore_index=True, sort=False)
 
 
 _TRANSITION_STATES = (

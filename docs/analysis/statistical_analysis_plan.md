@@ -414,9 +414,9 @@ Imputation does not cross incompatible geographic vintages and does not convert 
 
 ## 19. Multiplicity and confidence intervals
 
-The two primary case-study estimands, C1 and C2, form one confirmatory family. Report two-sided 97.5% confidence intervals, equivalent to Bonferroni control of familywise alpha at .05. Emphasize estimates and uncertainty; P values are secondary and reported consistently with JAMA style.
+The primary geographic-resolution family contains 4 descriptive estimands for each of 2 prespecified conditions: within-community variance share, median absolute percentile-rank difference, quartile disagreement, and movement into or out of the highest quartile. Each estimate uses a 95% community-area cluster-bootstrap percentile interval based on 1000 replicates. The analysis emphasizes magnitudes, uncertainty, and condition-specific denominators. It does not use an omnibus P value or claim familywise confirmation.
 
-The separate hypertension and diabetes contrasts are secondary and use 95% confidence intervals without claims of familywise confirmation. Supportive families—spatial alternatives, annual periods, comparator metrics, and equity models—are labeled separately and use Benjamini–Hochberg false-discovery-rate adjustment within each named family only when more than one formal test is reported. Descriptive summaries and prespecified diagnostics are not subjected to multiplicity correction.
+C1 remains unexecuted because combined-diabetes mutual exclusivity and denominator equivalence are unresolved. C2 is supplementary. All C2 coefficients and contrasts use 95% HC3 intervals with residual-degrees-of-freedom t critical values. The no-capture adjustment, population-weighted, capture-adjusted, and spatial-error variants are reported together as sensitivity analyses. Supportive families, including spatial alternatives, annual periods, comparator metrics, and equity models, are labeled separately and use Benjamini-Hochberg false-discovery-rate adjustment within each named family only when more than 1 formal test is reported. Descriptive summaries and prespecified diagnostics are not subjected to multiplicity correction.
 
 ## 20. Sensitivity and robustness analyses
 
@@ -434,6 +434,7 @@ The following are prespecified:
 10. exclusion of crosswalked tract estimates in tract comparisons;
 11. complete-case versus permitted multiple-imputation covariate model;
 12. external comparator classification using tertiles instead of quartiles.
+13. C2 without capture adjustment, using the same eligible areas and the locked age, sex, and poverty covariates.
 
 When compatible life-expectancy standard errors or confidence intervals are available, add the prespecified precision-weighted sensitivity described in Section 7; it never replaces the unweighted principal model.
 

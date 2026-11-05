@@ -22,6 +22,8 @@ artifact_dir <- file.path(project_root, "outputs", "notebooks", "chicago_healthm
 table_1 <- read.csv(file.path(artifact_dir, "table_1_resource_quality.csv"), check.names = FALSE)
 table_2 <- read.csv(file.path(artifact_dir, "table_2_model_readiness_sensitivities.csv"), check.names = FALSE)
 flow <- read.csv(file.path(artifact_dir, "supplement_complete_tract_cohort_flow.csv"), check.names = FALSE)
+selection <- read.csv(file.path(artifact_dir, "supplement_tract_selection_audit.csv"), check.names = FALSE)
+age_reconciliation <- read.csv(file.path(artifact_dir, "supplement_age_stratum_reconciliation.csv"), check.names = FALSE)
 noise <- read.csv(file.path(artifact_dir, "supplement_binomial_noise_reference.csv"), check.names = FALSE)
 shrinkage <- read.csv(file.path(artifact_dir, "supplement_empirical_bayes_sensitivity.csv"), check.names = FALSE)
 suppression <- read.csv(file.path(artifact_dir, "supplement_suppression_scenarios.csv"), check.names = FALSE)
@@ -58,6 +60,16 @@ value <- function(condition, estimand, field) {
 
 flow_value <- function(condition, field) {
   row <- flow[flow$condition_id == condition, , drop = FALSE]
+  stopifnot(nrow(row) == 1)
+  row[[field]][1]
+}
+
+selection_value <- function(condition, group, field) {
+  row <- selection[
+    selection$condition_id == condition & selection$selection_stage == group,
+    ,
+    drop = FALSE
+  ]
   stopifnot(nrow(row) == 1)
   row[[field]][1]
 }
@@ -208,7 +220,7 @@ Chicago, Illinois.
 
 ## Participants
 
-Adults observed in participating Chicago Area Patient-Centered Outcomes Research Network systems. The annual denominator included unique network adults with at least 1 of 39 conditions.
+Adults observed in participating Chicago Area Patient-Centered Outcomes Research Network systems. The annual denominator used source-defined adults with at least 1 of 39 conditions. The study team reports annual cross-system deduplication, which could not be independently verified from aggregate files.
 
 ## Exposures
 
@@ -250,13 +262,13 @@ The public resource combines CAPriCORN diagnosis aggregates with American Commun
 
 This study used the governed aggregate exports underlying the website rather than values transcribed from the map. We restricted the analysis to Chicago and compared the census tract view with community-area summaries constructed from the same validated tract numerators and denominators. The primary analysis used CAPriCORN diagnosis aggregates and geographic crosswalks. American Community Survey variables entered only supplementary models. The website's retail, service, crime, and social vulnerability layers were not analyzed. The study evaluated the geographic information provided by the underlying data. It did not evaluate website usability, community engagement, or whether viewing the map changed policy or resource decisions.
 
-The analytic unit was a geography-condition-year aggregate. No patient-level records were used. For each tract and condition, the numerator was the annual number of unique CAPriCORN adults with the diagnosis, and the denominator was the annual number of unique CAPriCORN adults with at least 1 of 39 included conditions who were observed that year. The upstream data integration process performed cross-system deduplication within each year. The aggregate files did not permit independent verification of person-level linkage or identification of people appearing in multiple years. We therefore refer to every estimate as an EHR-diagnosed proportion among observed CAPriCORN adults, not population prevalence.
+The analytic unit was a geography-condition-year aggregate. No patient-level records were used. For each tract and condition, the numerator was the annual source-defined count of adults with the diagnosis, and the denominator was the annual source-defined count of adults with at least 1 of 39 included conditions who were observed that year. The study team reports that the upstream data integration process deduplicated adults across systems within each year. The aggregate files did not permit independent verification of person-level linkage or identification of people appearing in multiple years. We therefore refer to every estimate as an EHR-diagnosed proportion among observed CAPriCORN adults, not population prevalence.
 
 ## Eligibility and Geographic Linkage
 
 Tracts had to fall within the frozen Chicago boundary definition, have a denominator of at least 30, have an observable numerator and nonsuppressed estimate, and contribute all 3 primary years. We assigned each tract to its dominant community area only when the maximum overlay weight was at least 0.99. The leave-one-out comparator also required another eligible tract in that community area. These rules yielded `r flow_value("hypertension", "complete_2022_2024_tracts")` complete hypertension tracts and `r flow_value("copd", "complete_2022_2024_tracts")` complete COPD tracts before dominant-area linkage, `r flow_value("hypertension", "dominant_area_eligible_tracts")` and `r flow_value("copd", "dominant_area_eligible_tracts")` after linkage, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` and `r flow_value("copd", "loo_comparator_eligible_tracts")` with a leave-one-out comparator.
 
-We treated unresolved zero-or-suppressed values as informative missingness. The primary analysis used complete cases. Scenario analyses replaced an unresolved numerator with 0 or with the smaller of 9 and the denominator. These scenarios were not interpreted as formal bounds. Age-standardized estimates were not computed because age-stratum denominators, stratum-specific suppression behavior, and a compatible standard population could not be reconciled from the aggregate files.
+We treated unresolved zero-or-suppressed values as informative missingness. The primary analysis used complete cases. Scenario analyses replaced an unresolved numerator with 0 or with the smaller of 9 and the denominator. These scenarios were not interpreted as formal bounds. Age-standardized estimates were not computed. Stored age-stratum fields were present, but their sums rarely matched the all-age totals, their suppression semantics were undocumented, and no compatible standard population had been approved.
 
 ## Primary Estimands
 
@@ -276,7 +288,7 @@ Analyses used Python 3.13.14 (Python Software Foundation) with pandas 3.0.3, Num
 
 ## Ethics
 
-[Insert the exact institutional review board determination, approval or exemption identifier, consent or waiver determination, and governing institution. Confirm the data-sharing restrictions and whether the analysis met the definition of non–human participants research.]
+The final institutional review board determination, approval or exemption identifier, consent or waiver determination, and governing institution have not been supplied for this review draft. The study owner must confirm these items before submission. The aggregate nature of the analytic files is not used to infer an ethics determination.
 
 # Results
 
@@ -284,7 +296,9 @@ Analyses used Python 3.13.14 (Python Software Foundation) with pandas 3.0.3, Num
 
 The community-area resource contained `r resource_record_n` condition-year records across `r resource_area_n` community areas and `r resource_year_n` years (Table 1). Hypertension records were complete across all `r table_1_value("Hypertension", "Condition-year records, No.")` area-years. `r table_1_count("COPD", "Suppressed, No. (%)")` of `r table_1_value("COPD", "Condition-year records, No.")` COPD area-year records (`r fmt_pct(table_1_percent("COPD", "Suppressed, No. (%)"))`%) were suppressed. The source-published median condition-record denominator was `r format(table_1_count("Hypertension", "CHM condition-record denominator, median (IQR)"), big.mark = ",", scientific = FALSE)` for hypertension and `r format(table_1_count("COPD", "CHM condition-record denominator, median (IQR)"), big.mark = ",", scientific = FALSE)` for COPD. These denominators were geography-period-condition observations, not counts of unique people across the study period.
 
-Among `r flow_value("hypertension", "boundary_tracts")` Chicago-boundary tracts for hypertension, `r flow_value("hypertension", "complete_2022_2024_tracts")` had complete 2022 through 2024 data, `r flow_value("hypertension", "dominant_area_eligible_tracts")` met the dominant-area criterion, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` had another eligible tract in the area. For COPD, the corresponding counts were `r flow_value("copd", "boundary_tracts")`, `r flow_value("copd", "complete_2022_2024_tracts")`, `r flow_value("copd", "dominant_area_eligible_tracts")`, and `r flow_value("copd", "loo_comparator_eligible_tracts")` (Figure 1). The greater COPD attrition reflected unresolved or suppressed values rather than an absence of Chicago tracts.
+Among `r flow_value("hypertension", "boundary_tracts")` Chicago-boundary tracts for hypertension, `r flow_value("hypertension", "complete_2022_2024_tracts")` had complete 2022 through 2024 data, `r flow_value("hypertension", "dominant_area_eligible_tracts")` met the dominant-area criterion, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` had another eligible tract in the area. For COPD, the corresponding counts were `r flow_value("copd", "boundary_tracts")`, `r flow_value("copd", "complete_2022_2024_tracts")`, `r flow_value("copd", "dominant_area_eligible_tracts")`, and `r flow_value("copd", "loo_comparator_eligible_tracts")` (Figure 1). The greater COPD attrition reflected unresolved or suppressed values and tracts without a focal-condition source row, not exclusion from the common Chicago boundary.
+
+For COPD, the `r selection_value("copd", "primary_loo_eligible", "tract_n")` included tracts had a median annual denominator of `r format(selection_value("copd", "primary_loo_eligible", "annual_denominator_median"), big.mark = ",")`, compared with `r format(selection_value("copd", "all_excluded_from_primary", "annual_denominator_median"), big.mark = ",")` among the `r selection_value("copd", "all_excluded_from_primary", "tract_n")` excluded tracts. Excluded COPD tracts contributed `r selection_value("copd", "all_excluded_from_primary", "unresolved_or_ineligible_tract_year_records")` unresolved or ineligible tract-year records. The COPD results therefore describe a more selected tract sample than the hypertension results. These aggregate comparisons do not identify the direction or magnitude of selection bias.
 
 ## Primary Geographic-Resolution Estimates
 
@@ -296,19 +310,19 @@ Exploratory AUC analyses are reported only in the statistician review companion,
 
 ## Sensitivity Analyses
 
-The observed information-loss estimates exceeded the median noise-only reference for both conditions. Noise-only quartile disagreement was `r fmt_pct(noise_value("hypertension", "quartile_disagree_pct", "noise_only_median"))`% for hypertension and `r fmt_pct(noise_value("copd", "quartile_disagree_pct", "noise_only_median"))`% for COPD, compared with observed values of `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% and `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`%. Empirical-Bayes shrinkage produced quartile-disagreement estimates of `r fmt_pct(shrinkage_value("hypertension", "quartile_disagree_pct", "shrunken_estimate"))`% for hypertension and `r fmt_pct(shrinkage_value("copd", "quartile_disagree_pct", "shrunken_estimate"))`% for COPD, close to the unshrunk results. The primary estimate and finite-denominator review graphics are reported in the statistician review companion.
+For the noise comparison, all 4 metrics were recomputed in the leave-one-tract-out simulation frame of `r noise_value("hypertension", "within_variance_share", "eligible_tract_n")` hypertension tracts and `r noise_value("copd", "within_variance_share", "eligible_tract_n")` COPD tracts. The variance-share noise contrast therefore used a narrower population than the primary variance-share estimate. For hypertension, observed minus noise-only median differences were `r fmt_prop_pct(noise_value("hypertension", "within_variance_share", "observed_minus_noise_median"))` percentage points for within-community variance share, `r fmt_rank(noise_value("hypertension", "median_absolute_percentile_rank_gap", "observed_minus_noise_median"))` percentile-rank units, `r fmt_pct(noise_value("hypertension", "quartile_disagree_pct", "observed_minus_noise_median"))` percentage points for quartile disagreement, and `r fmt_pct(noise_value("hypertension", "q4_movement_pct", "observed_minus_noise_median"))` percentage points for highest-quartile movement. The corresponding COPD differences were `r fmt_prop_pct(noise_value("copd", "within_variance_share", "observed_minus_noise_median"))` percentage points, `r fmt_rank(noise_value("copd", "median_absolute_percentile_rank_gap", "observed_minus_noise_median"))`, `r fmt_pct(noise_value("copd", "quartile_disagree_pct", "observed_minus_noise_median"))` percentage points, and `r fmt_pct(noise_value("copd", "q4_movement_pct", "observed_minus_noise_median"))` percentage points. These contrasts describe excess over the simulation median and are not bias-corrected estimates. Empirical-Bayes shrinkage produced quartile-disagreement estimates of `r fmt_pct(shrinkage_value("hypertension", "quartile_disagree_pct", "shrunken_estimate"))`% for hypertension and `r fmt_pct(shrinkage_value("copd", "quartile_disagree_pct", "shrunken_estimate"))`% for COPD. The primary estimate and finite-denominator review graphics are reported in the statistician review companion.
 
 Suppression scenarios did not change hypertension estimates. For COPD, imputing unresolved numerators as 0 produced `r fmt_pct(suppression_value("copd", "unresolved_numerator_zero", "quartile_disagree_pct"))`% quartile disagreement, whereas assigning up to 9 produced `r fmt_pct(suppression_value("copd", "unresolved_numerator_up_to_nine", "quartile_disagree_pct"))`%. Corresponding highest-quartile movement was `r fmt_pct(suppression_value("copd", "unresolved_numerator_zero", "q4_movement_pct"))`% and `r fmt_pct(suppression_value("copd", "unresolved_numerator_up_to_nine", "q4_movement_pct"))`%. These scenarios included `r suppression_value("copd", "unresolved_numerator_zero", "tract_sample_n")` tracts and therefore changed both the values and the analytic population. Source-published community-area, noncrossing-tract, ZCTA, reliability-stratified, cross-source, and annual analyses are reported in the statistician review companion. They were treated as sensitivities rather than independent standards.
 
 # Discussion
 
-In this worked use case of Chicago Health Map, community-area summaries retained broad geographic signal but did not retain all clinically observed tract variation. The information loss was larger for COPD than hypertension across the variance, rank, quartile, and highest-quartile estimands. The finding persisted after empirical-Bayes shrinkage and remained greater than the median differences expected from the study's finite denominators. These results support a supplementary role for small-area health-system data: they can identify variation within common public reporting units that merits investigation with population-based and community evidence.
+In this worked use case of Chicago Health Map, community-area summaries retained broad geographic signal but did not retain all clinically observed tract variation. The estimated magnitudes differed between COPD and hypertension, but the study did not prespecify or estimate between-condition contrasts. Empirical-Bayes shrinkage and finite-denominator simulations tested how much the result depended on unstable crude proportions. The simulation contrasts were descriptive and did not remove measurement error. These results support a supplementary role for small-area health-system data: they can identify variation within common public reporting units that merits investigation with population-based and community evidence.
 
 The results do not imply that tract estimates are more accurate than community-area estimates. The leave-one-out design answered a narrower question by comparing each tract with a coarser summary constructed from other tracts in the same source frame. This avoided allowing the focal tract to define its own comparator and avoided treating source-published community-area values as a gold standard. Prior EHR surveillance studies have similarly shown that routine clinical data can provide timely neighborhood information while remaining sensitive to patient capture, phenotype definitions, participating systems, and utilization.<sup>7-15,37-44</sup>
 
-COPD and hypertension differed in data completeness and estimated information loss. COPD had more unresolved or suppressed tract-years, fewer complete tracts, and wider uncertainty. Its larger tract-community differences therefore coexist with a more selected analytic frame. Hypertension had near-complete tract availability and showed smaller but precisely estimated within-area differences. The study did not assign a threshold for practical importance, and neither pattern establishes where services are needed. A tract flagged by this analysis is a place where the EHR-derived description differs from its area's summary, not evidence of underdiagnosis, poor care, disease burden, or an intervention target.
+COPD and hypertension differed in data completeness and estimated information loss. COPD had more unresolved or suppressed tract-years, fewer complete tracts, and wider uncertainty. Its tract-community differences therefore coexist with a more selected analytic frame. Hypertension had near-complete tract availability and also showed within-area differences. The study did not assign a threshold for practical importance, test a between-condition contrast, or establish where services are needed. A tract flagged by this analysis is a place where the EHR-derived description differs from its area's summary, not evidence of underdiagnosis, poor care, disease burden, or an intervention target.
 
-The noise simulation addressed one source of measurement uncertainty. Observed quartile disagreement exceeded the central noise-only distributions, so denominator size alone did not reproduce the tract-community differences under the simulation assumptions. The simulation assumed binomial variation around the leave-one-out area probability and did not represent diagnostic misclassification, health-system selection, geocoding error, cross-year dependence, or changes in participating institutions. Shrinkage stabilized crude proportions under a beta-binomial model but could not correct the EHR population to the resident population.
+The noise simulation addressed one source of measurement uncertainty. The observed-minus-simulation contrasts quantified how far each primary metric lay above or below the noise-only median. The simulation assumed binomial variation around the leave-one-out area probability and did not represent diagnostic misclassification, health-system selection, extra-binomial variation, geocoding error, spatial dependence, cross-year dependence, or changes in participating institutions. Shrinkage stabilized crude proportions under a beta-binomial model but could not correct the EHR population to the resident population.
 
 Chicago Health Map can complement public health data when each source retains its own inferential boundary. Population surveys, vital records, and modeled surveillance remain necessary for resident-population inference. Health-system records can add a clinically grounded tract-level signal and can be refreshed on different schedules. Used together, the sources can identify discordant areas, generate hypotheses about ascertainment or access, and support targeted data-quality review. They should not be combined as if they measure the same population, and EHR estimates should not independently direct resource allocation. The same principle underlies multisite EHR surveillance networks and health information exchange programs.<sup>1,9,12,14,40-44</sup>
 
@@ -316,9 +330,9 @@ The website supports several bounded, practical uses. A public health team can u
 
 ## Limitations
 
-The denominator included adults observed in participating systems who had at least 1 of 39 conditions. It did not represent all Chicago residents, all health care users, or all adults with the focal condition. Annual cross-system deduplication was performed upstream, but the aggregate files could not verify linkage or identify people observed in multiple years.
+The denominator included adults observed in participating systems who had at least 1 of 39 conditions. It did not represent all Chicago residents, all health care users, or all adults with the focal condition. The study team reports that annual cross-system deduplication was performed upstream, but the aggregate files could not verify linkage or identify people observed in multiple years.
 
-The measures were crude. Available aggregate data did not support defensible age standardization, and differences in tract composition could contribute to the observed variation. Unresolved and suppressed records were informative, particularly for COPD. The scenario analyses changed the analytic population and were not formal bounds.
+The measures were crude. Age fields were present, but they did not additively reconcile with the all-age totals and their suppression semantics were undocumented. Available aggregate data therefore did not support defensible age standardization, and differences in tract composition could contribute to the observed variation. Unresolved and suppressed records were informative, particularly for COPD. The scenario analyses changed the analytic population and were not formal bounds.
 
 Geographic assignment depended on geocoding, boundary vintages, and the 0.99 dominant-area rule. Results may differ with other neighborhood definitions. Reliability categories were supplied by the source. The relationship between the internal 5-tier labels and the public 4-tier framework still requires source-owner confirmation.
 
@@ -340,7 +354,7 @@ Tract-level Chicago Health Map measures contained clinically observed geographic
 
 **Role of the Funder/Sponsor:** [Insert the funder or sponsor's role in study design, data collection, analysis, manuscript preparation, and publication decisions.]
 
-**Data Sharing Statement:** Aggregate analytic artifacts, code, and public-source manifests are available in the study repository. [Insert the approved statement governing access to nonpublic Chicago Health Map source extracts and confirm whether a repository URL may be published.]
+**Data Sharing Statement:** Code and aggregate review artifacts are maintained in the study repository. Publication of the repository URL and access terms for nonpublic Chicago Health Map source extracts remain pending study-owner confirmation. Restricted source extracts will not be released without approval.
 
 **Additional Contributions:** [Insert acknowledgments and confirm written permission from named nonauthors.]
 

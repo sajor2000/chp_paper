@@ -50,6 +50,10 @@ class _FitResult(TypedDict):
     outcome: np.ndarray
     beta: np.ndarray
     covariance: np.ndarray
+    adjustment_covariates: tuple[str, ...]
+    residual_degrees_of_freedom: int
+    confidence_level: float
+    critical_value_distribution: str
 
 
 def direction_stability(reference: float, variant: float) -> bool | pd._libs.missing.NAType:
@@ -208,6 +212,25 @@ def build_governed_robustness_summary(frame: pd.DataFrame) -> pd.DataFrame:
             primary_estimand_executed=primary_execution[model_id],
         )
         records.append(reference_record)
+
+        if model_id == "C2":
+            no_capture = _fit_adjusted(
+                complete,
+                model_id,
+                scaling=scaling,
+                adjustment_covariates=ADJUSTMENT_COVARIATES[:-1],
+            )
+            records.append(
+                _variant_record(
+                    model_id,
+                    "no_capture_adjustment",
+                    no_capture,
+                    reference,
+                    target_population="distribution_of_eligible_community_areas",
+                    estimator="unweighted_ols_hc3",
+                    primary_estimand_executed=primary_execution[model_id],
+                )
+            )
 
         weighted = _fit_adjusted(
             complete,
@@ -474,15 +497,16 @@ def _fit_adjusted(
     scaling: dict[str, tuple[float, float]],
     weights: np.ndarray | None = None,
     capture_quartiles: tuple[float, float, float] | None = None,
+    adjustment_covariates: tuple[str, ...] = ADJUSTMENT_COVARIATES,
 ) -> _FitResult:
     transformed = complete.copy()
     predictors = list(MODEL_EXPOSURES[model_id])
-    for column in (*MODEL_EXPOSURES[model_id], *ADJUSTMENT_COVARIATES):
+    for column in (*MODEL_EXPOSURES[model_id], *adjustment_covariates):
         if column == "capture_rate_mean_2022_2024" and capture_quartiles is not None:
             continue
         center, scale = scaling[column]
         transformed[column] = (transformed[column] - center) / scale
-        predictors.append(column) if column in ADJUSTMENT_COVARIATES else None
+        predictors.append(column) if column in adjustment_covariates else None
     if capture_quartiles is not None:
         categories = np.digitize(
             complete["capture_rate_mean_2022_2024"].to_numpy(dtype=float),
@@ -521,7 +545,10 @@ def _fit_adjusted(
     contrast[1 : 1 + len(MODEL_EXPOSURES[model_id])] = 1.0
     estimate = float(contrast @ beta)
     variance = float(contrast @ covariance @ contrast)
-    critical = float(stats.norm.ppf(0.9875))
+    residual_degrees_of_freedom = len(outcome) - design.shape[1]
+    if residual_degrees_of_freedom <= 0:
+        raise CaseStudyAnalysisError("robustness model has no residual degrees of freedom")
+    critical = float(stats.t.ppf(0.975, df=residual_degrees_of_freedom))
     standard_error = float(np.sqrt(variance))
     return {
         "estimate": estimate,
@@ -532,6 +559,10 @@ def _fit_adjusted(
         "outcome": outcome,
         "beta": beta,
         "covariance": covariance,
+        "adjustment_covariates": adjustment_covariates,
+        "residual_degrees_of_freedom": residual_degrees_of_freedom,
+        "confidence_level": 0.95,
+        "critical_value_distribution": "t_residual_degrees_of_freedom",
     }
 
 
@@ -589,7 +620,10 @@ def _variant_record(
         "percentage_change_reason": reason,
         "estimator": estimator,
         "covariance_type": "HC3",
-        "adjustment_set": "|".join(ADJUSTMENT_COVARIATES),
+        "adjustment_set": "|".join(fit["adjustment_covariates"]),
+        "confidence_level": fit["confidence_level"],
+        "critical_value_distribution": fit["critical_value_distribution"],
+        "residual_degrees_of_freedom": fit["residual_degrees_of_freedom"],
         "primary_estimand_executed": primary_estimand_executed,
         "results_authorized": False,
     }

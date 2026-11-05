@@ -192,7 +192,7 @@ Results prose should answer, in order: who or what was analyzed, what was observ
 
 Prefer:
 
-> Among [N] eligible community areas, [n] ([%]) met the reliability threshold. The EHR-diagnosed proportion was associated with [outcome] ([estimate]; 97.5% CI, [lower] to [upper]) (Table 2).
+> Among [N] eligible community areas, [n] ([%]) met the reliability threshold. The EHR-diagnosed proportion was associated with [outcome] ([estimate]; 95% CI, [lower] to [upper]) (Table 2).
 
 Avoid:
 
@@ -254,7 +254,7 @@ Keep the project within the configured maximum of 5 combined main displays:
 2. **Figure 1:** study geography, capture, reliability, missingness, and analytic inclusion.
 3. **Figure 2:** cardiometabolic and COPD adjusted associations with uncertainty.
 4. **Figure 3:** EHR versus independent public-measure concordance and discordance.
-5. **Table 2:** primary adjusted estimates, 97.5% CIs where required by the SAP, and clearly labeled secondary estimates.
+5. **Table 2:** primary adjusted estimates with 95% residual-df t CIs where required by the SAP and clearly labeled secondary estimates.
 
 Use brief descriptive titles, preferably 10 to 15 words, rather than titles that merely repeat the table number. Define units in column headers. Put abbreviations, denominator definitions, suppression rules, reference groups, model covariates, CI level, and data-period notes in footnotes. Keep a figure and table from duplicating the same role: use figures for patterns and uncertainty at a glance, tables for exact values.
 

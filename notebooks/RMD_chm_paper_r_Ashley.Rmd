@@ -80,6 +80,15 @@ as_flag <- function(x) tolower(as.character(x)) == "true"
 percent <- function(x, digits = 1) scales::percent(x, accuracy = 10^(-digits))
 condition_name <- function(x) ifelse(x == "copd", "COPD", tools::toTitleCase(x))
 wrap_caption <- function(text, width = 125) paste(strwrap(text, width = width), collapse = "\n")
+noise_value <- function(condition, metric, field) {
+  row <- binomial_noise[
+    binomial_noise$condition_id == condition & binomial_noise$metric == metric,
+    ,
+    drop = FALSE
+  ]
+  stopifnot(nrow(row) == 1)
+  row[[field]][1]
+}
 
 parse_count <- function(x) {
   parsed <- suppressWarnings(as.numeric(gsub("[^0-9.-]", "", as.character(x))))
@@ -201,6 +210,8 @@ spatial_error <- read_artifact("supplement_spatial_error_sensitivity.csv")
 robustness <- read_artifact("supplement_robustness_summary.csv")
 tract_cohort_flow <- read_artifact("supplement_tract_cohort_flow.csv")
 complete_tract_cohort_flow <- read_artifact("supplement_complete_tract_cohort_flow.csv")
+tract_selection_audit <- read_artifact("supplement_tract_selection_audit.csv")
+age_stratum_reconciliation <- read_artifact("supplement_age_stratum_reconciliation.csv")
 aggregation_loss <- read_artifact("supplement_aggregation_loss.csv")
 binomial_noise <- read_artifact("supplement_binomial_noise_reference.csv")
 empirical_bayes <- read_artifact("supplement_empirical_bayes_sensitivity.csv")
@@ -312,6 +323,17 @@ require_columns(complete_tract_cohort_flow, "supplement_complete_tract_cohort_fl
   "condition_id", "complete_2022_2024_tracts", "dominant_area_eligible_tracts",
   "excluded_at_dominant_area_linkage", "loo_comparator_eligible_tracts",
   "excluded_no_other_eligible_tract_in_area", "dominant_area_threshold"
+))
+require_columns(tract_selection_audit, "supplement_tract_selection_audit.csv", c(
+  "condition_id", "selection_stage", "comparison_group", "tract_n",
+  "eligible_tract_year_records", "unresolved_or_ineligible_tract_year_records",
+  "annual_denominator_median", "annual_denominator_q1", "annual_denominator_q3",
+  "pooled_crude_ehr_percent", "results_authorized"
+))
+require_columns(age_stratum_reconciliation, "supplement_age_stratum_reconciliation.csv", c(
+  "condition_id", "area_year_rows", "community_areas", "age_fields_complete_rows",
+  "numerator_additive_match_rows", "denominator_additive_match_rows",
+  "zero_age_numerator_cells", "analysis_status", "results_authorized"
 ))
 require_columns(aggregation_loss, "supplement_aggregation_loss.csv", c(
   "condition_id", "comparison_geography_label", "comparison_role", "noncrossing_only",
@@ -450,13 +472,13 @@ This R Markdown document is an R companion to `00_master_chicago_healthmap_pipel
 
 The paper uses a geographic-resolution analysis as a worked example of how Chicago Health Map can support a scientific question. It asks whether tract measures contain geographic information beyond a community-area summary constructed from the other eligible tracts in the same area. This leave-one-tract-out comparison prevents the focal tract from contributing to its own reference value and uses the same validated tract numerators and denominators on both sides. Source-published community-area values, Census ZIP Code Tabulation Area (ZCTA) values, and CDC PLACES estimates are secondary sensitivities. Community-area life-expectancy and spatial analyses are supplementary demonstrations.
 
-CHM values are crude EHR-diagnosed proportions among annual unique CAPriCORN adults with at least 1 of the 39 included conditions who were observed in participating systems. MRAIA performs cross-system deduplication within year. The aggregate files cannot independently verify person-level linkage. These values are not estimates of disease prevalence among all Chicago residents. Public health estimates remain the basis for population inference. Health-system research data may supplement those estimates by showing clinically recorded patterns at smaller geographic scales. They do not replace population surveillance.<sup>1-8</sup>
+CHM values are crude EHR-diagnosed proportions among annual source-defined CAPriCORN adults with at least 1 of the 39 included conditions who were observed in participating systems. The study team reports that MRAIA performs cross-system deduplication within year. The aggregate files cannot independently verify person-level linkage. These values are not estimates of disease prevalence among all Chicago residents. Public health estimates remain the basis for population inference. Health-system research data may supplement those estimates by showing clinically recorded patterns at smaller geographic scales. They do not replace population surveillance.<sup>1-8</sup>
 
 ## Chicago Health Map Website and Public Data Resource
 
 Chicago Health Map is a public interactive website maintained by the Rush Health Equity Data Analytics Studio. The site displays annual aggregate diagnosis percentages for 38 chronic conditions and firearm injury among adults observed in participating CAPriCORN health systems across 6 counties in metropolitan Chicago. A visitor can select a condition, year, demographic group, and geographic unit. The choropleth map displays the percentage diagnosed, identifies areas with insufficient data, and presents source-provided reliability information. Census tracts provide the most detailed view. The site also presents Chicago's 77 community areas, community snapshots, and optional contextual layers.<sup>8-9</sup>
 
-The public methods page identifies CAPriCORN as the source of clinical diagnosis records. CAPriCORN contributors standardize structured data with the PCORnet Common Data Model, and the website defines conditions from International Classification of Diseases, 10th Revision codes. MRAIA performs cross-system deduplication. Values based on fewer than 10 people are suppressed rather than displayed as zero. Reliability flags combine patient capture with demographic alignment to the American Community Survey. The website also uses American Community Survey demographic estimates, US Census Bureau TIGER tract boundaries, Chicago Data Portal community-area boundaries, the CDC and Agency for Toxic Substances and Disease Registry Social Vulnerability Index, OpenStreetMap, Chicago Police Department data, and City of Chicago 311 records.<sup>9</sup>
+The public methods page identifies CAPriCORN as the source of clinical diagnosis records. CAPriCORN contributors standardize structured data with the PCORnet Common Data Model, and the website defines conditions from International Classification of Diseases, 10th Revision codes. The study team reports that MRAIA performs cross-system deduplication. Values based on fewer than 10 people are suppressed rather than displayed as zero. Reliability flags combine patient capture with demographic alignment to the American Community Survey. The website also uses American Community Survey demographic estimates, US Census Bureau TIGER tract boundaries, Chicago Data Portal community-area boundaries, the CDC and Agency for Toxic Substances and Disease Registry Social Vulnerability Index, OpenStreetMap, Chicago Police Department data, and City of Chicago 311 records.<sup>9</sup>
 
 The present study did not analyze every layer available on the website. The primary analysis used governed CAPriCORN diagnosis aggregates and tract-to-community geographic relationships. American Community Survey variables entered only supplementary models. The retail, service, crime, and social vulnerability layers remained website context and did not enter the estimators reported in this review. The study did not evaluate website usability or whether viewing the map changed a program, resource decision, or health outcome.
 
@@ -855,7 +877,7 @@ Within-community variance share, absolute tract-community percentile-rank gap, e
 
 ### Results
 
-The governed community-area resource contained `r sum(parse_count(table_1[["Condition-year records, No."]]))` condition-year records. `r display_review[["Review result"]][display_review$Display == "Figure 2"]` These are aggregate record counts and small-area estimates. Patient-level demographic characteristics were not available in the review extract.
+The governed community-area resource contained `r sum(parse_count(table_1[["Condition-year records, No."]]))` condition-year records. The primary geographic-resolution analysis included `r aggregation_primary$tract_sample_n[aggregation_primary$condition_id == "hypertension"]` hypertension tracts and `r aggregation_primary$tract_sample_n[aggregation_primary$condition_id == "copd"]` COPD tracts with focal-excluded community-area comparators. These are aggregate record counts and small-area estimates. Patient-level demographic characteristics were not available in the review extract.
 
 ### Conclusions and Relevance
 
@@ -893,7 +915,7 @@ The locked adjustment set is percentage aged 65 years or older, percentage femal
 
 ## Multiplicity and interpretation
 
-The primary geographic statistics answer related but distinct questions and are reported with their denominators. They are not ranked on a single accuracy scale. Spatial local tests use Benjamini-Hochberg false-discovery-rate control within prespecified condition-period-statistic families. All analyses are descriptive or associational. No result is interpreted as a causal effect.
+The primary geographic statistics answer related but distinct questions and are reported with their denominators. They are not ranked on a single accuracy scale. Local spatial statistics were not run because the required complete topology was unavailable, so no local false-discovery-rate family is reported. All analyses are descriptive or associational. No result is interpreted as a causal effect.
 
 # Statistical Analysis Module 0: Provenance and Data Assembly
 
@@ -991,6 +1013,55 @@ review_table(
 
 **Final specification.** The primary analysis applies the representative-point boundary rule, an annual denominator threshold of 30, exclusion of unresolved zero-or-suppressed values, and a dominant community-area overlap threshold of 0.99. Hypertension decreases from 777 complete tracts to 722 linked tracts, and COPD decreases from 448 to 411. The 55 and 37 linkage exclusions are explicit. Because a focal-excluded comparator requires at least 1 other eligible tract in the same area, 2 additional hypertension tracts and 10 additional COPD tracts are unavailable for the rank and classification estimands, leaving 720 and 401, respectively. Across all condition-years, 2015 records are excluded for suppression or missing numerators and 4 are excluded for denominators below 30 or missing denominators. The available analytic file cannot execute the complete 50%-area rerun because it lacks 2 alternative-frame-only tracts.
 
+```{r tract-selection-audit, echo=FALSE}
+selection_review <- tract_selection_audit |>
+  filter(selection_stage %in% c("primary_loo_eligible", "all_excluded_from_primary")) |>
+  transmute(
+    Condition = condition_name(condition_id),
+    Cohort = recode(
+      selection_stage,
+      primary_loo_eligible = "Included in primary leave-one-out analysis",
+      all_excluded_from_primary = "Excluded before primary leave-one-out analysis"
+    ),
+    `Tracts, No.` = tract_n,
+    `Eligible tract-years, No.` = eligible_tract_year_records,
+    `Unresolved or ineligible tract-years, No.` = unresolved_or_ineligible_tract_year_records,
+    `Annual denominator, median` = annual_denominator_median,
+    `Annual denominator, Q1` = annual_denominator_q1,
+    `Annual denominator, Q3` = annual_denominator_q3,
+    `Pooled crude EHR-diagnosed proportion, %` = pooled_crude_ehr_percent
+  )
+review_table(
+  selection_review,
+  "Table QC-3. Aggregate characteristics of included and excluded tracts",
+  digits = 2
+)
+```
+
+**Selection interpretation.** COPD exclusions were more extensive than hypertension exclusions and were concentrated in unresolved or ineligible tract-years. Included COPD tracts also had larger annual denominators than excluded COPD tracts. These differences show that the COPD analysis describes a selected subset of Chicago tracts. They do not establish the direction or size of bias in excluded tracts and do not support population prevalence inference.
+
+```{r age-stratum-reconciliation, echo=FALSE}
+age_review <- age_stratum_reconciliation |>
+  transmute(
+    Condition = condition_name(condition_id),
+    `Area-year rows, No.` = area_year_rows,
+    `Rows with complete age fields, No.` = age_fields_complete_rows,
+    `Numerator sums matching total, No.` = numerator_additive_match_rows,
+    `Denominator sums matching total, No.` = denominator_additive_match_rows,
+    `Zero age-numerator cells, No.` = zero_age_numerator_cells,
+    `Zero age-denominator cells, No.` = zero_age_denominator_cells,
+    `Suppression semantics` = stratum_suppression_semantics,
+    `Analysis status` = analysis_status
+  )
+review_table(
+  age_review,
+  "Table QC-4. Reconciliation of stored age-stratum fields with total counts",
+  digits = 0
+)
+```
+
+**Age-standardization decision.** Age-stratum fields are present, but their sums rarely equal the stored all-age totals and many numerator cells are zero. The aggregate release does not establish whether those zeros mean true zero, suppression, or another source rule. A standard population has also not been selected. Direct age standardization would therefore combine unreconciled numerators and denominators and is not run. Percentage aged 65 years or older remains an area-level adjustment variable only.
+
 # Statistical Analysis Module 1: Pooled CHM Proportions
 
 ## Scientific question and estimand
@@ -1072,6 +1143,7 @@ primary_detail <- pooled_r |>
   ) |>
   group_by(condition_id) |>
   mutate(
+    ehr_rank = rank(ehr_percent, ties.method = "average") / n(),
     comparison_rank = rank(comparison_ehr_percent, ties.method = "average") / n()
   ) |>
   ungroup()
@@ -1571,7 +1643,7 @@ review_table(
 
 **Limitation and supplement needed.** The leave-one-out comparator reduces part-whole dependence but does not remove finite-denominator noise, informative suppression, selection into participating health systems, or spatial dependence. The noise, shrinkage, suppression, noncrossing, reliability, source-export, and ZCTA sensitivities appear below. Combined diabetes remains unexecuted until the 2 components are shown to be mutually exclusive, denominator-equivalent, phenotype-aligned, and period-aligned.
 
-## Figure 2. Primary Geographic-Resolution Estimates
+## eFigure G1. Primary Geographic-Resolution Estimates
 
 ```{r primary-estimate-forest, fig.width=11.5, fig.height=8.5, fig.alt="Forest plot of the four primary geographic-resolution estimands with 95 percent cluster-bootstrap intervals for hypertension and COPD.", echo=FALSE}
 primary_plot_data <- primary_four_estimands |>
@@ -1591,7 +1663,7 @@ ggplot(primary_plot_data, aes(x = Estimate, y = Condition, color = Condition)) +
   facet_wrap(~Estimand, scales = "free_x", ncol = 2) +
   scale_color_manual(values = c(Hypertension = jama_palette[["blue"]], COPD = jama_palette[["vermilion"]])) +
   labs(
-    title = "Figure 2. Tract information beyond leave-one-out community-area summaries",
+    title = "eFigure G1. Tract information beyond leave-one-out community-area summaries",
     subtitle = "Point estimates and 95% community-area cluster-bootstrap intervals",
     x = "Estimate on the metric-specific scale",
     y = NULL,
@@ -1602,11 +1674,12 @@ ggplot(primary_plot_data, aes(x = Estimate, y = Condition, color = Condition)) +
   theme(legend.position = "none")
 ```
 
-## Figure 3. Finite-Denominator Noise Reference
+## eFigure G2. Finite-Denominator Noise Reference
 
 ```{r binomial-noise-figure, fig.width=11.5, fig.height=7.5, fig.alt="Observed geographic-resolution estimates are compared with binomial noise-only simulation reference distributions.", echo=FALSE}
 noise_plot_data <- binomial_noise |>
   filter(metric %in% c(
+    "within_variance_share",
     "median_absolute_percentile_rank_gap",
     "quartile_disagree_pct",
     "q4_movement_pct"
@@ -1615,6 +1688,7 @@ noise_plot_data <- binomial_noise |>
     Condition = condition_name(condition_id),
     Metric = recode(
       metric,
+      within_variance_share = "Within-community variance share",
       median_absolute_percentile_rank_gap = "Median absolute percentile-rank gap",
       quartile_disagree_pct = "Quartile disagreement, %",
       q4_movement_pct = "Movement into or out of Q4, %"
@@ -1630,10 +1704,10 @@ ggplot(noise_plot_data, aes(y = Condition)) +
   ) +
   geom_point(aes(x = noise_only_median), shape = 21, fill = "white", size = 3, stroke = 0.8) +
   geom_point(aes(x = observed_estimate, color = Condition), shape = 18, size = 3.4) +
-  facet_wrap(~Metric, scales = "free_x", ncol = 3) +
+  facet_wrap(~Metric, scales = "free_x", ncol = 2) +
   scale_color_manual(values = c(Hypertension = jama_palette[["blue"]], COPD = jama_palette[["vermilion"]])) +
   labs(
-    title = "Figure 3. Observed geographic differences compared with finite-denominator noise",
+    title = "eFigure G2. Observed geographic differences compared with finite-denominator noise",
     subtitle = "Diamonds show observed estimates. Open circles and gray intervals show the median and central 95% of 1000 binomial simulations.",
     x = "Estimate on the metric-specific scale",
     y = NULL,
@@ -1643,6 +1717,40 @@ ggplot(noise_plot_data, aes(y = Condition)) +
   theme_review(base_size = 12) +
   theme(legend.position = "none")
 ```
+
+```{r binomial-noise-excess-table, echo=FALSE}
+noise_excess_review <- binomial_noise |>
+  filter(metric %in% c(
+    "within_variance_share",
+    "median_absolute_percentile_rank_gap",
+    "quartile_disagree_pct",
+    "q4_movement_pct"
+  )) |>
+  transmute(
+    Condition = condition_name(condition_id),
+    Estimand = recode(
+      metric,
+      within_variance_share = "Within-community variance share",
+      median_absolute_percentile_rank_gap = "Median absolute percentile-rank gap",
+      quartile_disagree_pct = "Quartile disagreement, %",
+      q4_movement_pct = "Movement into or out of Q4, %"
+    ),
+    Observed = observed_estimate,
+    `Noise-only median` = noise_only_median,
+    `Observed minus noise-only median` = observed_minus_noise_median,
+    `Noise-only 2.5th percentile` = noise_only_ci_low,
+    `Noise-only 97.5th percentile` = noise_only_ci_high,
+    `Noise-frame eligible tracts, No.` = eligible_tract_n,
+    `Simulations, No.` = replicate_count
+  )
+review_table(
+  noise_excess_review,
+  "Table QC-5. Observed information loss and excess over the binomial noise-only median",
+  digits = 3
+)
+```
+
+**Simulation boundary.** All 4 observed metrics were recomputed in the leave-one-tract-out simulation frame. This frame included `r noise_value("hypertension", "within_variance_share", "eligible_tract_n")` hypertension tracts and `r noise_value("copd", "within_variance_share", "eligible_tract_n")` COPD tracts. It is narrower than the primary variance-share population, so the variance-share values in this section are sensitivity estimates. The observed-minus-noise value is a descriptive contrast with the simulation median. It is not a bias-corrected estimate. The simulation treats tract-year counts as conditionally independent binomial draws. It does not model the same adult appearing in more than 1 year, cross-year dependence, extra-binomial variation, coding heterogeneity, care selection, geocoding error, changes in participating systems, or residual spatial dependence.
 
 # Statistical Analysis Module 3: Cross-Source Agreement and Cluster Bootstrap
 
@@ -1950,7 +2058,7 @@ Do neighboring community areas show residual spatial dependence after the C2 adj
 
 The population is the `r c2_n`-area C2 analytic frame. The primary weights are row-standardized queen contiguity weights restricted to the eligible areas. Global Moran I is evaluated under the fitted regression design by drawing independent Gaussian errors, projecting every draw through the OLS residual-maker matrix, and comparing the observed statistic with 9999 null statistics using a 2-sided add-one rule. This regression-residual null simulation accounts for the covariance induced by estimating the regression coefficients and follows the Cliff-Ord residual-testing framework.<sup>26-27</sup>
 
-The prespecified trigger activated a concentrated-likelihood spatial-error sensitivity. Local Moran I and Getis-Ord Gi* analyses use separate declared false-discovery-rate families. COPD local statistics were not run because complete 77-area topology was unavailable.<sup>28-30</sup>
+The prespecified trigger activated a concentrated-likelihood spatial-error sensitivity. Local Moran I and Getis-Ord Gi* statistics were not run because complete 77-area topology was unavailable. No local cluster inference or local false-discovery-rate family is reported.<sup>28-30</sup>
 
 ## Assumptions, diagnostics, missingness, and interpretation
 
@@ -1966,7 +2074,7 @@ spatial_review <- spatial_diagnostics |>
     `Permutation P value` = permutation_p_value,
     `Permutations, No.` = permutations,
     `Weights transformation` = weights_transformation,
-    `Residual inference method` = inference_method,
+    `Residual inference method` = permutation_rule,
     `Escalation required` = escalation_required
   )
 review_table(spatial_review, "eTable R4. Residual spatial autocorrelation", digits = 4)
@@ -2081,7 +2189,7 @@ review_table(
 )
 ```
 
-The internal reliability labels are displayed as exploratory source-supplied categories. They are not described as validated tiers because the public 4-tier framework and internal 5-tier labels have not yet been reconciled with the source owner. NCHS reliability principles are considered for presentation, but the NCHS standards were developed for survey estimates and are not applied wholesale to these EHR denominators.<sup>31</sup> Age-standardized estimates are not computed because the governed aggregate extract lacks age-stratum condition numerators, age-stratum denominators, and documented stratum-specific suppression semantics. Area-level percentage aged 65 years or older cannot substitute for those inputs.
+The internal reliability labels are displayed as exploratory source-supplied categories. They are not described as validated tiers because the public 4-tier framework and internal 5-tier labels have not yet been reconciled with the source owner. NCHS reliability principles are considered for presentation, but the NCHS standards were developed for survey estimates and are not applied wholesale to these EHR denominators.<sup>31</sup> Age-standardized estimates are not computed because the stored age-stratum fields do not additively reconcile with the all-age totals, their suppression semantics are undocumented, and no compatible standard population has been approved. Area-level percentage aged 65 years or older cannot substitute for those inputs.
 
 ```{r sensitivity-table, echo=FALSE}
 sensitivity_review <- robustness |>
@@ -2096,6 +2204,9 @@ sensitivity_review <- robustness |>
     `CI lower` = ci_low,
     `CI upper` = ci_high,
     `Eligible areas, No.` = eligible_n,
+    `Adjustment set` = adjustment_set,
+    `CI distribution` = critical_value_distribution,
+    `Residual df` = residual_degrees_of_freedom,
     `Direction stable` = direction_stability,
     `Absolute change, %` = absolute_percentage_change,
     `Threshold status` = threshold_crossed
@@ -2229,9 +2340,9 @@ stopifnot(
 )
 
 display_qc <- data.frame(
-  Display = c("Table 1", "Figure 1", "Figure 2", "Figure 3", "Table 2", "Review Figure/Table HCS-1", "eFigures/eTables"),
-  `Rendered form` = c("HTML table", "Stacked bars", "Quartile matrix", "Two-panel plot", "HTML table", "Scatterplot with HCS error bars and HTML table", "HTML tables and plots"),
-  `Primary unit shown` = c("Condition-year records", "Aggregate records", "Eligible tracts", "Eligible tracts and annual sets", "Eligible tracts", "Pairwise-complete community areas", "Areas, tracts, or model terms"),
+  Display = c("Table 1", "Figure 1", "eFigure G1", "eFigure G2", "Table 2", "Review Figure/Table HCS-1", "eFigures/eTables"),
+  `Rendered form` = c("HTML table", "Stacked bars", "Four-panel forest plot", "Four-panel noise-reference plot", "HTML table", "Scatterplot with HCS error bars and HTML table", "HTML tables and plots"),
+  `Primary unit shown` = c("Condition-year records", "Aggregate records", "Eligible tracts", "Eligible tracts and simulation replicates", "Eligible tracts", "Pairwise-complete community areas", "Areas, tracts, or model terms"),
   `Denominator stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
   `Interpretation limit stated` = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"),
   `Aggregate results available for review` = "Yes",
@@ -2248,7 +2359,7 @@ directly in the specification table without reopening completed analyses that ar
 
 ## Principal findings
 
-Tract measures and leave-one-tract-out community-area summaries did not produce identical geographic descriptions. The observed within-community variance share was larger for COPD than hypertension. The area summaries also changed a larger proportion of COPD tract quartiles and highest-quartile classifications. The finite-denominator simulation, empirical-Bayes shrinkage, and suppression scenarios show how the conclusions depend on measurement precision and unresolved counts. These results indicate that the tract frame contains small-area clinical information that a community-area summary does not fully retain. In the secondary triangulation, CHM and HCS hypertension estimates showed partial community-area rank alignment despite different absolute levels and measurement systems. That pattern supports using the sources together while arguing against treating them as interchangeable.
+Tract measures and leave-one-tract-out community-area summaries did not produce identical geographic descriptions. The estimated magnitudes differed between COPD and hypertension, but this study did not prespecify or estimate between-condition contrasts. The finite-denominator simulation, empirical-Bayes shrinkage, and suppression scenarios show how the conclusions depend on measurement precision and unresolved counts. These results indicate that the tract frame contains small-area clinical information that a community-area summary does not fully retain. In the secondary triangulation, CHM and HCS hypertension estimates showed partial community-area rank alignment despite different absolute levels and measurement systems. That pattern supports using the sources together while arguing against treating them as interchangeable.
 
 The scientific contribution is the source-role framework and the explicit measurement comparison. The tract-versus-community analysis is the worked use case, not a complete evaluation of every function on the website. Population-based public health data estimate health across defined resident populations. CHM describes diagnoses recorded among adults observed in participating health systems. Using the sources together can reveal aligned and divergent patterns, identify where a coarse label hides tract heterogeneity, and motivate follow-up surveillance or community assessment.
 
@@ -2262,7 +2373,7 @@ The present data cannot estimate prevalence among all Chicago residents without 
 
 ## Limitations
 
-First, health-system inclusion depends on care seeking, participating systems, coding, geocoding, and annual eligibility. Capture metadata does not correct this selection. Second, the annual tract denominator matches the supplied captured-adult count, but the aggregate extract cannot independently verify person-level eligibility or MRAIA cross-system deduplication. Third, unresolved zero-or-suppressed values and the denominator threshold change analytic populations by condition. The scenario analyses are not formal bounds. Fourth, the primary representative-point Chicago rule differs from the incomplete 50%-area alternative frame, which requires 2 tracts absent from the primary-prefiltered file. Fifth, source-published community-area and ZCTA exports use undocumented transformations and condition-varying denominators, so they are sensitivities rather than primary comparators. Sixth, rank categories are distribution-dependent and sensitive to eligible tracts and ties. Seventh, the binomial simulation isolates finite-denominator noise but does not model coding error, care selection, geocoding error, overdispersion, or spatial dependence. Eighth, the aggregate release lacks age-stratum condition counts, so age-standardization is not defensible. Ninth, PLACES differs in phenotype, denominator, period, and estimation method and is not a gold standard. Tenth, HCS is self-reported and survey-derived, its rolling period differs from the CHM pool, and only HCS sampling standard errors are available. Eleventh, cluster bootstrap intervals do not fully represent spatial dependence or source-estimate uncertainty. Twelfth, the C2 model has only `r c2_n` areas, is sensitive to population weighting, and has ecological interpretation. Thirteenth, combined diabetes was excluded because its source semantics are unresolved. Fourteenth, no frozen 2025 CHM extract or approved external-network extract was available, so temporal and geographic transportability were not tested.
+First, health-system inclusion depends on care seeking, participating systems, coding, geocoding, and annual eligibility. Capture metadata does not correct this selection. Second, the annual tract denominator matches the supplied captured-adult count, but the aggregate extract cannot independently verify person-level eligibility or MRAIA cross-system deduplication. Third, unresolved zero-or-suppressed values and the denominator threshold change analytic populations by condition. The scenario analyses are not formal bounds. Fourth, the primary representative-point Chicago rule differs from the incomplete 50%-area alternative frame, which requires 2 tracts absent from the primary-prefiltered file. Fifth, source-published community-area and ZCTA exports use undocumented transformations and condition-varying denominators, so they are sensitivities rather than primary comparators. Sixth, rank categories are distribution-dependent and sensitive to eligible tracts and ties. Seventh, the binomial simulation isolates finite-denominator noise but does not model coding error, care selection, geocoding error, overdispersion, or spatial dependence. Eighth, stored age-stratum fields do not reconcile additively with all-age totals and lack documented suppression semantics, so age-standardization is not defensible. Ninth, PLACES differs in phenotype, denominator, period, and estimation method and is not a gold standard. Tenth, HCS is self-reported and survey-derived, its rolling period differs from the CHM pool, and only HCS sampling standard errors are available. Eleventh, cluster bootstrap intervals do not fully represent spatial dependence or source-estimate uncertainty. Twelfth, the C2 model has only `r c2_n` areas, is sensitive to population weighting, and has ecological interpretation. Thirteenth, combined diabetes was excluded because its source semantics are unresolved. Fourteenth, no frozen 2025 CHM extract or approved external-network extract was available, so temporal and geographic transportability were not tested.
 
 ## Additional data or analyses that would strengthen the paper
 

@@ -8,7 +8,7 @@
   {
     "analysis_name": "COPD association analysis",
     "authorization": false,
-    "narrative": "Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (97.5% CI, -4.83 to -0.37) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction. This is an area-level association among observed CAPriCORN adults, not an individual effect or a population-prevalence comparison.",
+    "narrative": "Among 76 eligible community areas, a 1-IQR higher recorded COPD proportion was associated with -2.60 years of life expectancy (95% residual-df t CI, -4.59 to -0.62) after adjustment. Residual Moran I was 0.209 (permutation P=0.0023); the spatial-error estimate was -2.73 years and did not change direction. This is an area-level association among observed CAPriCORN adults, not an individual effect or a population-prevalence comparison.",
     "status": "candidate estimate; not authorized for manuscript import"
   }
 ]

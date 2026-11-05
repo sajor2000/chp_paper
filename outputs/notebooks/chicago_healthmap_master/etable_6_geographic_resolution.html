@@ -66,7 +66,7 @@
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="40" class="gt_heading gt_title gt_font_normal">eTable 6. Geographic-resolution sensitivity</td>
+    <td colspan="43" class="gt_heading gt_title gt_font_normal">eTable 6. Geographic-resolution sensitivity</td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-condition_id">condition_id</th>
@@ -86,11 +86,13 @@
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-quartile_disagree_pct_ci_low">quartile_disagree_pct_ci_low</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-quartile_disagree_pct_ci_high">quartile_disagree_pct_ci_high</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-q4_movement_pct">q4_movement_pct</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-q4_movement_count">q4_movement_count</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-q4_movement_pct_ci_low">q4_movement_pct_ci_low</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-q4_movement_pct_ci_high">q4_movement_pct_ci_high</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-opposite_extreme_count">opposite_extreme_count</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-opposite_extreme_pct">opposite_extreme_pct</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-tract_high_comparison_not_high_count">tract_high_comparison_not_high_count</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-comparison_high_tract_not_high_count">comparison_high_tract_not_high_count</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-tract_low_comparison_not_low_count">tract_low_comparison_not_low_count</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-assignment_rule">assignment_rule</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-crossing_sensitivity">crossing_sensitivity</th>
@@ -107,6 +109,7 @@
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-zip_zcta_sensitivity_status">zip_zcta_sensitivity_status</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-results_authorized">results_authorized</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-noncrossing_only">noncrossing_only</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-comparison_role">comparison_role</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-source_artifact">source_artifact</th>
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="etable_6_geographic_resolution-source_checksum">source_checksum</th>
 </tr>
@@ -115,7 +118,187 @@
   <tr>
     <td class="gt_row gt_left">copd</td>
     <td class="gt_row gt_left">chicago_community_area</td>
-    <td class="gt_row gt_left">dominant_direct_community_area</td>
+    <td class="gt_row gt_left">leave_one_tract_out_denominator_pooled_community_area</td>
+    <td class="gt_row gt_right">401</td>
+    <td class="gt_row gt_right">64</td>
+    <td class="gt_row gt_right">0.7142204589683395</td>
+    <td class="gt_row gt_right">0.14463840399002495</td>
+    <td class="gt_row gt_right">0.125</td>
+    <td class="gt_row gt_right">0.17266631139532815</td>
+    <td class="gt_row gt_right">0.16971909378673017</td>
+    <td class="gt_row gt_right">191</td>
+    <td class="gt_row gt_right">47.63092269326683</td>
+    <td class="gt_row gt_right">210</td>
+    <td class="gt_row gt_right">52.36907730673317</td>
+    <td class="gt_row gt_right">47.263339552238804</td>
+    <td class="gt_row gt_right">61.56061211311999</td>
+    <td class="gt_row gt_right">23.44139650872818</td>
+    <td class="gt_row gt_right">94</td>
+    <td class="gt_row gt_right">18.085033517924806</td>
+    <td class="gt_row gt_right">33.82004079003864</td>
+    <td class="gt_row gt_right">2</td>
+    <td class="gt_row gt_right">0.4987531172069825</td>
+    <td class="gt_row gt_right">47</td>
+    <td class="gt_row gt_right">47</td>
+    <td class="gt_row gt_right">33</td>
+    <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
+    <td class="gt_row gt_left">all_eligible</td>
+    <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
+    <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
+    <td class="gt_row gt_left">primary_leave_one_tract_out_rollup</td>
+    <td class="gt_row gt_left">The focal tract is excluded from a numerator-and-denominator pooled community-area comparator.</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">20260715</td>
+    <td class="gt_row gt_left">community_area_id</td>
+    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">percentile_2.5_97.5</td>
+    <td class="gt_row gt_left">direct_zcta_comparison</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">primary</td>
+    <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
+    <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">hypertension</td>
+    <td class="gt_row gt_left">chicago_community_area</td>
+    <td class="gt_row gt_left">leave_one_tract_out_denominator_pooled_community_area</td>
+    <td class="gt_row gt_right">720</td>
+    <td class="gt_row gt_right">75</td>
+    <td class="gt_row gt_right">0.8760129936919975</td>
+    <td class="gt_row gt_right">0.08472222222222225</td>
+    <td class="gt_row gt_right">0.07994384805440491</td>
+    <td class="gt_row gt_right">0.10440235993514684</td>
+    <td class="gt_row gt_right">0.10842399691358025</td>
+    <td class="gt_row gt_right">477</td>
+    <td class="gt_row gt_right">66.25</td>
+    <td class="gt_row gt_right">243</td>
+    <td class="gt_row gt_right">33.75</td>
+    <td class="gt_row gt_right">28.891643059490086</td>
+    <td class="gt_row gt_right">43.399291084703755</td>
+    <td class="gt_row gt_right">11.666666666666666</td>
+    <td class="gt_row gt_right">84</td>
+    <td class="gt_row gt_right">6.68299767204587</td>
+    <td class="gt_row gt_right">19.975291230966793</td>
+    <td class="gt_row gt_right">0</td>
+    <td class="gt_row gt_right">0.0</td>
+    <td class="gt_row gt_right">42</td>
+    <td class="gt_row gt_right">42</td>
+    <td class="gt_row gt_right">35</td>
+    <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
+    <td class="gt_row gt_left">all_eligible</td>
+    <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
+    <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
+    <td class="gt_row gt_left">primary_leave_one_tract_out_rollup</td>
+    <td class="gt_row gt_left">The focal tract is excluded from a numerator-and-denominator pooled community-area comparator.</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">20260715</td>
+    <td class="gt_row gt_left">community_area_id</td>
+    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">percentile_2.5_97.5</td>
+    <td class="gt_row gt_left">direct_zcta_comparison</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">primary</td>
+    <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
+    <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">copd</td>
+    <td class="gt_row gt_left">chicago_community_area</td>
+    <td class="gt_row gt_left">leave_one_tract_out_denominator_pooled_community_area</td>
+    <td class="gt_row gt_right">133</td>
+    <td class="gt_row gt_right">35</td>
+    <td class="gt_row gt_right">0.6775282847553075</td>
+    <td class="gt_row gt_right">0.1278195488721804</td>
+    <td class="gt_row gt_right">0.1037654521795706</td>
+    <td class="gt_row gt_right">0.1896683943304421</td>
+    <td class="gt_row gt_right">0.1732149923681384</td>
+    <td class="gt_row gt_right">78</td>
+    <td class="gt_row gt_right">58.64661654135338</td>
+    <td class="gt_row gt_right">55</td>
+    <td class="gt_row gt_right">41.35338345864661</td>
+    <td class="gt_row gt_right">37.163307800996506</td>
+    <td class="gt_row gt_right">65.62638683431952</td>
+    <td class="gt_row gt_right">21.052631578947366</td>
+    <td class="gt_row gt_right">28</td>
+    <td class="gt_row gt_right">13.953011818528402</td>
+    <td class="gt_row gt_right">37.29014272970562</td>
+    <td class="gt_row gt_right">2</td>
+    <td class="gt_row gt_right">1.5037593984962405</td>
+    <td class="gt_row gt_right">14</td>
+    <td class="gt_row gt_right">14</td>
+    <td class="gt_row gt_right">10</td>
+    <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
+    <td class="gt_row gt_left">noncrossing_only</td>
+    <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
+    <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
+    <td class="gt_row gt_left">primary_leave_one_tract_out_rollup</td>
+    <td class="gt_row gt_left">The focal tract is excluded from a numerator-and-denominator pooled community-area comparator.</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">20260715</td>
+    <td class="gt_row gt_left">community_area_id</td>
+    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">percentile_2.5_97.5</td>
+    <td class="gt_row gt_left">direct_zcta_comparison</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_left">primary_sensitivity</td>
+    <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
+    <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">hypertension</td>
+    <td class="gt_row gt_left">chicago_community_area</td>
+    <td class="gt_row gt_left">leave_one_tract_out_denominator_pooled_community_area</td>
+    <td class="gt_row gt_right">235</td>
+    <td class="gt_row gt_right">45</td>
+    <td class="gt_row gt_right">0.864079447418791</td>
+    <td class="gt_row gt_right">0.08936170212765959</td>
+    <td class="gt_row gt_right">0.08372041798996012</td>
+    <td class="gt_row gt_right">0.13168656804211643</td>
+    <td class="gt_row gt_right">0.11661385242191037</td>
+    <td class="gt_row gt_right">162</td>
+    <td class="gt_row gt_right">68.93617021276596</td>
+    <td class="gt_row gt_right">73</td>
+    <td class="gt_row gt_right">31.06382978723404</td>
+    <td class="gt_row gt_right">28.291887592788967</td>
+    <td class="gt_row gt_right">51.491497738314614</td>
+    <td class="gt_row gt_right">7.659574468085106</td>
+    <td class="gt_row gt_right">18</td>
+    <td class="gt_row gt_right">4.506602914389799</td>
+    <td class="gt_row gt_right">20.643767934365275</td>
+    <td class="gt_row gt_right">0</td>
+    <td class="gt_row gt_right">0.0</td>
+    <td class="gt_row gt_right">9</td>
+    <td class="gt_row gt_right">9</td>
+    <td class="gt_row gt_right">12</td>
+    <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
+    <td class="gt_row gt_left">noncrossing_only</td>
+    <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
+    <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
+    <td class="gt_row gt_left">primary_leave_one_tract_out_rollup</td>
+    <td class="gt_row gt_left">The focal tract is excluded from a numerator-and-denominator pooled community-area comparator.</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">1000</td>
+    <td class="gt_row gt_right">20260715</td>
+    <td class="gt_row gt_left">community_area_id</td>
+    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">percentile_2.5_97.5</td>
+    <td class="gt_row gt_left">direct_zcta_comparison</td>
+    <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_left">primary_sensitivity</td>
+    <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
+    <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
+  </tr>
+  <tr>
+    <td class="gt_row gt_left">copd</td>
+    <td class="gt_row gt_left">chicago_community_area</td>
+    <td class="gt_row gt_left">dominant_source_published_direct_community_area</td>
     <td class="gt_row gt_right">411</td>
     <td class="gt_row gt_right">74</td>
     <td class="gt_row gt_right">0.7816178927412106</td>
@@ -130,34 +313,37 @@
     <td class="gt_row gt_right">43.08831060751553</td>
     <td class="gt_row gt_right">56.525970591346656</td>
     <td class="gt_row gt_right">24.574209245742093</td>
+    <td class="gt_row gt_right">101</td>
     <td class="gt_row gt_right">17.616424535916064</td>
     <td class="gt_row gt_right">29.46672667775686</td>
     <td class="gt_row gt_right">2</td>
     <td class="gt_row gt_right">0.48661800486618007</td>
     <td class="gt_row gt_right">31</td>
+    <td class="gt_row gt_right">70</td>
     <td class="gt_row gt_right">60</td>
     <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
     <td class="gt_row gt_left">all_eligible</td>
     <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
     <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
-    <td class="gt_row gt_left">cross_frame_only_no_literal_aggregation</td>
-    <td class="gt_row gt_left">Direct tract and direct community-area CHM values are compared as linked cross-frame classifications; tract disease values are not aggregated.</td>
+    <td class="gt_row gt_left">secondary_source_published_cross_frame</td>
+    <td class="gt_row gt_left">The source-published community-area weighting algorithm is not documented; this direct cross-frame result is a sensitivity only.</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">20260715</td>
     <td class="gt_row gt_left">community_area_id</td>
-    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts</td>
     <td class="gt_row gt_left">percentile_2.5_97.5</td>
     <td class="gt_row gt_left">direct_zcta_comparison</td>
     <td class="gt_row gt_center">False</td>
     <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">secondary_source_export</td>
     <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
     <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
   </tr>
   <tr>
     <td class="gt_row gt_left">hypertension</td>
     <td class="gt_row gt_left">chicago_community_area</td>
-    <td class="gt_row gt_left">dominant_direct_community_area</td>
+    <td class="gt_row gt_left">dominant_source_published_direct_community_area</td>
     <td class="gt_row gt_right">722</td>
     <td class="gt_row gt_right">77</td>
     <td class="gt_row gt_right">0.9048824676007202</td>
@@ -172,34 +358,37 @@
     <td class="gt_row gt_right">29.970964937699218</td>
     <td class="gt_row gt_right">43.527995744797295</td>
     <td class="gt_row gt_right">10.526315789473683</td>
+    <td class="gt_row gt_right">76</td>
     <td class="gt_row gt_right">6.545785194694052</td>
     <td class="gt_row gt_right">17.252029638279534</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0.0</td>
     <td class="gt_row gt_right">44</td>
+    <td class="gt_row gt_right">32</td>
     <td class="gt_row gt_right">7</td>
     <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
     <td class="gt_row gt_left">all_eligible</td>
     <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
     <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
-    <td class="gt_row gt_left">cross_frame_only_no_literal_aggregation</td>
-    <td class="gt_row gt_left">Direct tract and direct community-area CHM values are compared as linked cross-frame classifications; tract disease values are not aggregated.</td>
+    <td class="gt_row gt_left">secondary_source_published_cross_frame</td>
+    <td class="gt_row gt_left">The source-published community-area weighting algorithm is not documented; this direct cross-frame result is a sensitivity only.</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">20260715</td>
     <td class="gt_row gt_left">community_area_id</td>
-    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts</td>
     <td class="gt_row gt_left">percentile_2.5_97.5</td>
     <td class="gt_row gt_left">direct_zcta_comparison</td>
     <td class="gt_row gt_center">False</td>
     <td class="gt_row gt_center">False</td>
+    <td class="gt_row gt_left">secondary_source_export</td>
     <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
     <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
   </tr>
   <tr>
     <td class="gt_row gt_left">copd</td>
     <td class="gt_row gt_left">chicago_community_area</td>
-    <td class="gt_row gt_left">dominant_direct_community_area</td>
+    <td class="gt_row gt_left">dominant_source_published_direct_community_area</td>
     <td class="gt_row gt_right">144</td>
     <td class="gt_row gt_right">46</td>
     <td class="gt_row gt_right">0.7896596918859327</td>
@@ -214,34 +403,37 @@
     <td class="gt_row gt_right">38.055178652193575</td>
     <td class="gt_row gt_right">60.0</td>
     <td class="gt_row gt_right">26.38888888888889</td>
+    <td class="gt_row gt_right">38</td>
     <td class="gt_row gt_right">12.668678739101274</td>
     <td class="gt_row gt_right">32.17601683029453</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0.0</td>
     <td class="gt_row gt_right">12</td>
+    <td class="gt_row gt_right">26</td>
     <td class="gt_row gt_right">19</td>
     <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
     <td class="gt_row gt_left">noncrossing_only</td>
     <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
     <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
-    <td class="gt_row gt_left">cross_frame_only_no_literal_aggregation</td>
-    <td class="gt_row gt_left">Direct tract and direct community-area CHM values are compared as linked cross-frame classifications; tract disease values are not aggregated.</td>
+    <td class="gt_row gt_left">secondary_source_published_cross_frame</td>
+    <td class="gt_row gt_left">The source-published community-area weighting algorithm is not documented; this direct cross-frame result is a sensitivity only.</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">20260715</td>
     <td class="gt_row gt_left">community_area_id</td>
-    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts</td>
     <td class="gt_row gt_left">percentile_2.5_97.5</td>
     <td class="gt_row gt_left">direct_zcta_comparison</td>
     <td class="gt_row gt_center">False</td>
     <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_left">secondary_source_export</td>
     <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
     <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
   </tr>
   <tr>
     <td class="gt_row gt_left">hypertension</td>
     <td class="gt_row gt_left">chicago_community_area</td>
-    <td class="gt_row gt_left">dominant_direct_community_area</td>
+    <td class="gt_row gt_left">dominant_source_published_direct_community_area</td>
     <td class="gt_row gt_right">245</td>
     <td class="gt_row gt_right">55</td>
     <td class="gt_row gt_right">0.9092511621762066</td>
@@ -256,27 +448,30 @@
     <td class="gt_row gt_right">24.321684966216218</td>
     <td class="gt_row gt_right">44.129328702711206</td>
     <td class="gt_row gt_right">7.755102040816326</td>
+    <td class="gt_row gt_right">19</td>
     <td class="gt_row gt_right">3.7159034034034035</td>
     <td class="gt_row gt_right">16.131508205998866</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0.0</td>
     <td class="gt_row gt_right">12</td>
+    <td class="gt_row gt_right">7</td>
     <td class="gt_row gt_right">2</td>
     <td class="gt_row gt_left">dominant_community_area_max_overlay_weight_gte_0.99</td>
     <td class="gt_row gt_left">noncrossing_only</td>
     <td class="gt_row gt_left">geographic_resolution_sensitivity</td>
     <td class="gt_row gt_left">tract_resolution_not_area_prevalence</td>
-    <td class="gt_row gt_left">cross_frame_only_no_literal_aggregation</td>
-    <td class="gt_row gt_left">Direct tract and direct community-area CHM values are compared as linked cross-frame classifications; tract disease values are not aggregated.</td>
+    <td class="gt_row gt_left">secondary_source_published_cross_frame</td>
+    <td class="gt_row gt_left">The source-published community-area weighting algorithm is not documented; this direct cross-frame result is a sensitivity only.</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">1000</td>
     <td class="gt_row gt_right">20260715</td>
     <td class="gt_row gt_left">community_area_id</td>
-    <td class="gt_row gt_left">recomputed_within_each_cluster_resample</td>
+    <td class="gt_row gt_left">source_area_rank_recomputed_once_per_sampled_area_copy_then_mapped_to_tracts</td>
     <td class="gt_row gt_left">percentile_2.5_97.5</td>
     <td class="gt_row gt_left">direct_zcta_comparison</td>
     <td class="gt_row gt_center">False</td>
     <td class="gt_row gt_center">True</td>
+    <td class="gt_row gt_left">secondary_source_export</td>
     <td class="gt_row gt_left">00_master_analytic_dataset.parquet</td>
     <td class="gt_row gt_left">373f0bfff77c0059b81831a1365650533f2eb8a9a12be665691e28d53f549916</td>
   </tr>

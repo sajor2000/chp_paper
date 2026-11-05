@@ -239,6 +239,11 @@ def build_claim_evidence_audit(
     """Validate and render the SAP claim-to-evidence contract."""
 
     required = set(CLAIM_EVIDENCE_COLUMNS) - {"display_id"}
+    expected_artifacts = {
+        "C1": "etable_2_model_readiness_sensitivities.csv",
+        "C2": "etable_2_model_readiness_sensitivities.csv",
+        "GR": "table_2_geographic_resolution.csv",
+    }
     records: list[dict[str, object]] = []
     for result in result_objects:
         missing = sorted(required - set(result))
@@ -256,6 +261,12 @@ def build_claim_evidence_audit(
                 raise CaseStudyAnalysisError("C2 claim evidence requires estimate, interval, and n")
         if claim_id not in display_registry:
             raise CaseStudyAnalysisError(f"claim {claim_id} has no registered display")
+        if result["source_artifact"] != expected_artifacts.get(claim_id):
+            raise CaseStudyAnalysisError(
+                f"claim {claim_id} cites an artifact that does not contain its estimand"
+            )
+        if not str(result["verification_status"]).startswith("verified_against_"):
+            raise CaseStudyAnalysisError(f"claim {claim_id} is not bound to a verified result")
         record = dict(result)
         record["display_id"] = display_registry[claim_id]
         records.append({column: record[column] for column in CLAIM_EVIDENCE_COLUMNS})
@@ -313,13 +324,13 @@ def build_descriptive_claim_evidence_audit(
 def build_master_claim_records(
     readiness: pd.DataFrame,
     primary_contrasts: pd.DataFrame,
-    aggregation_loss: pd.DataFrame,
+    primary_information_loss: pd.DataFrame,
 ) -> list[dict[str, object]]:
     """Assemble the three governed paper claims without manuscript authorization."""
 
     c1 = readiness.loc[readiness["model_id"].eq("C1")]
     c2 = primary_contrasts.loc[primary_contrasts["model_id"].eq("C2")]
-    if len(c1) != 1 or len(c2) != 1 or aggregation_loss.empty:
+    if len(c1) != 1 or len(c2) != 1 or primary_information_loss.empty:
         raise CaseStudyAnalysisError("master claim inputs are incomplete")
     c1_row, c2_row = c1.iloc[0], c2.iloc[0]
     c1_status = str(c1_row.get("status"))
@@ -340,22 +351,62 @@ def build_master_claim_records(
     ]
     if not all(np.isfinite(c2_values)) or not (
         c2_values[1] <= c2_values[0] <= c2_values[2]
-        and c2_values[3] == 0.975
+        and c2_values[3] == 0.95
         and int(c2_values[4]) > 0
+        and c2_row.get("critical_value_distribution") == "t_residual_degrees_of_freedom"
+        and int(c2_row.get("residual_degrees_of_freedom", 0)) > 0
     ):
         raise CaseStudyAnalysisError("COPD candidate estimate contract is not verified")
-    required_resolution = {"tract_sample_n", "results_authorized", "analysis_status"}
-    if not required_resolution.issubset(aggregation_loss.columns):
+    required_information_loss = {
+        "condition_id",
+        "estimand",
+        "eligible_tract_n",
+        "estimate",
+        "ci_low",
+        "ci_high",
+        "confidence_level",
+        "bootstrap_replicates",
+        "bootstrap_seed",
+        "results_authorized",
+    }
+    if not required_information_loss.issubset(primary_information_loss.columns):
         raise CaseStudyAnalysisError("geographic-resolution evidence contract is incomplete")
-    if aggregation_loss["results_authorized"].ne(False).any() or set(
-        aggregation_loss["analysis_status"].astype(str)
-    ) != {"geographic_resolution_sensitivity"}:
+    expected_estimands = {
+        "Within-community variance share",
+        "Median absolute percentile-rank gap",
+        "Quartile disagreement",
+        "Movement into or out of Q4",
+    }
+    expected_pairs = {
+        (condition, estimand)
+        for condition in ("hypertension", "copd")
+        for estimand in expected_estimands
+    }
+    observed_pairs = set(
+        zip(
+            primary_information_loss["condition_id"].astype(str),
+            primary_information_loss["estimand"].astype(str),
+            strict=True,
+        )
+    )
+    numeric = primary_information_loss[
+        ["eligible_tract_n", "estimate", "ci_low", "ci_high", "confidence_level"]
+    ].apply(pd.to_numeric, errors="coerce")
+    if (
+        observed_pairs != expected_pairs
+        or primary_information_loss.duplicated(["condition_id", "estimand"]).any()
+        or numeric.isna().any().any()
+        or primary_information_loss["results_authorized"].ne(False).any()
+        or not numeric["confidence_level"].eq(0.95).all()
+        or not pd.to_numeric(
+            primary_information_loss["bootstrap_replicates"], errors="coerce"
+        ).eq(1000).all()
+    ):
         raise CaseStudyAnalysisError("geographic-resolution evidence is not verified")
     common = {
         "period": "CHM 2022-2024; source-specific public periods retained",
         "missingness_rule": "Complete case for the estimand; no imputation of suppressed values",
         "authorization": False,
-        "verification_status": "verified_internal_audit",
     }
     return [
         {
@@ -383,8 +434,9 @@ def build_master_claim_records(
                 "not_run_combined_diabetes_semantics_unapproved"
                 if c1_semantics_withheld else "audit_only_exploratory"
             ),
-            "source_artifact": "table_2_model_readiness_sensitivities.csv",
+            "source_artifact": "etable_2_model_readiness_sensitivities.csv",
             "analysis_status": c1_status,
+            "verification_status": "verified_against_readiness_result_object",
             **common,
         },
         {
@@ -399,32 +451,34 @@ def build_master_claim_records(
             "unit": "life-expectancy years",
             "grain": "Chicago community area",
             "denominator": "76 eligible community areas",
-            "method": "Equal-area OLS with HC3 covariance",
+            "method": "Equal-area OLS with HC3 covariance and residual-df t critical values",
             "uncertainty": confidence_text(float(c2_row["confidence_level"])),
             "diagnostic": "Influence and adjusted residual Moran checks",
             "sensitivity_status": "freeze_candidate_supportive_sensitivities",
-            "source_artifact": "table_2_model_readiness_sensitivities.csv",
+            "source_artifact": "etable_2_model_readiness_sensitivities.csv",
             "analysis_status": "freeze_candidate_primary_model_unsecured",
+            "verification_status": "verified_against_model_result_object",
             **common,
         },
         {
             "claim_id": "GR",
-            "question": "What tract classifications change under direct coarser-area CHM ranks?",
-            "estimand": "Highest-quartile tract transitions under community-area and ZCTA ranks",
+            "question": "What tract information is not retained by a focal-excluded community-area summary?",
+            "estimand": "Within-area variance, rank difference, quartile disagreement, and Q4 movement",
             "estimate": None,
             "ci_low": None,
             "ci_high": None,
             "confidence_level": None,
-            "eligible_n": int(aggregation_loss["tract_sample_n"].max()),
+            "eligible_n": int(numeric["eligible_tract_n"].max()),
             "unit": "tracts and percentage",
-            "grain": "Census tract linked to dominant community area or ZCTA",
+            "grain": "Census tract linked to a dominant Chicago community area",
             "denominator": "Condition-specific eligible tracts",
-            "method": "Direct-rank transition classification",
-            "uncertainty": "Descriptive annual stability; no inferential interval",
-            "diagnostic": "All-tract, noncrossing-tract, and annual comparison",
+            "method": "Leave-one-tract-out denominator-pooled area comparison",
+            "uncertainty": "95% community-area cluster-bootstrap percentile intervals",
+            "diagnostic": "Noise-only simulation, shrinkage, suppression, noncrossing, and source-export sensitivities",
             "sensitivity_status": "geographic_resolution_sensitivity",
-            "source_artifact": "supplement_geographic_consequence_transitions.csv",
+            "source_artifact": "table_2_geographic_resolution.csv",
             "analysis_status": "descriptive_complementarity_not_validation",
+            "verification_status": "verified_against_primary_information_loss_rows",
             **common,
         },
     ]

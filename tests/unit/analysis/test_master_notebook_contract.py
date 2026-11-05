@@ -97,8 +97,8 @@ def test_notebook_uses_jama_methods_results_discussion_order() -> None:
         "Table 1. Chicago Health Map community-area data coverage, 2019–2024",
         "Figure 1. Chicago Health Map geographic coverage and data quality",
         "### Geographic alignment and cross-scale classification",
-        "Figure 2. Added geographic information from tract-level measures",
-        "Figure 3. Direct cross-frame classification differences and stability",
+        "eFigure S1. Source-published cross-frame alignment sensitivity",
+        "eFigure S2. Direct cross-frame classification differences and stability",
         "Table 2. Geographic alignment and direct cross-frame classification differences by condition",
         "## 4. Discussion",
         "### Principal finding and scientific contribution",
@@ -120,8 +120,8 @@ def test_geographic_results_are_complete_before_discussion_and_models_follow_it(
     """The reader should finish the geographic argument before seeing model evidence."""
     source = _source()
     results = source.index("## 3. Results")
-    figure_2 = source.index("Figure 2. Added geographic information from tract-level measures", results)
-    figure_3 = source.index("Figure 3. Direct cross-frame classification differences", figure_2)
+    figure_2 = source.index("eFigure S1. Source-published cross-frame alignment sensitivity", results)
+    figure_3 = source.index("eFigure S2. Direct cross-frame classification differences", figure_2)
     table_2 = source.index("Table 2. Geographic alignment and direct cross-frame classification differences", figure_3)
     discussion = source.index("## 4. Discussion", table_2)
     supplement = source.index("## 5. Supplementary analyses", discussion)
@@ -132,8 +132,8 @@ def test_geographic_results_are_complete_before_discussion_and_models_follow_it(
 
 def test_main_display_interpretations_follow_their_rendered_outputs() -> None:
     source = _source()
-    figure_2 = source.index("Figure 2. Added geographic information from tract-level measures")
-    figure_3 = source.index("Figure 3. Direct cross-frame classification differences")
+    figure_2 = source.index("eFigure S1. Source-published cross-frame alignment sensitivity")
+    figure_3 = source.index("eFigure S2. Direct cross-frame classification differences")
     table_2 = source.index("Table 2. Geographic alignment and direct cross-frame classification differences")
     for start, end in ((figure_2, figure_3), (figure_3, table_2)):
         segment = source[start:end]
@@ -163,7 +163,7 @@ def test_statistician_results_are_numeric_while_manuscript_import_stays_closed()
 
 def test_geographic_labels_do_not_overstate_literal_aggregation() -> None:
     source = _source()
-    assert "Figure 3. Direct cross-frame classification differences and stability" in source
+    assert "eFigure S2. Direct cross-frame classification differences and stability" in source
     assert "eFigure 11. Direct cross-frame classification differences" in source
     assert "literal geographic aggregation" in source
 
@@ -186,7 +186,7 @@ def test_reader_orienter_is_governed_and_main_displays_are_adjacent() -> None:
     assert "reader_cards" in source
     table_1 = source.index("Table 1. Chicago Health Map community-area data coverage")
     figure_1 = source.index("Figure 1. Chicago Health Map geographic coverage and data quality")
-    figure_2 = source.index("Figure 2. Added geographic information from tract-level measures")
+    figure_2 = source.index("eFigure S1. Source-published cross-frame alignment sensitivity")
     table_1_segment = source[table_1:figure_1]
     figure_1_segment = source[figure_1:figure_2]
     for segment in (table_1_segment, figure_1_segment):
@@ -227,13 +227,13 @@ def test_main_figures_are_geographic_and_model_free() -> None:
     figure_2_cell = next(
         cell
         for cell in _cells()
-        if "Figure 2. Added geographic information from tract-level measures" in ast.unparse(cell)
+        if "eFigure S1. Source-published cross-frame alignment sensitivity" in ast.unparse(cell)
         and "plt.subplots" in ast.unparse(cell)
     )
     figure_3_cell = next(
         cell
         for cell in _cells()
-        if "Figure 3. Direct cross-frame classification differences" in ast.unparse(cell)
+        if "eFigure S2. Direct cross-frame classification differences" in ast.unparse(cell)
         and "plt.subplots" in ast.unparse(cell)
     )
     figure_2_source = ast.unparse(figure_2_cell)
@@ -318,7 +318,7 @@ def test_methods_and_interpretation_state_full_inference_contract() -> None:
         "EHR-diagnosed proportion among observed CAPriCORN adults",
         "y_i = alpha + beta x_i + gamma Z_i + error_i",
         "HC3",
-        "97.5%",
+        "95% residual-degrees-of-freedom t",
         "maximum VIF",
         "multiplicity",
         "influence",
@@ -344,7 +344,7 @@ def test_statistician_review_guide_exposes_every_open_method_decision() -> None:
         "Restricted statistician review outputs — not for manuscript import",
         "observed-scale one-way method-of-moments estimator",
         "1000 replicates for review",
-        "Normal and t critical values require an explicit sensitivity comparison",
+        "95% intervals with residual-degrees-of-freedom t critical values",
         "Combined diabetes",
         "Mutual exclusivity, denominator equivalence",
     ):
@@ -354,7 +354,7 @@ def test_statistician_review_guide_exposes_every_open_method_decision() -> None:
 def test_every_numbered_display_has_a_biostatistical_review_annotation() -> None:
     source = _source()
     for display in (
-        "Table 1", "Figure 1", "Figure 2", "Figure 3", "Table 2",
+        "Table 1", "Figure 1", "eFigure S1", "eFigure S2", "Table 2",
         "eTable 1", "eTable 2", "eTable 3", "eTable 4", "eTable 5",
         "eTable 6", "eTable 7", "eTable 8", "eTable 9",
         "eFigure 1", "eFigure 2", "eFigure 3", "eFigure 4", "eFigure 5",
@@ -377,9 +377,9 @@ def test_primary_geographic_comparisons_use_the_chm_only_tract_frame() -> None:
     assert "tract_percentile," not in matrix_source
 
     comparison_start = source.index("aggregation_loss = pd.concat")
-    comparison_end = source.index("return (aggregation_loss,)")
+    comparison_end = source.index("return aggregation_loss, binomial_noise_reference")
     comparison_source = source[comparison_start:comparison_end]
-    assert "summarize_community_area_aggregation_loss(analytic, tract_chm_direct)" in comparison_source
+    assert 'tract_chm_direct, comparator="leave_one_tract_out_rollup"' in comparison_source
     assert "analytic, tract_chm_direct_noncrossing" in comparison_source
     assert "tract_percentile" not in comparison_source
     assert "Needed supplement or decision" in source
@@ -436,7 +436,7 @@ def test_master_notebook_explains_source_streams_and_join_ledger() -> None:
         "community_area_id",
         "geography_id, time_period",
         "disease values are never interpolated",
-        "direct cross-frame classification consequences",
+        "focal-excluded area summary",
         "ZCTAs are Census statistical areas, not USPS ZIP Codes",
         "fact_zcta_condition_stats.text",
         "20,536",
@@ -477,7 +477,7 @@ def test_master_notebook_declares_manuscript_and_vector_outputs() -> None:
         "manuscript_import_allowed",
         "results_authorized",
         "supplement_aggregation_loss.csv",
-        "geographic_resolution_sensitivity",
+            "primary_leave_one_tract_out_rollup",
         "direct_zcta_comparison",
         "supplement_geographic_consequence_transitions.csv",
         "supplement_geographic_consequence_stability.csv",
@@ -487,18 +487,17 @@ def test_master_notebook_declares_manuscript_and_vector_outputs() -> None:
     assert '"C1": {' in source and '"C2": {' in source
 
 
-def test_exact_five_main_displays_and_required_panel_roles() -> None:
+def test_exact_three_main_displays_and_required_panel_roles() -> None:
     source = _source()
     rendered_source = source + _display_source()
     assert "MAIN_DISPLAY_IDS = (" in source
     for display_id in (
         '"table_1"',
         '"figure_1"',
-        '"figure_2"',
-        '"figure_3"',
         '"table_2"',
     ):
         assert source.count(display_id) == 1
+    assert "main_ids = tuple(MAIN_DISPLAY_IDS)" in source
     for panel_role in (
         "Chicago tract and community-area footprint",
         "Condition-year availability",
@@ -546,7 +545,7 @@ def test_master_notebook_declares_schema_first_claim_and_display_audits() -> Non
         "supplement_data_quality_audit.csv",
         "supplement_claim_evidence_audit.csv",
         "supplement_geographic_resolution_matrix.csv",
-        "geographic_resolution_sensitivity",
+        "primary_leave_one_tract_out_rollup",
         "direct_zcta_comparison",
     ):
         assert required in source
@@ -566,7 +565,7 @@ def test_figure_redesign_uses_geographic_alignment_and_consequences() -> None:
     assert "c2_prediction" not in next(
         ast.unparse(cell)
         for cell in _cells()
-        if "Figure 3. Direct cross-frame classification differences" in ast.unparse(cell)
+        if "eFigure S2. Direct cross-frame classification differences" in ast.unparse(cell)
         and "plt.subplots" in ast.unparse(cell)
     )
 

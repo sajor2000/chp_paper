@@ -13,6 +13,8 @@ from chicagohealthmap.analysis.paper_displays import (
     build_geographic_consequence_display_data,
     build_geographic_main_evidence,
     build_flow_summary,
+    build_primary_information_loss_display,
+    build_primary_information_loss_table,
     build_resolution_heatmap_data,
     build_true_tract_gap_frame,
     confidence_interval_label,
@@ -121,15 +123,30 @@ def test_geographic_main_evidence_drives_three_row_table_2() -> None:
     )
     resolution = pd.DataFrame(
         {
-            "condition_id": ["hypertension", "diabetes", "copd"] * 2,
-            "tract_sample_n": [792, 770, 584, 800, 780, 600],
-            "exact_quartile_agreement_count": [515, 472, 298, 1, 1, 1],
-            "exact_quartile_agreement_pct": [65.025, 61.299, 51.027, 1.0, 1.0, 1.0],
-            "quartile_disagree_count": [277, 298, 286, 999, 999, 999],
-            "quartile_disagree_pct": [34.975, 38.701, 48.973, 99.0, 99.0, 99.0],
-            "comparison_geography_type": ["chicago_community_area"] * 3 + ["zcta"] * 3,
-            "noncrossing_only": [False] * 6,
-            "results_authorized": [False] * 6,
+            "condition_id": ["hypertension", "diabetes", "copd"] * 3,
+            "tract_sample_n": [792, 770, 584, 800, 780, 600, 801, 781, 601],
+            "exact_quartile_agreement_count": [515, 472, 298, 1, 1, 1, 2, 2, 2],
+            "exact_quartile_agreement_pct": [65.025, 61.299, 51.027, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0],
+            "quartile_disagree_count": [277, 298, 286, 999, 999, 999, 998, 998, 998],
+            "quartile_disagree_pct": [34.975, 38.701, 48.973, 99.0, 99.0, 99.0, 98.0, 98.0, 98.0],
+            "q4_movement_count": [99, 141, 125, 0, 0, 0, 0, 0, 0],
+            "q4_movement_pct": [
+                100 * 99 / 792,
+                100 * 141 / 770,
+                100 * 125 / 584,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+            "tract_high_comparison_not_high_count": [55, 58, 40, 0, 0, 0, 0, 0, 0],
+            "comparison_high_tract_not_high_count": [44, 83, 85, 0, 0, 0, 0, 0, 0],
+            "comparison_geography_type": ["chicago_community_area"] * 6 + ["zcta"] * 3,
+            "comparison_role": ["primary"] * 3 + ["secondary_source_export"] * 6,
+            "noncrossing_only": [False] * 9,
+            "results_authorized": [False] * 9,
         }
     )
     transitions = pd.DataFrame(
@@ -170,11 +187,64 @@ def test_geographic_main_evidence_drives_three_row_table_2() -> None:
         "combined_components_not_primary_places_comparator_pending_phenotype_and_period_mapping|"
         "spearman_r:not_available|weighted_kappa:not_available|gwet_ac1:not_available"
     )
-    assert table.loc[0, "Q4 movers, No. (%)"] == "99 (100.0)"
+    assert table.loc[0, "Q4 movers, No. (%)"] == "99 (12.5)"
     assert table.loc[2, "Quartile disagreement, No. (%)"] == "286 (49.0)"
     assert not evidence["results_authorized"].any()
     assert not evidence["manuscript_import_allowed"].any()
     assert "metric-specific" in evidence.loc[0, "uncertainty_status"]
+
+
+def test_primary_information_loss_table_binds_four_estimands_per_condition() -> None:
+    partition = pd.DataFrame(
+        {
+            "analysis_id": ["A1", "A1"],
+            "condition_id": ["hypertension", "copd"],
+            "sensitivity_status": ["primary", "primary"],
+            "eligible_n": [722, 411],
+            "within_variance_share": [0.195, 0.469],
+            "ci_low": [0.724, 0.379],
+            "ci_high": [0.849, 0.667],
+            "bootstrap_replicates": [1000, 1000],
+            "bootstrap_seed": [20260715, 20260715],
+            "results_authorized": [False, False],
+        }
+    )
+    resolution = pd.DataFrame(
+        {
+            "condition_id": ["hypertension", "copd"],
+            "comparison_role": ["primary", "primary"],
+            "noncrossing_only": [False, False],
+            "tract_sample_n": [720, 401],
+            "median_absolute_percentile_rank_gap": [0.084, 0.145],
+            "median_absolute_percentile_rank_gap_ci_low": [0.080, 0.125],
+            "median_absolute_percentile_rank_gap_ci_high": [0.104, 0.173],
+            "quartile_disagree_pct": [34.0, 52.9],
+            "quartile_disagree_pct_ci_low": [28.9, 47.3],
+            "quartile_disagree_pct_ci_high": [43.4, 61.6],
+            "q4_movement_pct": [11.8, 23.7],
+            "q4_movement_pct_ci_low": [6.7, 18.1],
+            "q4_movement_pct_ci_high": [20.0, 33.8],
+            "bootstrap_replicates": [1000, 1000],
+            "bootstrap_seed": [20260715, 20260715],
+            "results_authorized": [False, False],
+        }
+    )
+
+    primary = build_primary_information_loss_table(partition, resolution)
+    display = build_primary_information_loss_display(primary)
+
+    assert primary.shape == (8, 15)
+    assert primary.groupby("condition_id")["estimand"].nunique().eq(4).all()
+    assert primary.loc[
+        primary["estimand"].eq("Within-community variance share"), "eligible_tract_n"
+    ].tolist() == [722, 411]
+    assert primary.loc[
+        primary["condition_id"].eq("hypertension")
+        & primary["estimand"].eq("Within-community variance share"),
+        "ci_low",
+    ].item() == pytest.approx(0.151)
+    assert display.shape == (8, 4)
+    assert display.iloc[0]["Estimate (95% CI)"] == "19.5% (15.1%-27.6%)"
 
 
 def test_geographic_main_evidence_marks_missing_metric_unavailable() -> None:
@@ -207,6 +277,10 @@ def test_geographic_main_evidence_marks_missing_metric_unavailable() -> None:
             "tract_sample_n": [3, 3, 3],
             "quartile_disagree_count": [1, 1, 1],
             "quartile_disagree_pct": [33.3, 33.3, 33.3],
+            "q4_movement_count": [2, 2, 2],
+            "q4_movement_pct": [66.7, 66.7, 66.7],
+            "tract_high_comparison_not_high_count": [1, 1, 1],
+            "comparison_high_tract_not_high_count": [1, 1, 1],
             "comparison_geography_type": ["chicago_community_area"] * 3,
             "noncrossing_only": [False] * 3,
             "results_authorized": [False] * 3,
@@ -240,6 +314,10 @@ def test_geographic_main_evidence_marks_missing_metric_unavailable() -> None:
     assert copd["comparison_geography_type"] == "chicago_community_area"
     assert copd["uncertainty_aware_agreement_status"] == "not_run"
     assert copd["source_checksum"] == "not_provided_in_frame"
+    assert copd["q4_movers_n"] == 2
+    assert copd["q4_transition_eligible_n"] == 3
+    assert copd["q4_movers_pct"] == pytest.approx(66.7)
+    assert pd.isna(copd["mean_annual_source_denominator"])
     assert bool(copd["results_authorized"]) is False
 
 
@@ -370,7 +448,13 @@ def test_adjusted_prediction_uses_observed_exposure_range_and_primary_ci() -> No
     assert prediction["exposure"].iloc[[0, -1]].tolist() == pytest.approx(
         [eligible[exposure].min(), eligible[exposure].max()]
     )
-    assert set(prediction["confidence_level"]) == {0.975}
+    assert set(prediction["confidence_level"]) == {0.95}
+    assert set(prediction["critical_value_distribution"]) == {
+        "t_residual_degrees_of_freedom"
+    }
+    assert set(prediction["residual_degrees_of_freedom"]) == {
+        len(eligible) - result.design.shape[1]
+    }
     assert set(prediction["n"]) == {len(eligible)}
     assert np.all(prediction["ci_low"] <= prediction["prediction"])
     assert np.all(prediction["prediction"] <= prediction["ci_high"])
@@ -382,7 +466,7 @@ def test_flow_summary_keeps_overlapping_case_denominators_as_branches() -> None:
         {"rows": [100, 80], "disease_measure_eligible_rows": [90, 70], "suppressed_rows": [2, 1]}
     )
     flow = build_flow_summary(source, case_denominators={"C1": 77, "C2": 76})
-    assert tuple(MAIN_DISPLAY_IDS) == ("table_1", "figure_1", "figure_2", "figure_3", "table_2")
+    assert tuple(MAIN_DISPLAY_IDS) == ("table_1", "figure_1", "table_2")
     assert flow.loc[flow["stage"].eq("pooled_community_areas"), "count"].item() == 77
     assert flow.loc[flow["stage"].eq("case_eligible"), "count"].tolist() == [77, 76]
     assert flow.loc[flow["stage"].eq("case_eligible"), "branch"].tolist() == ["C1", "C2"]

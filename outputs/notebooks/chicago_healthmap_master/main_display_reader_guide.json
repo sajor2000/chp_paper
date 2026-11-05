@@ -23,28 +23,6 @@
   },
   {
     "authorization": "Descriptive; results_authorized=false",
-    "display_id": "figure_2",
-    "exact_value_location": "Figure 2 panels; exact metrics in Table 2",
-    "inference_boundary": "Alignment is not validation or superiority",
-    "observed_pattern": "The audit display shows rank alignment and direct cross-frame classification differences.",
-    "question": "How do direct tract CHM ranks align across frames?",
-    "sensitivity": "Annual/noncrossing supplement",
-    "uncertainty_not_run": "Uncertainty-aware agreement not run if inputs are unavailable",
-    "unit_denominator": "eligible census tracts by condition"
-  },
-  {
-    "authorization": "Descriptive; results_authorized=false",
-    "display_id": "figure_3",
-    "exact_value_location": "Figure 3 panels and consequence CSV",
-    "inference_boundary": "Direct-frame differences are not causal aggregation effects",
-    "observed_pattern": "The audit display shows Q4 transitions, repeated source denominators, and stability checks.",
-    "question": "What classifications change under direct community-area linkage?",
-    "sensitivity": "Annual/noncrossing eFigures",
-    "uncertainty_not_run": "Classification intervals not run",
-    "unit_denominator": "eligible tracts and repeated source observations"
-  },
-  {
-    "authorization": "Descriptive; results_authorized=false",
     "display_id": "table_2",
     "exact_value_location": "Table 2 cells and editable CSV",
     "inference_boundary": "No prevalence, causality, validation, or service-need claim",

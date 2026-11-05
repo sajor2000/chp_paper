@@ -232,12 +232,15 @@ def test_case_studies_notebook_writes_deterministic_governed_outputs() -> None:
         )
         primary_contrasts = table_2.loc[table_2["row_type"].eq("adjusted_primary_contrast")]
         assert set(primary_contrasts["model_id"]) == {"C2"}
-        assert set(primary_contrasts["confidence_level"]) == {0.975}
+        assert set(primary_contrasts["confidence_level"]) == {0.95}
+        assert set(primary_contrasts["critical_value_distribution"]) == {
+            "t_residual_degrees_of_freedom"
+        }
         sensitivities = table_2.loc[table_2["row_type"].eq("supported_sensitivity")]
         assert set(sensitivities["estimate_unit"]) == {
             "life_expectancy_years_per_frozen_IQR_contrast"
         }
-        assert set(sensitivities["ci_label"]) == {"97.5% CI"}
+        assert set(sensitivities["ci_label"]) == {"95% CI"}
         assert set(sensitivities["analysis_status"]) == {"supported_sensitivity_not_primary"}
         assert set(table_2["moran_residual_model_id"].dropna()) == {"C2"}
         assert set(table_2.loc[table_2["estimate"].notna(), "model_key"]) == {"C2"}
@@ -300,7 +303,19 @@ def test_case_studies_notebook_writes_deterministic_governed_outputs() -> None:
             "analysis_status",
             "authorization_status",
         } <= set(robustness.columns)
-        assert {"population_weighted_ols", "frozen_capture_quartiles"} <= set(robustness["variant"])
+        assert {
+            "population_weighted_ols",
+            "frozen_capture_quartiles",
+            "no_capture_adjustment",
+        } <= set(robustness["variant"])
+        no_capture = robustness.loc[robustness["variant"].eq("no_capture_adjustment")]
+        assert set(no_capture["adjustment_set"]) == {
+            "pct_age_65_plus|pct_female|pct_below_fpl"
+        }
+        assert set(no_capture["confidence_level"]) == {0.95}
+        assert set(no_capture["critical_value_distribution"]) == {
+            "t_residual_degrees_of_freedom"
+        }
         adjusted_temporal = robustness.loc[
             robustness["variant"].str.startswith("leave_one_primary_year_out:")
         ]

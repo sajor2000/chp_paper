@@ -195,6 +195,33 @@ Machine-readable decision: ignored local artifact
 `outputs/quality/gate_3_decision.json`, produced deterministically by
 `notebooks/01_data_review.py` from `outputs/quality/ehr_quality.json`.
 
+## 2026-11-05 — Statistician-comment remediation decisions
+
+The geographic-resolution paper remains focused on hypertension and COPD. Mortality-gap or
+additional-condition analyses are deferred because they would change the estimand, require new
+phenotype and denominator review, and dilute the worked-use-case question.
+
+The primary community-area comparator is reconstructed from the other eligible tracts in the
+focal tract's dominant community area. Annual counts and community-area counts use summed
+numerators divided by summed denominators. Source-published community-area and ZCTA estimates are
+secondary sensitivities.
+
+The primary package reports 4 estimands with 1000 community-area cluster-bootstrap percentile
+intervals. A 1000-replicate binomial noise-only simulation, empirical-Bayes shrinkage,
+suppression scenarios, noncrossing analyses, direct-source comparisons, and included-versus-
+excluded cohort summaries test separate assumptions. None converts the EHR measure into resident
+population prevalence.
+
+C1 remains unexecuted. C2 remains supplementary and now uses 95% HC3 intervals with
+residual-degrees-of-freedom t critical values. A no-capture-adjustment variant is reported beside
+the unweighted, population-weighted, capture-adjusted, and spatial-error variants. The observed
+population-weight sensitivity is interpreted as sensitivity, not robustness.
+
+Stored age-stratum fields exist but do not reconcile additively with all-age totals and lack
+documented suppression semantics. Age standardization therefore remains not run. The final IRB,
+data-sharing, source-semantics, reliability, participating-system, and S7 decisions remain named
+human sign-off items. `results_authorized=false` remains unchanged.
+
 For reproducibility, this project-coupled notebook is executed through the locked project
 environment (`pyproject.toml` and `uv.lock`) rather than a partial PEP 723 dependency
 block. This is a deliberate deviation from the generic notebook-plan recommendation:

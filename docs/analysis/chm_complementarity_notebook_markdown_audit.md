@@ -44,7 +44,7 @@ within 30 days of submission.
 
 The markdown preserves the approved senior-biostatistical decisions: equal-weighted
 community-area OLS with HC3 covariance, prespecified adjustment for age 65 years or older,
-female sex, poverty, and EHR capture, primary 97.5% CIs for C1/C2, 95% CIs for separate
+female sex, poverty, and EHR capture, 95% residual-df t CIs for C1/C2, 95% CIs for separate
 hypertension and diabetes component contrasts, and supportive residual Moran diagnostics.
 The text does not convert EHR-diagnosed proportions among observed CAPriCORN adults into
 population prevalence or causal claims.

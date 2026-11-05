@@ -53,6 +53,24 @@ separate quota failure remains recorded. A new official-page check is required w
 submission. Ethics, data access, data sharing, funding,
 conflicts, contributor, reporting-checklist, and AI-disclosure fields also remain human-owned.
 
+## Human sign-off register
+
+No row in this register is satisfied by a passing computational test. A named human reviewer must
+record the decision, date, and evidence before `results_authorized` can change.
+
+| Decision requiring human confirmation | Current computational evidence | Status | Human reviewer | Date | Evidence or decision |
+| --- | --- | --- | --- | --- | --- |
+| Independent statistician approval of the 4 primary estimands, leave-one-out comparator, 1000-replicate community-area bootstrap, percentile interval, tie rule, and interpretation | Implemented, tested, and rendered for review | pending |  |  |  |
+| Source-owner confirmation of annual denominator eligibility and annual cross-system deduplication | Aggregate files are consistent with the documented denominator but cannot verify person-level linkage | pending |  |  |  |
+| Source-owner confirmation of unresolved zero, suppression, and secondary-suppression semantics | Complete-case and 0 to 9 scenario analyses are rendered | pending |  |  |  |
+| Reconciliation of public 4-tier and internal 5-tier reliability labels | Internal labels are presented only as exploratory source-supplied categories | pending |  |  |  |
+| Age-standardization decision | Stored age fields are present but fail additive reconciliation and lack documented suppression semantics | not_run_pending_source_reconciliation |  |  |  |
+| Combined-diabetes mutual exclusivity and denominator equivalence | Analysis remains unexecuted | not_run_pending_source_reconciliation |  |  |  |
+| Participating-system count and final network description | No number is inserted without source-owner confirmation | pending |  |  |  |
+| IRB determination, identifier, waiver or consent language, and governing institution | Review draft states that these items remain unsupplied | pending |  |  |  |
+| Data-sharing restrictions and public repository language | Aggregate outputs and code are separated from restricted extracts | pending |  |  |  |
+| S7 results authorization | Computational package remains fail-closed | pending |  |  |  |
+
 ## Not checked or not authorized
 
 - No causal interpretation, intervention effect, service-placement recommendation, or population
