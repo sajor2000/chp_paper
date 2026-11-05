@@ -488,10 +488,24 @@ def manuscript_citation_audit_command(
     companion: Path = typer.Option(..., "--companion", exists=True, dir_okay=False),
     references: Path = typer.Option(..., "--references", exists=True, dir_okay=False),
     claims: Path = typer.Option(..., "--claims", exists=True, dir_okay=False),
+    manifest: Path = typer.Option(..., "--manifest", exists=True, dir_okay=False),
+    rendered_main: Path | None = typer.Option(
+        None,
+        "--rendered-main",
+        exists=True,
+        dir_okay=False,
+    ),
 ) -> None:
     """Audit manuscript citations and the statistician-companion boundary."""
     try:
-        report = audit_manuscript_citations(main, companion, references, claims)
+        report = audit_manuscript_citations(
+            main,
+            companion,
+            references,
+            claims,
+            manifest,
+            rendered_main,
+        )
     except (ManuscriptAuditError, OSError, ValueError) as error:
         typer.echo(f"Manuscript citation audit failed: {error}", err=True)
         raise typer.Exit(code=1) from None

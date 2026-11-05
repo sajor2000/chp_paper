@@ -137,15 +137,22 @@ def test_cli_audit_requires_control_flag() -> None:
     assert "control audit requires --control" in result.output
 
 
-def _write_citation_audit_fixture(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
+def _write_citation_audit_fixture(
+    tmp_path: Path,
+) -> tuple[Path, Path, Path, Path, Path]:
     main = tmp_path / "main.Rmd"
     companion = tmp_path / "companion.Rmd"
     references = tmp_path / "references.csv"
     claims = tmp_path / "claims.csv"
+    manifest = tmp_path / "manifest.json"
     main.write_text(
-        "isFALSE(manifest$results_authorized)\n"
+        "```{r setup}\n"
+        "stopifnot(\n"
+        "  isFALSE(manifest$results_authorized)\n"
+        ")\n"
+        "```\n"
         "First claim.<sup>1</sup> Second claim.<sup>2</sup>\n"
-        "Exploratory AUC analyses are reported only in "
+        "Exploratory AUC analyses are reported only in the statistician review companion, "
         "`RMD_chm_paper_r_Ashley.html`.\n"
         "# References\n"
         "1. First source. doi:10.1000/first\n"
@@ -155,14 +162,39 @@ def _write_citation_audit_fixture(tmp_path: Path) -> tuple[Path, Path, Path, Pat
         encoding="utf-8",
     )
     companion.write_text(
-        "isFALSE(manifest$results_authorized)\n"
-        "# Statistical Analysis Module 5: Exploratory Area-Label AUC\n",
+        "```{r setup}\n"
+        "stopifnot(\n"
+        "  isFALSE(manifest$results_authorized)\n"
+        ")\n"
+        "```\n"
+        "Companion claim.<sup>1</sup>\n"
+        "# Statistical Analysis Module 5: Exploratory Area-Label AUC\n"
+        "# References\n"
+        "1. Companion source. doi:10.1000/companion\n"
+        "# Reproducibility Record\n"
+        "Review record.\n",
         encoding="utf-8",
     )
     pd.DataFrame(
         [
-            {"reference_number": 1, "doi": "10.1000/first"},
-            {"reference_number": 2, "pmid": "12345"},
+            {
+                "reference_number": 1,
+                "stable_identifier": "10.1000/first",
+                "identifier_type": "doi",
+                "verification_source": "DOI metadata",
+                "verification_status": "verified_test",
+                "support_status": "verified_support",
+                "supported_claim_or_method": "First claim",
+            },
+            {
+                "reference_number": 2,
+                "stable_identifier": "12345",
+                "identifier_type": "pmid",
+                "verification_source": "PubMed",
+                "verification_status": "verified_test",
+                "support_status": "verified_support",
+                "supported_claim_or_method": "Second claim",
+            },
         ]
     ).to_csv(references, index=False)
     pd.DataFrame(
@@ -170,11 +202,17 @@ def _write_citation_audit_fixture(tmp_path: Path) -> tuple[Path, Path, Path, Pat
             {
                 "claim_id": "M09",
                 "manuscript_location": "Statistician review companion",
+                "claim": "Area-label discrimination is companion-only",
+                "source_artifact": "companion.csv",
+                "denominator_or_unit": "Aggregate tracts",
+                "period": "2022-2024",
+                "uncertainty": "Percentile interval",
                 "verification_status": "verified_exact",
             }
         ]
     ).to_csv(claims, index=False)
-    return main, companion, references, claims
+    manifest.write_text('{"results_authorized": false}\n', encoding="utf-8")
+    return main, companion, references, claims, manifest
 
 
 def test_citation_audit_accepts_ordered_references_and_companion_auc(
@@ -183,11 +221,12 @@ def test_citation_audit_accepts_ordered_references_and_companion_auc(
     report = audit_manuscript_citations(*_write_citation_audit_fixture(tmp_path))
 
     assert report.references == 2
+    assert report.companion_references == 1
     assert report.auc_pointers == 1
 
 
 def test_citation_audit_rejects_reference_order_drift(tmp_path: Path) -> None:
-    main, companion, references, claims = _write_citation_audit_fixture(tmp_path)
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
     main.write_text(
         main.read_text(encoding="utf-8").replace(
             "First claim.<sup>1</sup> Second claim.<sup>2</sup>",
@@ -197,18 +236,95 @@ def test_citation_audit_rejects_reference_order_drift(tmp_path: Path) -> None:
     )
 
     with pytest.raises(ManuscriptAuditError, match="first appearance"):
-        audit_manuscript_citations(main, companion, references, claims)
+        audit_manuscript_citations(main, companion, references, claims, manifest)
 
 
 def test_citation_audit_rejects_numeric_auc_in_main(tmp_path: Path) -> None:
-    main, companion, references, claims = _write_citation_audit_fixture(tmp_path)
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
     main.write_text(
         main.read_text(encoding="utf-8").replace(
-            "Exploratory AUC analyses",
-            "Exploratory AUC 0.939 analyses",
+            "Exploratory AUC analyses are reported only in the statistician review companion,",
+            "Exploratory AUC 0.939 analyses are reported only in the statistician review companion,",
         ),
         encoding="utf-8",
     )
 
-    with pytest.raises(ManuscriptAuditError, match="nonnumeric"):
-        audit_manuscript_citations(main, companion, references, claims)
+    with pytest.raises(ManuscriptAuditError, match="exact nonnumeric"):
+        audit_manuscript_citations(main, companion, references, claims, manifest)
+
+
+def test_citation_audit_rejects_companion_reference_order_drift(tmp_path: Path) -> None:
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
+    companion.write_text(
+        companion.read_text(encoding="utf-8")
+        .replace("Companion claim.<sup>1</sup>", "Second.<sup>2</sup> First.<sup>1</sup>")
+        .replace(
+            "1. Companion source. doi:10.1000/companion",
+            "1. Companion source. doi:10.1000/companion\n"
+            "2. Other source. doi:10.1000/other",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="statistician companion references"):
+        audit_manuscript_citations(main, companion, references, claims, manifest)
+
+
+def test_citation_audit_rejects_duplicate_reference_number(tmp_path: Path) -> None:
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
+    main.write_text(
+        main.read_text(encoding="utf-8").replace(
+            "2. Second source. PMID:12345.",
+            "1. Second source. PMID:12345.",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="duplicate reference numbers"):
+        audit_manuscript_citations(main, companion, references, claims, manifest)
+
+
+def test_citation_audit_rejects_commented_authorization_guard(tmp_path: Path) -> None:
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
+    main.write_text(
+        main.read_text(encoding="utf-8").replace(
+            "  isFALSE(manifest$results_authorized)",
+            "  TRUE # isFALSE(manifest$results_authorized)",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="guard must be active"):
+        audit_manuscript_citations(main, companion, references, claims, manifest)
+
+
+def test_citation_audit_rejects_doi_and_doi_url_duplicate(tmp_path: Path) -> None:
+    main, companion, references, claims, manifest = _write_citation_audit_fixture(tmp_path)
+    companion.write_text(
+        companion.read_text(encoding="utf-8")
+        .replace("Companion claim.<sup>1</sup>", "First.<sup>1</sup> Second.<sup>2</sup>")
+        .replace(
+            "1. Companion source. doi:10.1000/companion",
+            "1. Companion source. doi:10.1000/companion\n"
+            "2. Duplicate source. https://doi.org/10.1000/companion",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ManuscriptAuditError, match="duplicate identifier"):
+        audit_manuscript_citations(main, companion, references, claims, manifest)
+
+
+def test_real_manuscript_citation_audit() -> None:
+    root = Path(__file__).resolve().parents[3]
+
+    report = audit_manuscript_citations(
+        root / "manuscript" / "chicago_health_map_jama_health_forum_original_investigation.Rmd",
+        root / "notebooks" / "RMD_chm_paper_r_Ashley.Rmd",
+        root / "manuscript" / "reference_verification.csv",
+        root / "manuscript" / "claim_evidence_map.csv",
+        root / "config" / "manuscript" / "results_authorization.json",
+    )
+
+    assert report.references == 44
+    assert report.companion_references == 33

@@ -1,7 +1,7 @@
 ---
 title: "Chicago Health Map and Tract-Level Information Beyond Community-Area Summaries"
 subtitle: "JAMA Health Forum Original Investigation: Statistician Review Draft"
-date: "November 4, 2026"
+date: "November 5, 2026"
 output:
   html_document:
     self_contained: true
@@ -25,7 +25,22 @@ flow <- read.csv(file.path(artifact_dir, "supplement_complete_tract_cohort_flow.
 noise <- read.csv(file.path(artifact_dir, "supplement_binomial_noise_reference.csv"), check.names = FALSE)
 shrinkage <- read.csv(file.path(artifact_dir, "supplement_empirical_bayes_sensitivity.csv"), check.names = FALSE)
 suppression <- read.csv(file.path(artifact_dir, "supplement_suppression_scenarios.csv"), check.names = FALSE)
-manifest <- jsonlite::fromJSON(file.path(artifact_dir, "notebook_run_manifest.json"))
+manifest <- jsonlite::fromJSON(
+  file.path(project_root, "manuscript", "statistician_review_input_manifest.json")
+)
+
+required_input_paths <- file.path(artifact_dir, names(manifest$files))
+names(required_input_paths) <- names(manifest$files)
+missing_inputs <- required_input_paths[!file.exists(required_input_paths)]
+if (length(missing_inputs) > 0) {
+  stop("Missing governed statistician-review inputs: ", paste(names(missing_inputs), collapse = ", "))
+}
+observed_sha256 <- vapply(
+  required_input_paths,
+  function(path) digest::digest(file = path, algo = "sha256", serialize = FALSE),
+  character(1)
+)
+stopifnot(identical(unname(observed_sha256), unname(unlist(manifest$files))))
 
 stopifnot(
   nrow(table_2) == 8,
@@ -49,6 +64,22 @@ flow_value <- function(condition, field) {
 
 noise_value <- function(condition, metric, field) {
   row <- noise[noise$condition_id == condition & noise$metric == metric, , drop = FALSE]
+  stopifnot(nrow(row) == 1)
+  row[[field]][1]
+}
+
+shrinkage_value <- function(condition, metric, field) {
+  row <- shrinkage[shrinkage$condition_id == condition & shrinkage$metric == metric, , drop = FALSE]
+  stopifnot(nrow(row) == 1)
+  row[[field]][1]
+}
+
+suppression_value <- function(condition, scenario, field) {
+  row <- suppression[
+    suppression$condition_id == condition & suppression$suppression_scenario == scenario,
+    ,
+    drop = FALSE
+  ]
   stopifnot(nrow(row) == 1)
   row[[field]][1]
 }
@@ -105,7 +136,7 @@ When Chicago Health Map tract estimates are replaced by community-area summaries
 
 Findings:
 
-In this ecological study, community-area summaries changed quartile classification for 34.0% of 720 hypertension tracts and 52.9% of 401 chronic obstructive pulmonary disease tracts. Within-community variation accounted for 19.5% and 46.9% of observed tract variation, respectively.
+In this ecological study, community-area summaries changed quartile classification for `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% of `r value("hypertension", "Quartile disagreement", "eligible_tract_n")` hypertension tracts and `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`% of `r value("copd", "Quartile disagreement", "eligible_tract_n")` chronic obstructive pulmonary disease tracts. Within-community variation accounted for `r fmt_prop_pct(value("hypertension", "Within-community variance share", "estimate"))`% and `r fmt_prop_pct(value("copd", "Within-community variance share", "estimate"))`% of observed tract variation, respectively.
 
 Meaning:
 
@@ -143,7 +174,7 @@ Outcomes were within-community variance share, median absolute percentile-rank d
 
 ## Results
 
-Chicago Health Map included 1848 community-area condition-year records. The primary analysis included 720 hypertension tracts and 401 chronic obstructive pulmonary disease (COPD) tracts. For hypertension, within-community variance share was `r fmt_prop_pct(value("hypertension", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_high"))`%). Median absolute rank difference was `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_high"))`), quartile disagreement was `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("hypertension", "Quartile disagreement", "ci_high"))`%), and highest-quartile movement was `r fmt_pct(value("hypertension", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_high"))`%). Corresponding COPD estimates were `r fmt_prop_pct(value("copd", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("copd", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("copd", "Within-community variance share", "ci_high"))`%), `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_high"))`), `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("copd", "Quartile disagreement", "ci_high"))`%), and `r fmt_pct(value("copd", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("copd", "Movement into or out of Q4", "ci_high"))`%).
+Chicago Health Map included 1848 community-area condition-year records. The primary analysis included `r flow_value("hypertension", "loo_comparator_eligible_tracts")` hypertension tracts and `r flow_value("copd", "loo_comparator_eligible_tracts")` chronic obstructive pulmonary disease (COPD) tracts. For hypertension, within-community variance share was `r fmt_prop_pct(value("hypertension", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("hypertension", "Within-community variance share", "ci_high"))`%). Median absolute rank difference was `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("hypertension", "Median absolute percentile-rank gap", "ci_high"))`), quartile disagreement was `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("hypertension", "Quartile disagreement", "ci_high"))`%), and highest-quartile movement was `r fmt_pct(value("hypertension", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("hypertension", "Movement into or out of Q4", "ci_high"))`%). Corresponding COPD estimates were `r fmt_prop_pct(value("copd", "Within-community variance share", "estimate"))`% (95% CI, `r fmt_prop_pct(value("copd", "Within-community variance share", "ci_low"))`%-`r fmt_prop_pct(value("copd", "Within-community variance share", "ci_high"))`%), `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "estimate"))` (95% CI, `r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_low"))`-`r fmt_rank(value("copd", "Median absolute percentile-rank gap", "ci_high"))`), `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Quartile disagreement", "ci_low"))`%-`r fmt_pct(value("copd", "Quartile disagreement", "ci_high"))`%), and `r fmt_pct(value("copd", "Movement into or out of Q4", "estimate"))`% (95% CI, `r fmt_pct(value("copd", "Movement into or out of Q4", "ci_low"))`%-`r fmt_pct(value("copd", "Movement into or out of Q4", "ci_high"))`%).
 
 ## Conclusions and Relevance
 
@@ -163,7 +194,7 @@ We describe the public website, its data sources, and its interpretation limits,
 
 ## Study Design and Data Sources
 
-We conducted an ecological repeated cross-sectional study of aggregate Chicago Health Map records from 2019 through 2024. The primary geographic-resolution analysis pooled 2022 through 2024, years selected to provide a contemporary 3-year period with consistent source fields. CAPriCORN supplied the clinical network context. American Community Survey data supplied area covariates for supplementary models. City of Chicago and US Census Bureau files supplied geographic boundaries and tract relationships. CDC PLACES, Healthy Chicago Survey, and Chicago Health Atlas data supported secondary cross-source analyses.<sup>16-17,19-26</sup> Reporting followed STROBE and RECORD guidance.<sup>27-28</sup>
+We conducted an ecological repeated cross-sectional study of aggregate Chicago Health Map records from 2019 through 2024. The primary geographic-resolution analysis pooled 2022 through 2024, years selected to provide a contemporary 3-year period with consistent source fields. CAPriCORN supplied the clinical network context. American Community Survey data supplied area covariates for supplementary models. City of Chicago and US Census Bureau files supplied geographic boundaries and tract relationships. CDC PLACES, Healthy Chicago Survey, and Chicago Health Atlas data supported secondary cross-source analyses.<sup>16-22</sup> Reporting followed STROBE and RECORD guidance.<sup>23-24</sup>
 
 ## Chicago Health Map Website and Data Resource
 
@@ -177,7 +208,7 @@ The analytic unit was a geography-condition-year aggregate. No patient-level rec
 
 ## Eligibility and Geographic Linkage
 
-Tracts had to fall within the frozen Chicago boundary definition, have a denominator of at least 30, have an observable numerator and nonsuppressed estimate, and contribute all 3 primary years. We assigned each tract to its dominant community area only when the maximum overlay weight was at least 0.99. The leave-one-out comparator also required another eligible tract in that community area. These rules yielded 777 complete hypertension tracts and 448 complete COPD tracts before dominant-area linkage, 722 and 411 after linkage, and 720 and 401 with a leave-one-out comparator.
+Tracts had to fall within the frozen Chicago boundary definition, have a denominator of at least 30, have an observable numerator and nonsuppressed estimate, and contribute all 3 primary years. We assigned each tract to its dominant community area only when the maximum overlay weight was at least 0.99. The leave-one-out comparator also required another eligible tract in that community area. These rules yielded `r flow_value("hypertension", "complete_2022_2024_tracts")` complete hypertension tracts and `r flow_value("copd", "complete_2022_2024_tracts")` complete COPD tracts before dominant-area linkage, `r flow_value("hypertension", "dominant_area_eligible_tracts")` and `r flow_value("copd", "dominant_area_eligible_tracts")` after linkage, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` and `r flow_value("copd", "loo_comparator_eligible_tracts")` with a leave-one-out comparator.
 
 We treated unresolved zero-or-suppressed values as informative missingness. The primary analysis used complete cases. Scenario analyses replaced an unresolved numerator with 0 or with the smaller of 9 and the denominator. These scenarios were not interpreted as formal bounds. Age-standardized estimates were not computed because age-stratum denominators, stratum-specific suppression behavior, and a compatible standard population could not be reconciled from the aggregate files.
 
@@ -185,15 +216,15 @@ We treated unresolved zero-or-suppressed values as informative missingness. The 
 
 We summed annual numerators and denominators before division. For focal tract (i) in community area (j), the pooled tract estimate was (p_{ij}=\sum_t y_{ijt}/\sum_t n_{ijt}). Its community-area comparator excluded the focal tract: (p_{-i,j}=\sum_{k\ne i,t}y_{kjt}/\sum_{k\ne i,t}n_{kjt}). Tests prevented substitution of an unweighted mean of annual percentages and verified that each focal tract contributed neither numerator nor denominator to its comparator.
 
-We estimated 4 complementary outcomes. First, the within-community variance share was the observed-scale within-area component divided by total tract variance using a one-way method-of-moments partition.<sup>29-30</sup> Second, we calculated the median absolute difference between empirical tract and leave-one-out comparator percentile ranks. Third, we measured disagreement across quartiles defined by fixed percentile boundaries at 0.25, 0.50, and 0.75, using average ranks for ties. Fourth, we measured movement into or out of the highest quartile. No magnitude threshold was defined after observing the results.
+We estimated 4 complementary outcomes. First, the within-community variance share was the observed-scale within-area component divided by total tract variance using a one-way method-of-moments partition.<sup>25-26</sup> Second, we calculated the median absolute difference between empirical tract and leave-one-out comparator percentile ranks. Third, we measured disagreement across quartiles defined by fixed percentile boundaries at 0.25, 0.50, and 0.75, using average ranks for ties. Fourth, we measured movement into or out of the highest quartile. No magnitude threshold was defined after observing the results.
 
 ## Uncertainty and Sensitivity Analyses
 
-We resampled community areas with replacement, retained their member tracts, and recomputed ranks and categories within each replicate. The primary analysis used 1000 replicates, seed 20260715, and the 2.5th and 97.5th percentiles.<sup>31-33</sup> We used the same design for all 4 primary estimands.
+We resampled community areas with replacement, retained their member tracts, and recomputed ranks and categories within each replicate. The primary analysis used 1000 replicates, seed 20260715, and the 2.5th and 97.5th percentiles.<sup>27-29</sup> We used the same design for all 4 primary estimands.
 
-To quantify finite-denominator variation, we ran 1000 binomial simulations using each tract-year denominator and its leave-one-out area probability. This simulation was a noise reference, not a measurement-error correction. We also applied beta-binomial empirical-Bayes shrinkage as a sensitivity, while retaining unshrunk estimates as primary.<sup>34</sup> Source-published community-area values and Census ZIP Code Tabulation Area values were secondary because their weighting and condition-specific denominators were not fully documented. Cross-source Spearman correlation and quadratic weighted kappa described alignment without treating either source as correct.<sup>35</sup>
+To quantify finite-denominator variation, we ran 1000 binomial simulations using each tract-year denominator and its leave-one-out area probability. This simulation was a noise reference, not a measurement-error correction. We also applied beta-binomial empirical-Bayes shrinkage as a sensitivity, while retaining unshrunk estimates as primary.<sup>30</sup> Source-published community-area values and Census ZIP Code Tabulation Area values were secondary because their weighting and condition-specific denominators were not fully documented. Cross-source Spearman correlation and quadratic weighted kappa described alignment without treating either source as correct.<sup>31</sup>
 
-Supplementary community-area models used ordinary least squares with HC3 covariance, residual-degrees-of-freedom (t) critical values, and 95% CIs.<sup>36</sup> The locked adjustment set was percentage aged 65 years or older, percentage female, percentage below the federal poverty level, and mean 2022 through 2024 capture. Regression-residual Moran I used row-standardized queen weights and 9999 fitted-design null simulations. Spatial error models were sensitivities.<sup>37-42</sup> Combined diabetes was not analyzed because mutual exclusivity and denominator equivalence were not established. We applied NCHS reliability principles cautiously because they were developed for survey estimates rather than EHR denominators.<sup>43</sup>
+Supplementary community-area models used ordinary least squares with HC3 covariance, residual-degrees-of-freedom (t) critical values, and 95% CIs.<sup>32</sup> The locked adjustment set was percentage aged 65 years or older, percentage female, percentage below the federal poverty level, and mean 2022 through 2024 capture. Regression-residual Moran I used row-standardized queen weights and 9999 fitted-design null simulations. Spatial error models were sensitivities.<sup>33-35</sup> Combined diabetes was not analyzed because mutual exclusivity and denominator equivalence were not established. We applied NCHS reliability principles cautiously because they were developed for survey estimates rather than EHR denominators.<sup>36</sup>
 
 Analyses used Python 3.13.14 (Python Software Foundation) with pandas 3.0.3, NumPy 2.5.1, SciPy 1.18.0, statsmodels 0.14.6, and Matplotlib 3.11.0. The review manuscript was rendered in R 4.6.1 (R Foundation). All CIs were 2-sided 95% intervals.
 
@@ -207,7 +238,7 @@ Analyses used Python 3.13.14 (Python Software Foundation) with pandas 3.0.3, Num
 
 The community-area resource contained 1848 condition-year records across 77 community areas and 6 years (Table 1). Hypertension records were complete across all 462 area-years. Five of 462 COPD area-year records (1.1%) were suppressed. The source-published median condition-record denominator was 3193 for hypertension and 3163 for COPD. These denominators were geography-period-condition observations, not counts of unique people across the study period.
 
-Among 782 Chicago-boundary tracts for hypertension, 777 had complete 2022 through 2024 data, 722 met the dominant-area criterion, and 720 had another eligible tract in the area. For COPD, the corresponding counts were 777, 448, 411, and 401 (Figure 1). The greater COPD attrition reflected unresolved or suppressed values rather than an absence of Chicago tracts.
+Among `r flow_value("hypertension", "boundary_tracts")` Chicago-boundary tracts for hypertension, `r flow_value("hypertension", "complete_2022_2024_tracts")` had complete 2022 through 2024 data, `r flow_value("hypertension", "dominant_area_eligible_tracts")` met the dominant-area criterion, and `r flow_value("hypertension", "loo_comparator_eligible_tracts")` had another eligible tract in the area. For COPD, the corresponding counts were `r flow_value("copd", "boundary_tracts")`, `r flow_value("copd", "complete_2022_2024_tracts")`, `r flow_value("copd", "dominant_area_eligible_tracts")`, and `r flow_value("copd", "loo_comparator_eligible_tracts")` (Figure 1). The greater COPD attrition reflected unresolved or suppressed values rather than an absence of Chicago tracts.
 
 ## Primary Geographic-Resolution Estimates
 
@@ -219,21 +250,21 @@ Exploratory AUC analyses are reported only in the statistician review companion,
 
 ## Sensitivity Analyses
 
-The observed information-loss estimates exceeded the median noise-only reference for both conditions. Noise-only quartile disagreement was `r fmt_pct(noise_value("hypertension", "quartile_disagree_pct", "noise_only_median"))`% for hypertension and `r fmt_pct(noise_value("copd", "quartile_disagree_pct", "noise_only_median"))`% for COPD, compared with observed values of `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% and `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`%. Empirical-Bayes shrinkage produced quartile-disagreement estimates of 33.8% for hypertension and 52.1% for COPD, close to the unshrunk results. The primary estimate and finite-denominator review graphics are reported in Supplement 1.
+The observed information-loss estimates exceeded the median noise-only reference for both conditions. Noise-only quartile disagreement was `r fmt_pct(noise_value("hypertension", "quartile_disagree_pct", "noise_only_median"))`% for hypertension and `r fmt_pct(noise_value("copd", "quartile_disagree_pct", "noise_only_median"))`% for COPD, compared with observed values of `r fmt_pct(value("hypertension", "Quartile disagreement", "estimate"))`% and `r fmt_pct(value("copd", "Quartile disagreement", "estimate"))`%. Empirical-Bayes shrinkage produced quartile-disagreement estimates of `r fmt_pct(shrinkage_value("hypertension", "quartile_disagree_pct", "shrunken_estimate"))`% for hypertension and `r fmt_pct(shrinkage_value("copd", "quartile_disagree_pct", "shrunken_estimate"))`% for COPD, close to the unshrunk results. The primary estimate and finite-denominator review graphics are reported in the statistician review companion.
 
-Suppression scenarios did not change hypertension estimates. For COPD, imputing unresolved numerators as 0 produced 48.9% quartile disagreement, whereas assigning up to 9 produced 52.3%. Corresponding highest-quartile movement was 17.0% and 16.7%. These scenarios included 713 tracts and therefore changed both the values and the analytic population. Source-published community-area, noncrossing-tract, ZCTA, reliability-stratified, cross-source, and annual analyses are reported in Supplement 1. They were treated as sensitivities rather than independent standards.
+Suppression scenarios did not change hypertension estimates. For COPD, imputing unresolved numerators as 0 produced `r fmt_pct(suppression_value("copd", "unresolved_numerator_zero", "quartile_disagree_pct"))`% quartile disagreement, whereas assigning up to 9 produced `r fmt_pct(suppression_value("copd", "unresolved_numerator_up_to_nine", "quartile_disagree_pct"))`%. Corresponding highest-quartile movement was `r fmt_pct(suppression_value("copd", "unresolved_numerator_zero", "q4_movement_pct"))`% and `r fmt_pct(suppression_value("copd", "unresolved_numerator_up_to_nine", "q4_movement_pct"))`%. These scenarios included `r suppression_value("copd", "unresolved_numerator_zero", "tract_sample_n")` tracts and therefore changed both the values and the analytic population. Source-published community-area, noncrossing-tract, ZCTA, reliability-stratified, cross-source, and annual analyses are reported in the statistician review companion. They were treated as sensitivities rather than independent standards.
 
 # Discussion
 
 In this worked use case of Chicago Health Map, community-area summaries retained broad geographic signal but did not retain all clinically observed tract variation. The information loss was larger for COPD than hypertension across the variance, rank, quartile, and highest-quartile estimands. The finding persisted after empirical-Bayes shrinkage and remained greater than the median differences expected from the study's finite denominators. These results support a supplementary role for small-area health-system data: they can identify variation within common public reporting units that merits investigation with population-based and community evidence.
 
-The results do not imply that tract estimates are more accurate than community-area estimates. The leave-one-out design answered a narrower question by comparing each tract with a coarser summary constructed from other tracts in the same source frame. This avoided allowing the focal tract to define its own comparator and avoided treating source-published community-area values as a gold standard. Prior EHR surveillance studies have similarly shown that routine clinical data can provide timely neighborhood information while remaining sensitive to patient capture, phenotype definitions, participating systems, and utilization.<sup>7-15,44-51</sup>
+The results do not imply that tract estimates are more accurate than community-area estimates. The leave-one-out design answered a narrower question by comparing each tract with a coarser summary constructed from other tracts in the same source frame. This avoided allowing the focal tract to define its own comparator and avoided treating source-published community-area values as a gold standard. Prior EHR surveillance studies have similarly shown that routine clinical data can provide timely neighborhood information while remaining sensitive to patient capture, phenotype definitions, participating systems, and utilization.<sup>7-15,37-44</sup>
 
 COPD and hypertension differed in data completeness and estimated information loss. COPD had more unresolved or suppressed tract-years, fewer complete tracts, and wider uncertainty. Its larger tract-community differences therefore coexist with a more selected analytic frame. Hypertension had near-complete tract availability and showed smaller but precisely estimated within-area differences. The study did not assign a threshold for practical importance, and neither pattern establishes where services are needed. A tract flagged by this analysis is a place where the EHR-derived description differs from its area's summary, not evidence of underdiagnosis, poor care, disease burden, or an intervention target.
 
 The noise simulation addressed one source of measurement uncertainty. Observed quartile disagreement exceeded the central noise-only distributions, so denominator size alone did not reproduce the tract-community differences under the simulation assumptions. The simulation assumed binomial variation around the leave-one-out area probability and did not represent diagnostic misclassification, health-system selection, geocoding error, cross-year dependence, or changes in participating institutions. Shrinkage stabilized crude proportions under a beta-binomial model but could not correct the EHR population to the resident population.
 
-Chicago Health Map can complement public health data when each source retains its own inferential boundary. Population surveys, vital records, and modeled surveillance remain necessary for resident-population inference. Health-system records can add a clinically grounded tract-level signal and can be refreshed on different schedules. Used together, the sources can identify discordant areas, generate hypotheses about ascertainment or access, and support targeted data-quality review. They should not be combined as if they measure the same population, and EHR estimates should not independently direct resource allocation. The same principle underlies multisite EHR surveillance networks and health information exchange programs.<sup>1,9,12,14,47-51</sup>
+Chicago Health Map can complement public health data when each source retains its own inferential boundary. Population surveys, vital records, and modeled surveillance remain necessary for resident-population inference. Health-system records can add a clinically grounded tract-level signal and can be refreshed on different schedules. Used together, the sources can identify discordant areas, generate hypotheses about ascertainment or access, and support targeted data-quality review. They should not be combined as if they measure the same population, and EHR estimates should not independently direct resource allocation. The same principle underlies multisite EHR surveillance networks and health information exchange programs.<sup>1,9,12,14,40-44</sup>
 
 The website supports several bounded, practical uses. A public health team can use the tract view to determine whether a community-area average conceals smaller-area differences, then examine those differences with population surveillance and local knowledge. A health system can review a diagnosis pattern beside capture and reliability information to identify places that require data-quality or ascertainment review. A community organization can use a community snapshot to frame questions for local partners and request more specific evidence. These examples concern question generation and measurement review. This study did not test whether the website changed programs, resource allocation, or health outcomes.
 
@@ -267,7 +298,7 @@ Tract-level Chicago Health Map measures contained clinically observed geographic
 
 **Additional Contributions:** [Insert acknowledgments and confirm written permission from named nonauthors.]
 
-**AI Assistance Disclosure:** OpenAI Codex was used on November 4, 2026, to organize and edit manuscript language, reconcile reported aggregate values with governed analysis artifacts, and render the author-review HTML. The authors are responsible for every sentence, number, citation, interpretation, and disclosure. References were drawn from verified project records and PubMed metadata rather than generated from model memory.
+**AI Assistance Disclosure:** OpenAI Codex was used on November 4 and 5, 2026, to organize and edit manuscript language, reconcile reported aggregate values with governed analysis artifacts, and render the author-review HTML. The authors are responsible for every sentence, number, citation, interpretation, and disclosure. References were drawn from verified project records and PubMed metadata rather than generated from model memory.
 
 # References
 
@@ -289,39 +320,32 @@ Tract-level Chicago Health Map measures contained clinically observed geographic
 16. Chicago Health Map. Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed November 4, 2026. https://chicagohealthmap.com/
 17. Kho AN, Hynes DM, Goel S, et al. CAPriCORN: Chicago Area Patient-Centered Outcomes Research Network. *J Am Med Inform Assoc.* 2014;21(4):607-611. doi:10.1136/amiajnl-2014-002827
 18. Chicago Health Map. Data Methods & Resources. Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed November 4, 2026. https://chicagohealthmap.com/data-glossary
-19. Hunt BR, et al. Life expectancy varies in local communities in Chicago: racial and spatial disparities and correlates. *J Racial Ethn Health Disparities.* 2015;2(4):425-433. doi:10.1007/s40615-015-0089-8
-20. Centers for Disease Control and Prevention. PLACES Census Tract Data, GIS Friendly Format, 2025 release, dataset yjkw-uj5s. Accessed July 13, 2026. https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2025-/yjkw-uj5s
-21. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001. Accessed July 13, 2026. https://www.census.gov/programs-surveys/acs/data/summary-file.html
-22. Chicago Health Atlas. Life expectancy, indicator VRLE. Originating source: Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026. https://chicagohealthatlas.org/api/v1/
-23. City of Chicago. Boundaries-Community Areas, dataset igwz-8jzy. Accessed July 14, 2026. https://data.cityofchicago.org/d/igwz-8jzy
-24. Chicago Department of Public Health. Healthy Chicago Survey hypertension and adult diabetes indicators. Chicago Health Atlas indicators HCSHYTP and HCSDIAP. Accessed August 27, 2026. https://chicagohealthatlas.org/
-25. Minnesota Electronic Health Record Consortium. Health Trends Across Communities in Minnesota Dashboard. Accessed August 27, 2026. https://mnehrconsortium.org/explore-our-findings/health-trends-across-communities-in-mn/
-26. Johnson SG, Chamberlain AM, Drawz P, et al. Design and implementation of a state-wide network for near real-time public health surveillance and research: the Minnesota Electronic Health Record Consortium experience. *Learn Health Syst.* 2026;10(2):e70070. doi:10.1002/lrh2.70070
-27. von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. *PLoS Med.* 2007;4(10):e296. doi:10.1371/journal.pmed.0040296
-28. Benchimol EI, et al. The REporting of studies Conducted using Observational Routinely-collected health Data statement. *PLoS Med.* 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
-29. Nakagawa S, Johnson PCD, Schielzeth H. The coefficient of determination R2 and intra-class correlation coefficient from generalized linear mixed-effects models revisited and expanded. *J R Soc Interface.* 2017;14(134):20170213. doi:10.1098/rsif.2017.0213
-30. Searle SR, Casella G, McCulloch CE. *Variance Components.* Wiley; 1992.
-31. Efron B. Bootstrap methods: another look at the jackknife. *Ann Stat.* 1979;7(1):1-26. doi:10.1214/aos/1176344552
-32. Davison AC, Hinkley DV. *Bootstrap Methods and Their Application.* Cambridge University Press; 1997. doi:10.1017/CBO9780511802843
-33. Field CA, Welsh AH. Bootstrapping clustered data. *J R Stat Soc Series B Stat Methodol.* 2007;69(3):369-390. doi:10.1111/j.1467-9868.2007.00593.x
-34. Morris CN. Parametric empirical Bayes inference: theory and applications. *J Am Stat Assoc.* 1983;78(381):47-55. doi:10.1080/01621459.1983.10477920
-35. Cohen J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. *Psychol Bull.* 1968;70(4):213-220. doi:10.1037/h0026256
-36. Long JS, Ervin LH. Using heteroscedasticity consistent standard errors in the linear regression model. *Am Stat.* 2000;54(3):217-224. doi:10.1080/00031305.2000.10474549
-37. Moran PAP. Notes on continuous stochastic phenomena. *Biometrika.* 1950;37(1-2):17-23. doi:10.1093/biomet/37.1-2.17
-38. Anselin L. Local indicators of spatial association-LISA. *Geogr Anal.* 1995;27(2):93-115. doi:10.1111/j.1538-4632.1995.tb00338.x
-39. Getis A, Ord JK. The analysis of spatial association by use of distance statistics. *Geogr Anal.* 1992;24(3):189-206. doi:10.1111/j.1538-4632.1992.tb00261.x
-40. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *J R Stat Soc Series B.* 1995;57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x
-41. Hepple LW. Exact testing for spatial autocorrelation among regression residuals. *Environ Plan A.* 1998;30(1):85-108. doi:10.1068/a300085
-42. Anselin L. *Spatial Econometrics: Methods and Models.* Kluwer Academic Publishers; 1988. doi:10.1007/978-94-015-7799-1
-43. Parker JD, Talih M, Malec DJ, et al. National Center for Health Statistics data presentation standards for proportions. *Vital Health Stat 2.* 2017;(175):1-22.
-44. Stolte A, Merli MG, Hurst JH, Liu Y, Wood CT, Goldstein BA. Using electronic health records to understand the population of local children captured in a large health system in Durham County, North Carolina. *Soc Sci Med.* 2022;296:114759. doi:10.1016/j.socscimed.2022.114759
-45. Romo ML, Chan PY, Lurie-Moroni E, et al. Characterizing adults receiving primary medical care in New York City: implications for using electronic health records for chronic disease surveillance. *Prev Chronic Dis.* 2016;13:E56. doi:10.5888/pcd13.150500
-46. Hohman KH, Zambarano B, Klompas M, et al. Development of a hypertension electronic phenotype for chronic disease surveillance in electronic health records. *Prev Chronic Dis.* 2023;20:E80. doi:10.5888/pcd20.230026
-47. Perlman SE, McVeigh KH, Thorpe LE, Jacobson L, Greene CM, Gwynn RC. Innovations in population health surveillance: using electronic health records for chronic disease surveillance. *Am J Public Health.* 2017;107(6):853-857. doi:10.2105/AJPH.2017.303813
-48. Hohman KH, Martinez AK, Klompas M, et al. Leveraging electronic health record data for timely chronic disease surveillance: the Multi-State EHR-Based Network for Disease Surveillance. *J Public Health Manag Pract.* 2023;29(2):162-173. doi:10.1097/PHH.0000000000001693
-49. Horth RZ, Wagstaff S, Jeppson T, et al. Use of electronic health records from a statewide health information exchange to support public health surveillance of diabetes and hypertension. *BMC Public Health.* 2019;19(1):1106. doi:10.1186/s12889-019-7367-z
-50. Laranjo L, Rodrigues D, Pereira AM, Ribeiro RT, Boavida JM. Use of electronic health records and geographic information systems in public health surveillance of type 2 diabetes: a feasibility study. *JMIR Public Health Surveill.* 2016;2(1):e12. doi:10.2196/publichealth.4319
-51. Thorpe LE, McVeigh KH, Perlman S, et al. Monitoring prevalence, treatment, and control of metabolic conditions in New York City adults using 2013 primary care electronic health records. *EGEMS (Wash DC).* 2016;4(1):1266. doi:10.13063/2327-9214.1266
+19. Centers for Disease Control and Prevention. PLACES Census Tract Data, GIS Friendly Format, 2025 release, dataset yjkw-uj5s. Accessed July 13, 2026. https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2025-/yjkw-uj5s
+20. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001. Accessed July 13, 2026. https://www.census.gov/programs-surveys/acs/data/summary-file.html
+21. City of Chicago. Boundaries-Community Areas, dataset igwz-8jzy. Accessed July 14, 2026. https://data.cityofchicago.org/d/igwz-8jzy
+22. Chicago Department of Public Health. Healthy Chicago Survey hypertension and adult diabetes indicators. Chicago Health Atlas indicators HCSHYTP and HCSDIAP. Accessed August 27, 2026. https://chicagohealthatlas.org/
+23. von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. *PLoS Med.* 2007;4(10):e296. doi:10.1371/journal.pmed.0040296
+24. Benchimol EI, et al. The REporting of studies Conducted using Observational Routinely-collected health Data statement. *PLoS Med.* 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+25. Nakagawa S, Johnson PCD, Schielzeth H. The coefficient of determination R2 and intra-class correlation coefficient from generalized linear mixed-effects models revisited and expanded. *J R Soc Interface.* 2017;14(134):20170213. doi:10.1098/rsif.2017.0213
+26. Searle SR, Casella G, McCulloch CE. *Variance Components.* Wiley; 1992.
+27. Efron B. Bootstrap methods: another look at the jackknife. *Ann Stat.* 1979;7(1):1-26. doi:10.1214/aos/1176344552
+28. Davison AC, Hinkley DV. *Bootstrap Methods and Their Application.* Cambridge University Press; 1997. doi:10.1017/CBO9780511802843
+29. Field CA, Welsh AH. Bootstrapping clustered data. *J R Stat Soc Series B Stat Methodol.* 2007;69(3):369-390. doi:10.1111/j.1467-9868.2007.00593.x
+30. Morris CN. Parametric empirical Bayes inference: theory and applications. *J Am Stat Assoc.* 1983;78(381):47-55. doi:10.1080/01621459.1983.10477920
+31. Cohen J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. *Psychol Bull.* 1968;70(4):213-220. doi:10.1037/h0026256
+32. Long JS, Ervin LH. Using heteroscedasticity consistent standard errors in the linear regression model. *Am Stat.* 2000;54(3):217-224. doi:10.1080/00031305.2000.10474549
+33. Moran PAP. Notes on continuous stochastic phenomena. *Biometrika.* 1950;37(1-2):17-23. doi:10.1093/biomet/37.1-2.17
+34. Hepple LW. Exact testing for spatial autocorrelation among regression residuals. *Environ Plan A.* 1998;30(1):85-108. doi:10.1068/a300085
+35. Anselin L. *Spatial Econometrics: Methods and Models.* Kluwer Academic Publishers; 1988. doi:10.1007/978-94-015-7799-1
+36. Parker JD, Talih M, Malec DJ, et al. National Center for Health Statistics data presentation standards for proportions. *Vital Health Stat 2.* 2017;(175):1-22.
+37. Stolte A, Merli MG, Hurst JH, Liu Y, Wood CT, Goldstein BA. Using electronic health records to understand the population of local children captured in a large health system in Durham County, North Carolina. *Soc Sci Med.* 2022;296:114759. doi:10.1016/j.socscimed.2022.114759
+38. Romo ML, Chan PY, Lurie-Moroni E, et al. Characterizing adults receiving primary medical care in New York City: implications for using electronic health records for chronic disease surveillance. *Prev Chronic Dis.* 2016;13:E56. doi:10.5888/pcd13.150500
+39. Hohman KH, Zambarano B, Klompas M, et al. Development of a hypertension electronic phenotype for chronic disease surveillance in electronic health records. *Prev Chronic Dis.* 2023;20:E80. doi:10.5888/pcd20.230026
+40. Perlman SE, McVeigh KH, Thorpe LE, Jacobson L, Greene CM, Gwynn RC. Innovations in population health surveillance: using electronic health records for chronic disease surveillance. *Am J Public Health.* 2017;107(6):853-857. doi:10.2105/AJPH.2017.303813
+41. Hohman KH, Martinez AK, Klompas M, et al. Leveraging electronic health record data for timely chronic disease surveillance: the Multi-State EHR-Based Network for Disease Surveillance. *J Public Health Manag Pract.* 2023;29(2):162-173. doi:10.1097/PHH.0000000000001693
+42. Horth RZ, Wagstaff S, Jeppson T, et al. Use of electronic health records from a statewide health information exchange to support public health surveillance of diabetes and hypertension. *BMC Public Health.* 2019;19(1):1106. doi:10.1186/s12889-019-7367-z
+43. Laranjo L, Rodrigues D, Pereira AM, Ribeiro RT, Boavida JM. Use of electronic health records and geographic information systems in public health surveillance of type 2 diabetes: a feasibility study. *JMIR Public Health Surveill.* 2016;2(1):e12. doi:10.2196/publichealth.4319
+44. Thorpe LE, McVeigh KH, Perlman S, et al. Monitoring prevalence, treatment, and control of metabolic conditions in New York City adults using 2013 primary care electronic health records. *EGEMS (Wash DC).* 2016;4(1):1266. doi:10.13063/2327-9214.1266
 
 # Table Legends
 

@@ -160,53 +160,27 @@ knitr::opts_chunk$set(
   cache = FALSE
 )
 
-manifest_path <- file.path(artifact_dir, "notebook_run_manifest.json")
+manifest_path <- file.path(project_root, "manuscript", "statistician_review_input_manifest.json")
 manifest <- jsonlite::fromJSON(manifest_path, simplifyVector = TRUE)
 # The upstream flag controls automated manuscript/coauthor exports. It does not
 # suppress the governed aggregate findings in this statistician review report.
 stopifnot(isFALSE(manifest$results_authorized))
 
-required_artifacts <- c(
-  "00_master_analytic_dataset.csv",
-  "00_master_analytic_dataset_manifest.json",
-  "table_1_resource_quality.csv",
-  "table_2_geographic_resolution.csv",
-  "supplement_geographic_main_evidence.csv",
-  "supplement_geographic_consequence_details.csv",
-  "supplement_geographic_resolution_matrix.csv",
-  "supplement_geographic_consequence_transitions.csv",
-  "supplement_geographic_consequence_stability.csv",
-  "supplement_concordance_bootstrap.csv",
-  "supplement_full_coefficient_table.csv",
-  "supplement_adjusted_diagnostic_data.csv",
-  "supplement_model_gate_diagnostics.csv",
-  "supplement_spatial_diagnostics.csv",
-  "supplement_spatial_error_sensitivity.csv",
-  "supplement_robustness_summary.csv",
-  "supplement_tract_cohort_flow.csv",
-  "supplement_complete_tract_cohort_flow.csv",
-  "supplement_aggregation_loss.csv",
-  "supplement_binomial_noise_reference.csv",
-  "supplement_empirical_bayes_sensitivity.csv",
-  "supplement_suppression_scenarios.csv",
-  "supplement_descriptive_complementarity_methods.csv",
-  "supplement_tract_complementarity.csv",
-  "biostatistical_display_review.csv"
-)
+required_artifacts <- names(manifest$files)
 missing_artifacts <- required_artifacts[!file.exists(file.path(artifact_dir, required_artifacts))]
 if (length(missing_artifacts) > 0) stop("Missing required artifacts: ", paste(missing_artifacts, collapse = ", "))
 
-expected_hashes <- unlist(manifest$output_sha256, use.names = TRUE)
+expected_hashes <- unlist(manifest$files, use.names = TRUE)
 checked_hashes <- vapply(required_artifacts, function(name) {
   digest::digest(file = file.path(artifact_dir, name), algo = "sha256", serialize = FALSE)
 }, character(1))
 hash_ok <- checked_hashes == expected_hashes[required_artifacts]
 if (anyNA(hash_ok) || !all(hash_ok)) {
-  stop("At least one R input does not match the completed Marimo manifest: ",
+  stop("At least one R input does not match the statistician-review input manifest: ",
        paste(required_artifacts[is.na(hash_ok) | !hash_ok], collapse = ", "))
 }
 
-raw_aggregate <- read_artifact("00_master_analytic_dataset.csv")
+raw_aggregate <- read_artifact("00_master_analytic_review_extract.csv")
 dataset_manifest <- jsonlite::fromJSON(
   file.path(artifact_dir, "00_master_analytic_dataset_manifest.json"),
   simplifyVector = TRUE
@@ -234,6 +208,7 @@ suppression_scenarios <- read_artifact("supplement_suppression_scenarios.csv")
 descriptive_methods <- read_artifact("supplement_descriptive_complementarity_methods.csv")
 reliability_sensitivity <- read_artifact("supplement_tract_complementarity.csv")
 display_review <- read_artifact("biostatistical_display_review.csv")
+hcs_chm_hypertension <- read_artifact("supplement_hcs_chm_hypertension.csv")
 
 aggregation_primary <- aggregation_loss |>
   filter(comparison_role == "primary", !as_flag(noncrossing_only))
@@ -244,101 +219,8 @@ variance_primary <- descriptive_methods |>
     condition_id %in% c("hypertension", "copd")
   )
 
-# The Healthy Chicago Survey (HCS) triangulation is read from the frozen public
-# source snapshot rather than from a manuscript result artifact. Every source
-# file is verified against the repository checksum ledger before parsing.
-checksum_ledger_path <- file.path(project_root, "sources", "public", "CHECKSUMS.sha256")
-checksum_lines <- readLines(checksum_ledger_path, warn = FALSE)
-checksum_lines <- checksum_lines[grepl("^[0-9a-f]{64}  ", checksum_lines)]
-checksum_ledger <- data.frame(
-  sha256 = sub("  .*", "", checksum_lines),
-  relative_path = sub("^[0-9a-f]{64}  ", "", checksum_lines),
-  stringsAsFactors = FALSE
-)
-
-read_verified_public_json <- function(relative_path) {
-  match_row <- checksum_ledger[checksum_ledger$relative_path == relative_path, , drop = FALSE]
-  if (nrow(match_row) != 1L) stop("Expected one public checksum entry for ", relative_path)
-  absolute_path <- file.path(project_root, relative_path)
-  if (!file.exists(absolute_path)) stop("Missing frozen public source: ", absolute_path)
-  observed <- digest::digest(file = absolute_path, algo = "sha256", serialize = FALSE)
-  if (!identical(observed, match_row$sha256[[1]])) {
-    stop("Frozen public source checksum mismatch: ", relative_path)
-  }
-  jsonlite::fromJSON(absolute_path, simplifyDataFrame = TRUE)
-}
-
-hcs_hypertension_path <- paste0(
-  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/data/",
-  "HCSHYTP/2023-2024.json"
-)
-hcs_diabetes_path <- paste0(
-  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/data/",
-  "HCSDIAP/2023-2024.json"
-)
-hcs_topics_path <- paste0(
-  "sources/public/chicago_health_atlas/snapshots/2026-07-13/original/metadata/",
-  "topics.json"
-)
-
-hcs_hypertension_source <- read_verified_public_json(hcs_hypertension_path)$results
-hcs_diabetes_source <- read_verified_public_json(hcs_diabetes_path)$results
-hcs_topics <- read_verified_public_json(hcs_topics_path)$results
-hcs_topic_metadata <- hcs_topics[hcs_topics$key %in% c("HCSHYTP", "HCSDIAP"), , drop = FALSE]
-
-hcs_hypertension <- hcs_hypertension_source |>
-  filter(l == "neighborhood", a == "HCSHYTP", p == "", d == "2023-2024") |>
-  transmute(
-    geography_id = as.character(as.integer(sub("^.*-", "", g))),
-    hcs_estimate = as.numeric(v),
-    hcs_standard_error = as.numeric(se),
-    hcs_ci_low = pmax(0, hcs_estimate - 1.96 * hcs_standard_error),
-    hcs_ci_high = pmin(100, hcs_estimate + 1.96 * hcs_standard_error)
-  )
-
-hcs_diabetes_availability <- hcs_diabetes_source |>
-  filter(l == "neighborhood", a == "HCSDIAP", p == "", d == "2023-2024")
-
-chm_hypertension_2022_2024 <- raw_aggregate |>
-  filter(
-    geography_type == "chicago_community_area",
-    condition_id == "hypertension",
-    time_period %in% 2022:2024,
-    !as_flag(suppression_flag),
-    is.finite(numerator),
-    is.finite(denominator),
-    denominator > 0
-  ) |>
-  mutate(geography_id = as.character(geography_id)) |>
-  group_by(geography_id) |>
-  summarise(
-    chm_numerator = sum(numerator),
-    chm_denominator = sum(denominator),
-    eligible_years = n_distinct(time_period),
-    .groups = "drop"
-  ) |>
-  filter(eligible_years == 3L) |>
-  mutate(chm_estimate = 100 * chm_numerator / chm_denominator)
-
-percentile_rank_r <- function(x) rank(x, ties.method = "average") / length(x)
-rank_quartile_r <- function(x) {
-  as.integer(cut(x, breaks = c(-Inf, 0.25, 0.50, 0.75, Inf), labels = 1:4, right = TRUE))
-}
-
-hcs_chm_hypertension <- inner_join(
-  chm_hypertension_2022_2024,
-  hcs_hypertension,
-  by = "geography_id"
-) |>
-  mutate(
-    chm_rank = percentile_rank_r(chm_estimate),
-    hcs_rank = percentile_rank_r(hcs_estimate),
-    chm_quartile = rank_quartile_r(chm_rank),
-    hcs_quartile = rank_quartile_r(hcs_rank),
-    absolute_rank_gap = abs(chm_rank - hcs_rank),
-    exact_quartile_agreement = chm_quartile == hcs_quartile
-  )
-
+# The HCS triangulation uses a governed, aggregate 77-community-area review artifact.
+# Its SHA-256 digest is verified above before any result is calculated.
 hcs_chm_summary <- data.frame(
   Measure = c(
     "Pairwise-complete community areas, No.",
@@ -382,11 +264,6 @@ chm_holdout_status <- if (chm_2025_available) {
 }
 
 stopifnot(
-  nrow(hcs_topic_metadata) == 2L,
-  all(hcs_topic_metadata$privacy == "Organization"),
-  nrow(hcs_hypertension) == 77L,
-  nrow(hcs_diabetes_availability) == 74L,
-  nrow(chm_hypertension_2022_2024) == 77L,
   nrow(hcs_chm_hypertension) == 77L,
   !anyDuplicated(hcs_chm_hypertension$geography_id),
   all(is.finite(hcs_chm_hypertension$hcs_estimate)),
@@ -412,12 +289,18 @@ display_review <- bind_rows(
   )
 )
 
-require_columns(raw_aggregate, "00_master_analytic_dataset.csv", c(
+require_columns(raw_aggregate, "00_master_analytic_review_extract.csv", c(
   "geography_id", "geography_type", "condition_id", "time_period", "disease_value_derivation",
   "numerator", "denominator", "suppression_flag", "primary_tract_annual_eligible",
   "primary_tract_annual_exclusion_reason", "city_inclusion_primary_eligible",
   "city_inclusion_area50_sensitivity_eligible", "city_inclusion_reason",
   "community_area_id", "max_community_area_weight"
+))
+require_columns(hcs_chm_hypertension, "supplement_hcs_chm_hypertension.csv", c(
+  "geography_id", "chm_numerator", "chm_denominator", "eligible_years", "chm_estimate",
+  "hcs_estimate", "hcs_standard_error", "hcs_ci_low", "hcs_ci_high", "chm_rank", "hcs_rank",
+  "chm_quartile", "hcs_quartile", "absolute_rank_gap", "exact_quartile_agreement",
+  "results_authorized"
 ))
 require_columns(tract_cohort_flow, "supplement_tract_cohort_flow.csv", c(
   "condition_id", "time_period", "boundary_eligible_rows", "boundary_eligible_tracts",
@@ -484,14 +367,15 @@ assert_unauthorized <- function(data, artifact_name) {
 
 invisible(Map(assert_unauthorized, list(
   main_evidence, bootstrap_results, coefficient_table, model_gate,
-  spatial_error, robustness
+  spatial_error, robustness, hcs_chm_hypertension
 ), c(
   "supplement_geographic_main_evidence.csv",
   "supplement_concordance_bootstrap.csv",
   "supplement_full_coefficient_table.csv",
   "supplement_model_gate_diagnostics.csv",
   "supplement_spatial_error_sensitivity.csv",
-  "supplement_robustness_summary.csv"
+  "supplement_robustness_summary.csv",
+  "supplement_hcs_chm_hypertension.csv"
 )))
 
 source_detail <- detail |>
@@ -502,7 +386,7 @@ source_detail <- detail |>
 
 stopifnot(
   nrow(raw_aggregate) == 20536,
-  ncol(raw_aggregate) == 97,
+  ncol(raw_aggregate) == 15,
   sum(raw_aggregate$geography_type == "census_tract") == 18688,
   sum(raw_aggregate$geography_type == "chicago_community_area") == 1848,
   dplyr::n_distinct(raw_aggregate$geography_id[raw_aggregate$geography_type == "census_tract"]) == 782,
@@ -566,13 +450,13 @@ This R Markdown document is an R companion to `00_master_chicago_healthmap_pipel
 
 The paper uses a geographic-resolution analysis as a worked example of how Chicago Health Map can support a scientific question. It asks whether tract measures contain geographic information beyond a community-area summary constructed from the other eligible tracts in the same area. This leave-one-tract-out comparison prevents the focal tract from contributing to its own reference value and uses the same validated tract numerators and denominators on both sides. Source-published community-area values, Census ZIP Code Tabulation Area (ZCTA) values, and CDC PLACES estimates are secondary sensitivities. Community-area life-expectancy and spatial analyses are supplementary demonstrations.
 
-CHM values are crude EHR-diagnosed proportions among annual unique CAPriCORN adults with at least 1 of the 39 included conditions who were observed in participating systems. MRAIA performs cross-system deduplication within year. The aggregate files cannot independently verify person-level linkage. These values are not estimates of disease prevalence among all Chicago residents. Public health estimates remain the basis for population inference. Health-system research data may supplement those estimates by showing clinically recorded patterns at smaller geographic scales. They do not replace population surveillance.<sup>1-7,29</sup>
+CHM values are crude EHR-diagnosed proportions among annual unique CAPriCORN adults with at least 1 of the 39 included conditions who were observed in participating systems. MRAIA performs cross-system deduplication within year. The aggregate files cannot independently verify person-level linkage. These values are not estimates of disease prevalence among all Chicago residents. Public health estimates remain the basis for population inference. Health-system research data may supplement those estimates by showing clinically recorded patterns at smaller geographic scales. They do not replace population surveillance.<sup>1-8</sup>
 
 ## Chicago Health Map Website and Public Data Resource
 
-Chicago Health Map is a public interactive website maintained by the Rush Health Equity Data Analytics Studio. The site displays annual aggregate diagnosis percentages for 38 chronic conditions and firearm injury among adults observed in participating CAPriCORN health systems across 6 counties in metropolitan Chicago. A visitor can select a condition, year, demographic group, and geographic unit. The choropleth map displays the percentage diagnosed, identifies areas with insufficient data, and presents source-provided reliability information. Census tracts provide the most detailed view. The site also presents Chicago's 77 community areas, community snapshots, and optional contextual layers.<sup>25,29</sup>
+Chicago Health Map is a public interactive website maintained by the Rush Health Equity Data Analytics Studio. The site displays annual aggregate diagnosis percentages for 38 chronic conditions and firearm injury among adults observed in participating CAPriCORN health systems across 6 counties in metropolitan Chicago. A visitor can select a condition, year, demographic group, and geographic unit. The choropleth map displays the percentage diagnosed, identifies areas with insufficient data, and presents source-provided reliability information. Census tracts provide the most detailed view. The site also presents Chicago's 77 community areas, community snapshots, and optional contextual layers.<sup>8-9</sup>
 
-The public methods page identifies CAPriCORN as the source of clinical diagnosis records. CAPriCORN contributors standardize structured data with the PCORnet Common Data Model, and the website defines conditions from International Classification of Diseases, 10th Revision codes. MRAIA performs cross-system deduplication. Values based on fewer than 10 people are suppressed rather than displayed as zero. Reliability flags combine patient capture with demographic alignment to the American Community Survey. The website also uses American Community Survey demographic estimates, US Census Bureau TIGER tract boundaries, Chicago Data Portal community-area boundaries, the CDC and Agency for Toxic Substances and Disease Registry Social Vulnerability Index, OpenStreetMap, Chicago Police Department data, and City of Chicago 311 records.<sup>25</sup>
+The public methods page identifies CAPriCORN as the source of clinical diagnosis records. CAPriCORN contributors standardize structured data with the PCORnet Common Data Model, and the website defines conditions from International Classification of Diseases, 10th Revision codes. MRAIA performs cross-system deduplication. Values based on fewer than 10 people are suppressed rather than displayed as zero. Reliability flags combine patient capture with demographic alignment to the American Community Survey. The website also uses American Community Survey demographic estimates, US Census Bureau TIGER tract boundaries, Chicago Data Portal community-area boundaries, the CDC and Agency for Toxic Substances and Disease Registry Social Vulnerability Index, OpenStreetMap, Chicago Police Department data, and City of Chicago 311 records.<sup>9</sup>
 
 The present study did not analyze every layer available on the website. The primary analysis used governed CAPriCORN diagnosis aggregates and tract-to-community geographic relationships. American Community Survey variables entered only supplementary models. The retail, service, crime, and social vulnerability layers remained website context and did not enter the estimators reported in this review. The study did not evaluate website usability or whether viewing the map changed a program, resource decision, or health outcome.
 
@@ -695,44 +579,44 @@ The following field groups make the analysis reconstructable without exposing in
 ```{r study-data-dictionary, echo=FALSE}
 data_dictionary <- data.frame(
   Artifact = c(
-    "00_master_analytic_dataset.csv",
-    "00_master_analytic_dataset.csv",
-    "00_master_analytic_dataset.csv",
-    "00_master_analytic_dataset.csv",
-    "00_master_analytic_dataset.csv",
+    "00_master_analytic_review_extract.csv",
+    "00_master_analytic_review_extract.csv",
+    "table_1_resource_quality.csv",
+    "supplement_full_coefficient_table.csv and supplement_adjusted_diagnostic_data.csv",
+    "00_master_analytic_review_extract.csv and 00_master_analytic_dataset_manifest.json",
     "supplement_tract_cohort_flow.csv and 00_master_analytic_dataset_manifest.json",
     "supplement_geographic_consequence_details.csv",
     "supplement_geographic_main_evidence.csv",
     "supplement_concordance_bootstrap.csv",
-    "Chicago Health Atlas HCSHYTP/2023-2024.json and HCSDIAP/2023-2024.json",
+    "supplement_hcs_chm_hypertension.csv",
     "supplement_full_coefficient_table.csv and supplement_adjusted_diagnostic_data.csv",
     "supplement_model_gate_diagnostics.csv, supplement_spatial_diagnostics.csv, supplement_spatial_error_sensitivity.csv, and supplement_robustness_summary.csv"
   ),
   Exact_columns_used_or_checked = c(
-    "geography_id; geography_type; time_period; condition_id; disease_value_derivation; tract_vintage",
-    "numerator; denominator; denominator_status; suppression_flag; suppression_reason; published_measure_value; published_measure_unit",
-    "capture_rate; capture_flag; reliability_tier; reliability_flag; equity_alignment_label; combined_reliability_label",
-    "pct_age_65_plus; pct_female; pct_below_fpl; acs_adult_population; census_covariate_uncertainty_status; associated standard-error and MOE fields",
-    "community_area_id; max_community_area_weight; covered_fraction; is_crossing_tract; is_sliver; tract_community_linkage_method; linkage_role",
+    "geography_id; geography_type; time_period; condition_id; disease_value_derivation",
+    "numerator; denominator; suppression_flag; primary_tract_annual_eligible; primary_tract_annual_exclusion_reason",
+    "Condition; Years, No.; Condition-year records, No.; Community areas represented, No.; denominator, eligibility, suppression, and capture summary fields",
+    "model_id; term; role; estimate; standard_error; ci_low; ci_high; confidence_level; covariance_type; n; fitted_value; residual; leverage; cooks_distance; externally_studentized_residual",
+    "community_area_id; max_community_area_weight; city_inclusion_primary_eligible; city_inclusion_area50_sensitivity_eligible; city_inclusion_reason; tract-boundary audit fields",
     "condition_id; time_period; boundary_eligible_rows; denominator_ge_30_rows; observable_after_suppression_rows; primary_eligible_rows; excluded-row counts; tract_boundary_audit; annual_tract_minimum_denominator",
     "ehr_percent; numerator; denominator; eligible_years; ehr_rank; comparison_rank; tract_quartile; comparison_quartile; tract_is_high; comparison_is_high; transition_state; sensitivity_status",
     "within_variance_share; exact_quartile_agreement_pct; quartile_disagree_pct; q4_movers_pct; weighted_kappa; gwet_ac1; vpc_icc; area_label_auc; availability and comparability fields",
     "condition_id; metric; estimate; ci_low; ci_high; sample_n; bootstrap_mean_sample_n; replicate_count; seed; cluster_unit; bootstrap_interval_method; bootstrap_rank_rule",
-    "g; l; a; p; d; v; se, plus topics.json name; description; units; privacy; team; dataset source metadata",
+    "geography_id; chm_numerator; chm_denominator; eligible_years; chm_estimate; hcs_estimate; hcs_standard_error; hcs_ci_low; hcs_ci_high; ranks; quartiles; absolute_rank_gap; exact_quartile_agreement",
     "model_id; term; role; estimate; standard_error; ci_low; ci_high; confidence_level; covariance_type; n; fitted_value; residual; leverage; cooks_distance; externally_studentized_residual",
     "predictor_vif; design_rank; maximum_absolute_pairwise_correlation; standardized_design_condition_number; observed_i; permutation_p_value; permutations; weights_checksum; lambda_hat; spatial_error_status; sensitivity estimates and status"
   ),
   Purpose = c(
     "Identify the condition, geography, period, measure derivation, and boundary vintage",
     "Construct and audit the direct EHR-diagnosed proportion and distinguish suppression from a true zero",
-    "Describe measurement completeness and reliability; never interpret capture as a sampling probability",
-    "Use the locked primary adjustment set and document covariate uncertainty; adult population is reserved for weighting or sensitivity work",
-    "Restrict direct geographic comparisons to documented tract relationships and expose crossing or incomplete coverage",
+    "Describe measurement completeness and source-published capture; never interpret capture as a sampling probability",
+    "Read the locked-model coefficients and diagnostic quantities without importing the full modeling frame",
+    "Restrict direct geographic comparisons to documented tract relationships and preserve the frozen boundary audit",
     "Reconstruct the sequential Chicago-boundary, minimum-denominator, suppression, and final analytic cohort",
     "Reconstruct direct tract-versus-coarser-area pooled comparisons, ranks, quartiles, and Q4 transitions",
     "Read the governed primary and secondary evidence summaries and their availability gates",
     "Read reproducible cluster-bootstrap uncertainty specifications and percentile intervals",
-    "Verify the frozen HCS source checksums, select unstratified 2023-2024 community-area estimates, and retain survey standard errors",
+    "Read the checksum-bound 77-area CHM-HCS comparison and retain the HCS survey standard errors",
     "Read HC3 model estimates and diagnostic quantities; model outputs are not recomputed in R",
     "Read model-design, residual-spatial, spatial-error, and robustness gates"
   ),
@@ -755,7 +639,7 @@ data_dictionary <- data.frame(
 review_table(data_dictionary, "Table R2. Aggregate-data dictionary and analytic use of each column group", digits = 0)
 ```
 
-Fields present solely for traceability, including `source_record_id`, `source_geography_id`, `community_area_weights_json`, and `geometry_wkt`, are not used as analysis values and their values are never displayed. The review uses their associated governed linkage and provenance fields only to state the source boundary and to check that direct geography relationships, rather than fabricated areal reallocations, define the comparison.
+The review extract deliberately omits unused traceability strings, geometries, and row-level source payloads. It retains only the 15 aggregate fields needed to reconstruct the displayed cohort flow, pooled estimates, tract-to-community linkage, coverage figure, and method checks. The full governed analysis remains the source of these review inputs.
 
 ### Analysis map: question, estimator, uncertainty, and decision rule
 
@@ -981,11 +865,11 @@ Leave-one-tract-out community-area summaries did not retain all observed tract h
 
 ## Study design and source roles
 
-This is a repeated cross-sectional ecological study. CHM contributes tract EHR-diagnosed proportions and source-published coarser-area sensitivity values. PLACES contributes modeled population estimates for cross-source comparison. The American Community Survey contributes population context and covariates. Chicago Health Atlas life expectancy contributes a supplementary community-area outcome. City of Chicago and Census boundaries contribute geography.<sup>21-25</sup>
+This is a repeated cross-sectional ecological study. CHM contributes tract EHR-diagnosed proportions and source-published coarser-area sensitivity values. PLACES contributes modeled population estimates for cross-source comparison. The American Community Survey contributes population context and covariates. Chicago Health Atlas life expectancy contributes a supplementary community-area outcome. City of Chicago and Census boundaries contribute geography.<sup>9-13</sup>
 
 No comparator is a gold standard. Agreement describes how two measurement systems classify the same small areas. It does not establish the validity of either system.<sup>3-5</sup>
 
-Reporting follows STROBE for cross-sectional observational studies, RECORD for routinely collected health data, and the current JAMA Health Forum Original Investigation instructions.<sup>18-20</sup>
+Reporting follows STROBE for cross-sectional observational studies, RECORD for routinely collected health data, and the current JAMA Health Forum Original Investigation instructions.<sup>14-16</sup>
 
 ## Data hierarchy
 
@@ -1023,7 +907,7 @@ The unit is a governed file. The analytic input contains `r nrow(raw_aggregate)`
 
 ## Variables, mathematical definition, and estimator
 
-For file <em>f</em>, the verification indicator is <em>I{H<sub>R</sub>(f) = H<sub>M</sub>(f)}</em>, where <em>H<sub>R</sub></em> is the SHA-256 digest computed during this R render and <em>H<sub>M</sub></em> is the digest stored in the Marimo run manifest. All required indicators must equal 1.
+For file <em>f</em>, the verification indicator is <em>I{H<sub>R</sub>(f) = H<sub>M</sub>(f)}</em>, where <em>H<sub>R</sub></em> is the SHA-256 digest computed during this R render and <em>H<sub>M</sub></em> is the digest stored in the statistician-review input manifest. All required indicators must equal 1.
 
 ## Assumptions, diagnostics, missingness, and interpretation
 
@@ -1035,11 +919,11 @@ provenance_table <- data.frame(
   SHA256 = checked_hashes,
   Matches_manifest = ifelse(hash_ok, "Yes", "No")
 )
-review_table(provenance_table, "Table R6. R input provenance against the completed Marimo manifest", digits = 0)
+review_table(provenance_table, "Table R6. R input provenance against the statistician-review manifest", digits = 0)
 ```
 
 <div class="scope-banner">
-The statistician review run uses the prespecified random seed <strong>`r manifest$seed`</strong> and <strong>`r manifest$permutations` spatial permutations</strong>. Every required analytic input matched its SHA-256 digest in the completed Marimo run manifest. Aggregate results are displayed for independent review but remain unauthorized for manuscript import.
+The statistician review run uses the prespecified random seed <strong>`r manifest$seed`</strong> and <strong>`r manifest$permutations` spatial permutations</strong>. Every required analytic input matched its SHA-256 digest in the statistician-review manifest. Aggregate results are displayed for independent review but remain unauthorized for manuscript import.
 </div>
 
 ## Tract analytic cohort flow
@@ -1245,11 +1129,11 @@ For the one-way unbalanced method-of-moments variance partition,
 
 <div class="equation" role="math"><em>n</em><sub>0</sub> = [N − Σ<sub>j</sub> n<sub>j</sub><sup>2</sup>/N] / (J − 1)<br><em>σ̂</em><sub>B</sub><sup>2</sup> = max{0, (MS<sub>B</sub> − MS<sub>W</sub>) / n<sub>0</sub>}<br><em>VPC</em> = <em>σ̂</em><sub>B</sub><sup>2</sup> / (<em>σ̂</em><sub>B</sub><sup>2</sup> + MS<sub>W</sub>)<br><em>WVS</em> = 1 − <em>VPC</em>.</div>
 
-The within-community variance share is the primary reported complement. It describes observed tract estimates and is not a reliability coefficient for latent individual risk.<sup>10,33</sup>
+The within-community variance share is the primary reported complement. It describes observed tract estimates and is not a reliability coefficient for latent individual risk.<sup>17-18</sup>
 
 ## Estimator and uncertainty
 
-Point estimates use the observed-scale method-of-moments partition and empirical ranks. For every tract and year, the primary area comparator equals the sum of eligible numerators from the other tracts divided by the sum of their eligible denominators. Annual values are pooled by summing numerators and denominators before division. Community-area cluster bootstrap intervals resample areas with replacement, retain all tracts in sampled areas, recompute ranks and categories in each replicate, and use the 2.5th and 97.5th percentiles. The review run uses 1000 replicates.<sup>12,30</sup>
+Point estimates use the observed-scale method-of-moments partition and empirical ranks. For every tract and year, the primary area comparator equals the sum of eligible numerators from the other tracts divided by the sum of their eligible denominators. Annual values are pooled by summing numerators and denominators before division. Community-area cluster bootstrap intervals resample areas with replacement, retain all tracts in sampled areas, recompute ranks and categories in each replicate, and use the 2.5th and 97.5th percentiles. The review run uses 1000 replicates.<sup>19-20</sup>
 
 ## Assumptions and diagnostics
 
@@ -1772,7 +1656,7 @@ The unit is a tract with an eligible CHM measure and an aligned PLACES estimate 
 
 ## Variables, estimator, and uncertainty
 
-Spearman correlation uses average ranks. Quadratic weighted kappa penalizes disagreements by squared category distance. Gwet AC1 treats categories nominally. Community-area cluster bootstrap intervals use 1000 replicates and percentile limits.<sup>8,9,12</sup>
+Spearman correlation uses average ranks. Quadratic weighted kappa penalizes disagreements by squared category distance. Gwet AC1 treats categories nominally. Community-area cluster bootstrap intervals use 1000 replicates and percentile limits.<sup>19,21-22</sup>
 
 ## Assumptions, diagnostics, missingness, and interpretation
 
@@ -1832,7 +1716,7 @@ review_table(bootstrap_review, "eTable R1. Cross-source agreement with cluster-b
 
 ## Scientific question and estimand
 
-Do pooled 2022 through 2024 CHM hypertension diagnosed proportions and the independent 2023-2024 Healthy Chicago Survey hypertension estimates similarly order Chicago's 77 community areas? The estimands are Spearman rank correlation, median absolute percentile-rank gap, and exact agreement between within-source quartiles. This analysis strengthens the source-complementarity argument because it compares 2 locally relevant measurement systems at the same named geography while preserving their different population definitions.<sup>26</sup>
+Do pooled 2022 through 2024 CHM hypertension diagnosed proportions and the independent 2023-2024 Healthy Chicago Survey hypertension estimates similarly order Chicago's 77 community areas? The estimands are Spearman rank correlation, median absolute percentile-rank gap, and exact agreement between within-source quartiles. This analysis strengthens the source-complementarity argument because it compares 2 locally relevant measurement systems at the same named geography while preserving their different population definitions.<sup>23</sup>
 
 ## Population, variables, and denominators
 
@@ -1919,7 +1803,7 @@ Does a leave-one-tract-out community-area mean distinguish tracts in the empiric
 
 The unit is a CHM-complete tract in a community area containing at least 2 eligible tracts. For each tract, the predictor is the mean of the other tracts in its linked area. The empirical Q4 threshold is recomputed inside each cluster-bootstrap replicate.
 
-The AUC does not evaluate a deployed prediction model. It has no external validation sample, no patient-level outcome, and no clinical decision threshold. It cannot establish that community-area labels predict tract burden. It remains outside the primary claim.<sup>11</sup>
+The AUC does not evaluate a deployed prediction model. It has no external validation sample, no patient-level outcome, and no clinical decision threshold. It cannot establish that community-area labels predict tract burden. It remains outside the primary claim.<sup>24</sup>
 
 ```{r auc-table, echo=FALSE}
 auc_review <- descriptive_methods |>
@@ -1950,7 +1834,7 @@ The C2 unit is an eligible Chicago community area with complete outcome, exposur
 
 ## Model and uncertainty
 
-The principal model is unweighted ordinary least squares with HC3 covariance:<sup>13</sup>
+The principal model is unweighted ordinary least squares with HC3 covariance:<sup>25</sup>
 
 <div class="equation" role="math"><em>LE</em><sub>j</sub> = α + β<sub>C</sub> COPD<sub>j</sub> + γ<sub>1</sub> Age65<sub>j</sub> + γ<sub>2</sub> Female<sub>j</sub> + γ<sub>3</sub> Poverty<sub>j</sub> + γ<sub>4</sub> Capture<sub>j</sub> + ε<sub>j</sub>.</div>
 
@@ -2064,9 +1948,9 @@ Do neighboring community areas show residual spatial dependence after the C2 adj
 
 ## Population, weights, and estimator
 
-The population is the `r c2_n`-area C2 analytic frame. The primary weights are row-standardized queen contiguity weights restricted to the eligible areas. Global Moran I is evaluated under the fitted regression design by drawing independent Gaussian errors, projecting every draw through the OLS residual-maker matrix, and comparing the observed statistic with 9999 null statistics using a 2-sided add-one rule. This regression-residual null simulation accounts for the covariance induced by estimating the regression coefficients and follows the Cliff-Ord residual-testing framework.<sup>14,31</sup>
+The population is the `r c2_n`-area C2 analytic frame. The primary weights are row-standardized queen contiguity weights restricted to the eligible areas. Global Moran I is evaluated under the fitted regression design by drawing independent Gaussian errors, projecting every draw through the OLS residual-maker matrix, and comparing the observed statistic with 9999 null statistics using a 2-sided add-one rule. This regression-residual null simulation accounts for the covariance induced by estimating the regression coefficients and follows the Cliff-Ord residual-testing framework.<sup>26-27</sup>
 
-The prespecified trigger activated a concentrated-likelihood spatial-error sensitivity. Local Moran I and Getis-Ord Gi* analyses use separate declared false-discovery-rate families. COPD local statistics were not run because complete 77-area topology was unavailable.<sup>15-17</sup>
+The prespecified trigger activated a concentrated-likelihood spatial-error sensitivity. Local Moran I and Getis-Ord Gi* analyses use separate declared false-discovery-rate families. COPD local statistics were not run because complete 77-area topology was unavailable.<sup>28-30</sup>
 
 ## Assumptions, diagnostics, missingness, and interpretation
 
@@ -2197,7 +2081,7 @@ review_table(
 )
 ```
 
-The internal reliability labels are displayed as exploratory source-supplied categories. They are not described as validated tiers because the public 4-tier framework and internal 5-tier labels have not yet been reconciled with the source owner. NCHS reliability principles are considered for presentation, but the NCHS standards were developed for survey estimates and are not applied wholesale to these EHR denominators.<sup>32</sup> Age-standardized estimates are not computed because the governed aggregate extract lacks age-stratum condition numerators, age-stratum denominators, and documented stratum-specific suppression semantics. Area-level percentage aged 65 years or older cannot substitute for those inputs.
+The internal reliability labels are displayed as exploratory source-supplied categories. They are not described as validated tiers because the public 4-tier framework and internal 5-tier labels have not yet been reconciled with the source owner. NCHS reliability principles are considered for presentation, but the NCHS standards were developed for survey estimates and are not applied wholesale to these EHR denominators.<sup>31</sup> Age-standardized estimates are not computed because the governed aggregate extract lacks age-stratum condition numerators, age-stratum denominators, and documented stratum-specific suppression semantics. Area-level percentage aged 65 years or older cannot substitute for those inputs.
 
 ```{r sensitivity-table, echo=FALSE}
 sensitivity_review <- robustness |>
@@ -2274,7 +2158,7 @@ A 2025 result will be labeled **out-of-time temporal replication** only when the
 
 ## External metropolitan EHR replication protocol
 
-The Minnesota EHR Consortium's Health Trends Across Communities (HTAC) program is the leading candidate because it reports summary EHR information from 11 health systems, uses privacy-preserving cross-system deduplication, geocodes to census tracts, suppresses small cells, and publishes data at multiple geographic levels. Its 2025 public-use file is available by request rather than anonymous download. Published MNEHRC work already demonstrates tract-level EHR comparisons with Census and PLACES, which makes it strong external context but does not by itself replicate CHM's tract-versus-direct-coarser-label estimand.<sup>4,27,28</sup>
+The Minnesota EHR Consortium's Health Trends Across Communities (HTAC) program is the leading candidate because it reports summary EHR information from 11 health systems, uses privacy-preserving cross-system deduplication, geocodes to census tracts, suppresses small cells, and publishes data at multiple geographic levels. Its 2025 public-use file is available by request rather than anonymous download. Published MNEHRC work already demonstrates tract-level EHR comparisons with Census and PLACES, which makes it strong external context but does not by itself replicate CHM's tract-versus-direct-coarser-label estimand.<sup>4,32-33</sup>
 
 ```{r external-replication-contract, echo=FALSE}
 external_replication_contract <- data.frame(
@@ -2451,32 +2335,32 @@ review_table(checklist, "Table R11. Final analysis and reporting checklist", dig
 5. Klompas M, et al. State and local chronic disease surveillance using electronic health record systems. *Am J Public Health.* 2017;107(9):1406-1412. doi:10.2105/AJPH.2017.303874
 6. Hunt BR, et al. Life expectancy varies in local communities in Chicago: racial and spatial disparities and correlates. *J Racial Ethn Health Disparities.* 2015;2(4):425-433. doi:10.1007/s40615-015-0089-8
 7. Dixon BE, et al. Measuring population health using electronic health records: exploring biases and representativeness in a community health information exchange. *Stud Health Technol Inform.* 2015;216:1009. PMID:26262310.
-8. Cohen J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. *Psychol Bull.* 1968;70(4):213-220. doi:10.1037/h0026256
-9. Gwet KL. Computing inter-rater reliability and its variance in the presence of high agreement. *Br J Math Stat Psychol.* 2008;61(pt 1):29-48. doi:10.1348/000711006X126600
-10. Nakagawa S, Johnson PCD, Schielzeth H. The coefficient of determination and intraclass correlation coefficient from generalized linear mixed-effects models revisited and expanded. *J R Soc Interface.* 2017;14(134):20170213. doi:10.1098/rsif.2017.0213
-11. Hanley JA, McNeil BJ. The meaning and use of the area under a receiver operating characteristic curve. *Radiology.* 1982;143(1):29-36. doi:10.1148/radiology.143.1.7063747
-12. Efron B. Bootstrap methods: another look at the jackknife. *Ann Stat.* 1979;7(1):1-26. doi:10.1214/aos/1176344552
-13. Long JS, Ervin LH. Using heteroscedasticity consistent standard errors in the linear regression model. *Am Stat.* 2000;54(3):217-224. doi:10.1080/00031305.2000.10474549
-14. Moran PAP. Notes on continuous stochastic phenomena. *Biometrika.* 1950;37(1-2):17-23. doi:10.1093/biomet/37.1-2.17
-15. Anselin L. Local indicators of spatial association-LISA. *Geogr Anal.* 1995;27(2):93-115. doi:10.1111/j.1538-4632.1995.tb00338.x
-16. Getis A, Ord JK. The analysis of spatial association by use of distance statistics. *Geogr Anal.* 1992;24(3):189-206. doi:10.1111/j.1538-4632.1992.tb00261.x
-17. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *J R Stat Soc Series B.* 1995;57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x
-18. von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. *PLoS Med.* 2007;4(10):e296. doi:10.1371/journal.pmed.0040296
-19. Benchimol EI, et al. The REporting of studies Conducted using Observational Routinely-collected health Data statement. *PLoS Med.* 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
-20. JAMA Health Forum. Instructions for Authors. Accessed August 27, 2026. https://jamanetwork.com/journals/jama-health-forum/pages/instructions-for-authors
-21. Centers for Disease Control and Prevention. PLACES Census Tract Data, GIS Friendly Format, 2025 release, dataset yjkw-uj5s.
-22. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
-23. Chicago Health Atlas. Life expectancy, indicator VRLE. Originating source: Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
-24. City of Chicago. Boundaries-Community Areas, dataset igwz-8jzy. Accessed July 14, 2026.
-25. Chicago Health Map. Data Methods & Resources. Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed November 4, 2026. https://chicagohealthmap.com/data-glossary
-26. Chicago Department of Public Health. Healthy Chicago Survey hypertension and adult diabetes indicators. Chicago Health Atlas indicators HCSHYTP and HCSDIAP. Accessed August 27, 2026. https://chicagohealthatlas.org/
-27. Minnesota Electronic Health Record Consortium. Health Trends Across Communities in Minnesota Dashboard. Accessed August 27, 2026. https://mnehrconsortium.org/explore-our-findings/health-trends-across-communities-in-mn/
-28. Johnson SG, Chamberlain AM, Drawz P, et al. Design and implementation of a state-wide network for near real-time public health surveillance and research: the Minnesota Electronic Health Record Consortium experience. *Learn Health Syst.* 2026;10(2):e70070. doi:10.1002/lrh2.70070
-29. Kho AN, Hynes DM, Goel S, et al. CAPriCORN: Chicago Area Patient-Centered Outcomes Research Network. *J Am Med Inform Assoc.* 2014;21(4):607-611. doi:10.1136/amiajnl-2014-002827
-30. Davison AC, Hinkley DV. *Bootstrap Methods and Their Application.* Cambridge University Press; 1997. doi:10.1017/CBO9780511802843
-31. Hepple LW. Exact testing for spatial autocorrelation among regression residuals. *Environ Plan A.* 1998;30(1):85-108. doi:10.1068/a300085
-32. Parker JD, Talih M, Malec DJ, et al. National Center for Health Statistics data presentation standards for proportions. *Vital Health Stat 2.* 2017;(175):1-22.
-33. Searle SR, Casella G, McCulloch CE. *Variance Components.* Wiley; 1992.
+8. Kho AN, Hynes DM, Goel S, et al. CAPriCORN: Chicago Area Patient-Centered Outcomes Research Network. *J Am Med Inform Assoc.* 2014;21(4):607-611. doi:10.1136/amiajnl-2014-002827
+9. Chicago Health Map. Data Methods & Resources. Rush University System for Health, Rush Health Equity Data Analytics Studio. Accessed November 4, 2026. https://chicagohealthmap.com/data-glossary
+10. Centers for Disease Control and Prevention. PLACES Census Tract Data, GIS Friendly Format, 2025 release, dataset yjkw-uj5s.
+11. US Census Bureau. American Community Survey 5-Year Detailed Tables, 2019, 2022, and 2024 releases. Tables B01001, B03002, B15003, B17001, B19013, B23025, B25044, and B27001.
+12. Chicago Health Atlas. Life expectancy, indicator VRLE. Originating source: Illinois Department of Public Health Death Certificate Data Files. Accessed July 14, 2026.
+13. City of Chicago. Boundaries-Community Areas, dataset igwz-8jzy. Accessed July 14, 2026.
+14. von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. *PLoS Med.* 2007;4(10):e296. doi:10.1371/journal.pmed.0040296
+15. Benchimol EI, et al. The REporting of studies Conducted using Observational Routinely-collected health Data statement. *PLoS Med.* 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+16. JAMA Health Forum. Instructions for Authors. Accessed August 27, 2026. https://jamanetwork.com/journals/jama-health-forum/pages/instructions-for-authors
+17. Nakagawa S, Johnson PCD, Schielzeth H. The coefficient of determination and intraclass correlation coefficient from generalized linear mixed-effects models revisited and expanded. *J R Soc Interface.* 2017;14(134):20170213. doi:10.1098/rsif.2017.0213
+18. Searle SR, Casella G, McCulloch CE. *Variance Components.* Wiley; 1992.
+19. Efron B. Bootstrap methods: another look at the jackknife. *Ann Stat.* 1979;7(1):1-26. doi:10.1214/aos/1176344552
+20. Davison AC, Hinkley DV. *Bootstrap Methods and Their Application.* Cambridge University Press; 1997. doi:10.1017/CBO9780511802843
+21. Cohen J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. *Psychol Bull.* 1968;70(4):213-220. doi:10.1037/h0026256
+22. Gwet KL. Computing inter-rater reliability and its variance in the presence of high agreement. *Br J Math Stat Psychol.* 2008;61(pt 1):29-48. doi:10.1348/000711006X126600
+23. Chicago Department of Public Health. Healthy Chicago Survey hypertension and adult diabetes indicators. Chicago Health Atlas indicators HCSHYTP and HCSDIAP. Accessed August 27, 2026. https://chicagohealthatlas.org/
+24. Hanley JA, McNeil BJ. The meaning and use of the area under a receiver operating characteristic curve. *Radiology.* 1982;143(1):29-36. doi:10.1148/radiology.143.1.7063747
+25. Long JS, Ervin LH. Using heteroscedasticity consistent standard errors in the linear regression model. *Am Stat.* 2000;54(3):217-224. doi:10.1080/00031305.2000.10474549
+26. Moran PAP. Notes on continuous stochastic phenomena. *Biometrika.* 1950;37(1-2):17-23. doi:10.1093/biomet/37.1-2.17
+27. Hepple LW. Exact testing for spatial autocorrelation among regression residuals. *Environ Plan A.* 1998;30(1):85-108. doi:10.1068/a300085
+28. Anselin L. Local indicators of spatial association-LISA. *Geogr Anal.* 1995;27(2):93-115. doi:10.1111/j.1538-4632.1995.tb00338.x
+29. Getis A, Ord JK. The analysis of spatial association by use of distance statistics. *Geogr Anal.* 1992;24(3):189-206. doi:10.1111/j.1538-4632.1992.tb00261.x
+30. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *J R Stat Soc Series B.* 1995;57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x
+31. Parker JD, Talih M, Malec DJ, et al. National Center for Health Statistics data presentation standards for proportions. *Vital Health Stat 2.* 2017;(175):1-22.
+32. Minnesota Electronic Health Record Consortium. Health Trends Across Communities in Minnesota Dashboard. Accessed August 27, 2026. https://mnehrconsortium.org/explore-our-findings/health-trends-across-communities-in-mn/
+33. Johnson SG, Chamberlain AM, Drawz P, et al. Design and implementation of a state-wide network for near real-time public health surveillance and research: the Minnesota Electronic Health Record Consortium experience. *Learn Health Syst.* 2026;10(2):e70070. doi:10.1002/lrh2.70070
 
 # Reproducibility Record
 
@@ -2485,9 +2369,9 @@ reproducibility <- data.frame(
   Field = c(
     "R version",
     "R Markdown input",
-    "Marimo source",
-    "Marimo input SHA-256",
-    "Marimo notebook SHA-256",
+    "Review input manifest",
+    "Checksum-bound input files, No.",
+    "Results authorization",
     "Release repository",
     "Required analytic input verification",
     "Random seed",
@@ -2498,9 +2382,9 @@ reproducibility <- data.frame(
   Value = c(
     R.version.string,
     "notebooks/RMD_chm_paper_r_Ashley.Rmd",
-    manifest$notebook_path,
-    manifest$input_sha256,
-    manifest$notebook_sha256,
+    "manuscript/statistician_review_input_manifest.json",
+    as.character(length(manifest$files)),
+    as.character(manifest$results_authorized),
     "https://github.com/sajor2000/chp_paper",
     "All required files matched the SHA-256 ledger",
     as.character(manifest$seed),

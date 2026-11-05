@@ -1,4 +1,9 @@
-Condition,"Tract/community eligible tracts, No.","Exact quartile agreement, No. (%)","Quartile disagreement, No. (%)",Within-community variance share,"Q4 transition eligible tracts, No.","Q4 movers, No. (%)"
-Hypertension,722,467 (64.7),255 (35.3),0.195,722,76 (10.5)
-Combined diabetes components,,—,—,,,—
-COPD,411,205 (49.9),206 (50.1),0.469,411,101 (24.6)
+condition_id,estimand,eligible_tract_n,estimate,ci_low,ci_high,unit,condition,uncertainty,results_authorized,manuscript_import_allowed
+copd,Within-community variance share,411,0.469243128461,0.332894492921,0.620926050655,proportion,COPD,95% community-area cluster-bootstrap percentile interval,False,False
+copd,Median absolute percentile-rank gap,401,0.144972119579,0.125,0.172666311395,percentile-rank units,COPD,95% community-area cluster-bootstrap percentile interval,False,False
+copd,Quartile disagreement,401,52.8678304239,47.2633395522,61.5606121131,%,COPD,95% community-area cluster-bootstrap percentile interval,False,False
+copd,Movement into or out of Q4,401,23.6907730673,18.0850335179,33.82004079,%,COPD,95% community-area cluster-bootstrap percentile interval,False,False
+hypertension,Within-community variance share,722,0.195073252049,0.15076865891,0.276202704737,proportion,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
+hypertension,Median absolute percentile-rank gap,720,0.0841797476147,0.0799438480544,0.104402359935,percentile-rank units,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
+hypertension,Quartile disagreement,720,34.0277777778,28.8916430595,43.3992910847,%,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
+hypertension,Movement into or out of Q4,720,11.8055555556,6.68299767205,19.975291231,%,Hypertension,95% community-area cluster-bootstrap percentile interval,False,False
