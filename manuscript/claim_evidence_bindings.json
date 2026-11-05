@@ -73,11 +73,11 @@
         "kind": "csv",
         "path": "outputs/notebooks/chicago_healthmap_master/supplement_binomial_noise_reference.csv",
         "rows": [
-          {"where": {"condition_id": "hypertension", "metric": "quartile_disagree_pct"}, "expect": {"replicate_count": 1000, "seed": 20260715}, "comparisons": [{"left": "observed_estimate", "operator": ">", "right": "noise_only_median"}]},
-          {"where": {"condition_id": "copd", "metric": "quartile_disagree_pct"}, "expect": {"replicate_count": 1000, "seed": 20260715}, "comparisons": [{"left": "observed_estimate", "operator": ">", "right": "noise_only_median"}]}
+          {"where": {"condition_id": "hypertension", "metric": "quartile_disagree_pct"}, "expect": {"noise_only_median": 14.7222222222, "replicate_count": 1000, "seed": 20260715}, "comparisons": [{"left": "observed_estimate", "operator": ">", "right": "noise_only_median"}]},
+          {"where": {"condition_id": "copd", "metric": "quartile_disagree_pct"}, "expect": {"noise_only_median": 36.6583541147, "replicate_count": 1000, "seed": 20260715}, "comparisons": [{"left": "observed_estimate", "operator": ">", "right": "noise_only_median"}]}
         ]
       },
-      "source_tokens": {"main": ["The observed information-loss estimates exceeded the median noise-only reference for both conditions."]},
+      "source_tokens": {"main": ["The observed information-loss estimates exceeded the median noise-only reference for both conditions.", "noise_value(\"hypertension\", \"quartile_disagree_pct\", \"noise_only_median\")", "noise_value(\"copd\", \"quartile_disagree_pct\", \"noise_only_median\")"]},
       "rendered_tokens": {"main": ["The observed information-loss estimates exceeded the median noise-only reference for both conditions.", "Noise-only quartile disagreement was 14.7% for hypertension and 36.7% for COPD"]},
       "references": [],
       "reference_support": {}
