@@ -430,9 +430,9 @@ h1, h2, h3, h4 { color: #14395b; font-weight: 700; }
 .subtitle { color: #48647c; }
 .scope-banner { border-left: 6px solid #176c77; background: #edf8f8; padding: 14px 18px; margin: 18px 0; }
 .decision-box { border: 1px solid #b9c8d6; background: #f7fafc; padding: 12px 16px; margin: 14px 0; }
-.review-table { width: 100%; border-collapse: collapse; border-top: 1.5px solid #17212b; border-bottom: 1.5px solid #17212b; margin: 12px 0 24px 0; font-size: 0.91em; }
-.review-table th { background: white; border-bottom: 1px solid #17212b; color: #17212b; text-align: left; padding: 8px; }
-.review-table td { border-bottom: 1px solid #d9e1e8; padding: 7px 8px; vertical-align: top; }
+.review-table { display: block; width: 100%; max-width: 100%; overflow-x: auto; border-collapse: collapse; border-top: 1.5px solid #17212b; border-bottom: 1.5px solid #17212b; margin: 12px 0 24px 0; font-size: 0.91em; }
+.review-table th { background: white; border-bottom: 1px solid #17212b; color: #17212b; text-align: left; padding: 8px; overflow-wrap: anywhere; }
+.review-table td { border-bottom: 1px solid #d9e1e8; padding: 7px 8px; vertical-align: top; overflow-wrap: anywhere; }
 .review-table tbody tr:last-child td { border-bottom: 0; }
 code { color: #1d5573; }
 pre { border: 1px solid #d9e1e8; border-radius: 4px; }
@@ -1284,7 +1284,7 @@ review_table(table_1_final, "Table 1. Community-area Chicago Health Map resource
 
 ## Figure 1. Coverage and suppression
 
-```{r main-figure-1, fig.width=12, fig.height=6.8, echo=FALSE}
+```{r main-figure-1, fig.width=12, fig.height=6.8, fig.alt="Four panels show aggregate source availability, suppression, denominator distributions, and source-published capture by year and condition.", echo=FALSE}
 coverage_plot_data <- raw_aggregate |>
   mutate(
     Geography = recode(
@@ -1395,7 +1395,7 @@ eligibility_plot + suppression_plot +
 
 ## eFigure 1. Source-Published Tract-Community Quartile Sensitivity
 
-```{r main-figure-2, fig.width=10.5, fig.height=5.8, echo=FALSE}
+```{r main-figure-2, fig.width=10.5, fig.height=5.8, fig.alt="Matrices compare tract quartiles with leave-one-tract-out community-area quartiles for hypertension and COPD.", echo=FALSE}
 matrix_plot <- resolution_matrix |>
   filter(!as_flag(noncrossing_only)) |>
   mutate(
@@ -1432,7 +1432,7 @@ ggplot(matrix_plot, aes(x = `Tract quartile`, y = `Community-area quartile`, fil
 
 ## eFigure 2. Source-Published Highest-Quartile Movement and Annual Stability
 
-```{r main-figure-3, fig.width=11.5, fig.height=5.5, echo=FALSE}
+```{r main-figure-3, fig.width=11.5, fig.height=5.5, fig.alt="Two panels show movement into or out of the top quartile and annual top-quartile overlap for hypertension and COPD.", echo=FALSE}
 transition_plot_data <- transitions |>
   filter(
     comparison_geography_type == "chicago_community_area",
@@ -1573,7 +1573,7 @@ review_table(
 
 ## Figure 2. Primary Geographic-Resolution Estimates
 
-```{r primary-estimate-forest, fig.width=11.5, fig.height=8.5, echo=FALSE}
+```{r primary-estimate-forest, fig.width=11.5, fig.height=8.5, fig.alt="Forest plot of the four primary geographic-resolution estimands with 95 percent cluster-bootstrap intervals for hypertension and COPD.", echo=FALSE}
 primary_plot_data <- primary_four_estimands |>
   mutate(
     Condition = factor(Condition, levels = c("Hypertension", "COPD")),
@@ -1604,7 +1604,7 @@ ggplot(primary_plot_data, aes(x = Estimate, y = Condition, color = Condition)) +
 
 ## Figure 3. Finite-Denominator Noise Reference
 
-```{r binomial-noise-figure, fig.width=11.5, fig.height=7.5, echo=FALSE}
+```{r binomial-noise-figure, fig.width=11.5, fig.height=7.5, fig.alt="Observed geographic-resolution estimates are compared with binomial noise-only simulation reference distributions.", echo=FALSE}
 noise_plot_data <- binomial_noise |>
   filter(metric %in% c(
     "median_absolute_percentile_rank_gap",
@@ -1662,7 +1662,7 @@ Spearman correlation uses average ranks. Quadratic weighted kappa penalizes disa
 
 Phenotype, period, and denominator differences remain visible. PLACES is not a truth standard. Compatible source-level uncertainty was unavailable, so the agreement analysis does not propagate uncertainty from either source. Cluster resampling addresses tract dependence within areas but not all spatial dependence.
 
-```{r bootstrap-forest, fig.width=10.5, fig.height=8.2, echo=FALSE}
+```{r bootstrap-forest, fig.width=10.5, fig.height=8.2, fig.alt="Forest plot of cross-source concordance estimates with community-area cluster-bootstrap intervals.", echo=FALSE}
 bootstrap_plot_data <- bootstrap_results |>
   mutate(
     Condition = condition_name(condition_id),
@@ -1741,7 +1741,7 @@ review_table(
 )
 ```
 
-```{r hcs-review-figure, fig.width=10.5, fig.height=8.0, echo=FALSE}
+```{r hcs-review-figure, fig.width=10.5, fig.height=8.0, fig.alt="Scatterplot compares community-area hypertension estimates from Chicago Health Map and the Healthy Chicago Survey with survey error bars.", echo=FALSE}
 hcs_rho <- hcs_chm_summary$Estimate[hcs_chm_summary$Measure == "Spearman rank correlation"]
 
 ggplot(hcs_chm_hypertension, aes(x = chm_estimate, y = hcs_estimate)) +
@@ -1869,7 +1869,7 @@ model_gate_review <- model_gate |>
 review_table(model_gate_review, "eTable R3. Prespecified model-readiness gates", digits = 3)
 ```
 
-```{r coefficient-forest, fig.width=9.5, fig.height=5.8, echo=FALSE}
+```{r coefficient-forest, fig.width=9.5, fig.height=5.8, fig.alt="Forest plot shows the supplementary ecological model coefficients with HC3 confidence intervals.", echo=FALSE}
 term_labels <- c(
   beta_c = "COPD diagnosed proportion, 1 IQR",
   gamma_age65 = "Age 65 years or older, 1 SD",
@@ -1901,7 +1901,7 @@ ggplot(coefficient_plot_data, aes(x = estimate, y = Term, color = Role)) +
   theme_review()
 ```
 
-```{r residual-diagnostics, fig.width=11, fig.height=8, echo=FALSE}
+```{r residual-diagnostics, fig.width=11, fig.height=8, fig.alt="Four diagnostic panels show residuals, normal quantiles, leverage, and Cook distance for the supplementary ecological model.", echo=FALSE}
 residual_plot <- ggplot(diagnostic_data, aes(x = fitted_value, y = residual)) +
   geom_hline(yintercept = 0, color = "#6E6E6E") +
   geom_point(color = jama_palette[["blue"]], alpha = 0.8) +
