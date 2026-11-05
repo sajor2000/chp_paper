@@ -8,6 +8,7 @@ from pathlib import Path
 import csv
 import html
 import json
+import math
 import re
 
 from chicagohealthmap.config import ProjectPaths
@@ -91,7 +92,10 @@ _CLAIM_LEDGER_FIELDS = (
     "period",
     "uncertainty",
     "verification_status",
+    "evidence_binding_id",
+    "reference_numbers",
 )
+_CLAIM_BINDINGS_FILE = "claim_evidence_bindings.json"
 
 
 def audit_text(text: str, contracts: ManuscriptContracts) -> None:
@@ -343,6 +347,252 @@ def _audit_reference_ledger(
             raise ManuscriptAuditError(f"ledger identifier does not match reference {number}")
 
 
+def _project_root_for_claims(claims_path: Path) -> Path:
+    """Resolve the project root for a production ledger or a flat test fixture."""
+    if claims_path.parent.name == "manuscript":
+        return claims_path.parent.parent
+    return claims_path.parent
+
+
+def _scalar_matches(actual: str, expected: object) -> bool:
+    """Compare CSV text with a typed binding value without silent coercion."""
+    if isinstance(expected, bool):
+        return actual.strip().casefold() == str(expected).casefold()
+    if isinstance(expected, int | float) and not isinstance(expected, bool):
+        try:
+            observed = float(actual.replace(",", ""))
+        except ValueError:
+            return False
+        return math.isclose(observed, float(expected), rel_tol=1e-9, abs_tol=1e-9)
+    return actual.strip() == str(expected)
+
+
+def _select_bound_rows(
+    rows: list[dict[str, str]],
+    where: dict[str, object],
+    claim_id: str,
+) -> list[dict[str, str]]:
+    """Select source rows using exact, typed equality from a claim binding."""
+    selected = [
+        row
+        for row in rows
+        if all(field in row and _scalar_matches(row[field], expected) for field, expected in where.items())
+    ]
+    if not selected:
+        raise ManuscriptAuditError(f"claim {claim_id} evidence selector matched no rows")
+    return selected
+
+
+def _audit_csv_claim_evidence(
+    evidence: dict[str, object],
+    *,
+    project_root: Path,
+    claim_id: str,
+) -> None:
+    """Verify row-level and aggregate assertions against one governed CSV artifact."""
+    relative_path = str(evidence.get("path", ""))
+    path = project_root / relative_path
+    if not relative_path or not path.is_file():
+        raise ManuscriptAuditError(f"claim {claim_id} evidence artifact is missing: {relative_path}")
+    rows = _read_csv_rows(path)
+    if not rows:
+        raise ManuscriptAuditError(f"claim {claim_id} evidence artifact is empty")
+
+    row_assertions = evidence.get("rows", [])
+    if not isinstance(row_assertions, list):
+        raise ManuscriptAuditError(f"claim {claim_id} has malformed row assertions")
+    for assertion in row_assertions:
+        if not isinstance(assertion, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed row assertion")
+        where = assertion.get("where", {})
+        expected = assertion.get("expect", {})
+        if not isinstance(where, dict) or not isinstance(expected, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed row assertion")
+        selected = _select_bound_rows(rows, where, claim_id)
+        if len(selected) != 1:
+            raise ManuscriptAuditError(f"claim {claim_id} evidence selector is not unique")
+        row = selected[0]
+        for field, value in expected.items():
+            if field not in row or not _scalar_matches(row[field], value):
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} evidence value mismatch for {field}"
+                )
+        for comparison in assertion.get("comparisons", []):
+            if not isinstance(comparison, dict):
+                raise ManuscriptAuditError(f"claim {claim_id} has a malformed comparison")
+            left = str(comparison.get("left", ""))
+            right = str(comparison.get("right", ""))
+            operator = comparison.get("operator")
+            try:
+                left_value = float(row[left])
+                right_value = float(row[right])
+            except (KeyError, ValueError) as error:
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} comparison fields are invalid"
+                ) from error
+            if operator == ">" and not left_value > right_value:
+                raise ManuscriptAuditError(f"claim {claim_id} evidence comparison failed")
+            if operator not in {">"}:
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} uses an unsupported comparison operator"
+                )
+
+    aggregate_assertions = evidence.get("aggregates", [])
+    if not isinstance(aggregate_assertions, list):
+        raise ManuscriptAuditError(f"claim {claim_id} has malformed aggregate assertions")
+    for assertion in aggregate_assertions:
+        if not isinstance(assertion, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed aggregate assertion")
+        where = assertion.get("where", {})
+        if not isinstance(where, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed aggregate selector")
+        selected = _select_bound_rows(rows, where, claim_id) if where else rows
+        field = str(assertion.get("field", ""))
+        operation = assertion.get("operation")
+        expected = assertion.get("expect")
+        if field not in selected[0]:
+            raise ManuscriptAuditError(f"claim {claim_id} aggregate field is missing")
+        if operation == "sum":
+            actual: object = sum(float(row[field].replace(",", "")) for row in selected)
+        elif operation == "unique":
+            values = {row[field] for row in selected}
+            if len(values) != 1:
+                raise ManuscriptAuditError(f"claim {claim_id} aggregate is not unique")
+            actual = next(iter(values))
+        else:
+            raise ManuscriptAuditError(
+                f"claim {claim_id} uses an unsupported aggregate operation"
+            )
+        if not _scalar_matches(str(actual), expected):
+            raise ManuscriptAuditError(f"claim {claim_id} aggregate evidence mismatch")
+
+
+def _audit_text_claim_evidence(
+    evidence: dict[str, object],
+    *,
+    project_root: Path,
+    claim_id: str,
+) -> None:
+    """Verify project-definition or interpretation claims against local text."""
+    paths = evidence.get("paths", [])
+    tokens = evidence.get("tokens", [])
+    if not isinstance(paths, list) or not isinstance(tokens, list) or not paths or not tokens:
+        raise ManuscriptAuditError(f"claim {claim_id} has an incomplete text binding")
+    combined = "\n".join(
+        (project_root / str(path)).read_text(encoding="utf-8") for path in paths
+    )
+    for token in tokens:
+        if str(token) not in combined:
+            raise ManuscriptAuditError(f"claim {claim_id} text evidence token is missing")
+
+
+def _normalized_rendered_text(text: str) -> str:
+    """Convert rendered HTML into stable visible text for exact token checks."""
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text))).strip()
+
+
+def _audit_claim_bindings(
+    claim_rows: list[dict[str, str]],
+    *,
+    claims_path: Path,
+    reference_rows: list[dict[str, str]],
+    references: dict[int, str],
+    source_documents: dict[str, str],
+    rendered_documents: dict[str, str],
+) -> None:
+    """Bind every claim to governed evidence, manuscript text, and references."""
+    bindings_path = claims_path.with_name(_CLAIM_BINDINGS_FILE)
+    if not bindings_path.is_file():
+        raise ManuscriptAuditError("claim evidence bindings file is missing")
+    payload = json.loads(bindings_path.read_text(encoding="utf-8"))
+    bindings = payload.get("claims")
+    if payload.get("schema_version") != 1 or not isinstance(bindings, dict):
+        raise ManuscriptAuditError("claim evidence bindings have an unsupported schema")
+    claim_ids = {row["claim_id"] for row in claim_rows}
+    if set(bindings) != claim_ids:
+        raise ManuscriptAuditError("claim evidence bindings do not match the claim ledger")
+
+    reference_support = {
+        int(row["reference_number"]): row["supported_claim_or_method"]
+        for row in reference_rows
+    }
+    project_root = _project_root_for_claims(claims_path)
+    for row in claim_rows:
+        claim_id = row["claim_id"]
+        if row["evidence_binding_id"] != claim_id:
+            raise ManuscriptAuditError(f"claim {claim_id} has the wrong evidence binding ID")
+        binding = bindings[claim_id]
+        if not isinstance(binding, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed evidence binding")
+
+        claim_value_tokens = binding.get("claim_value_tokens", [])
+        if not isinstance(claim_value_tokens, list):
+            raise ManuscriptAuditError(f"claim {claim_id} has malformed claim values")
+        numeric_claim_tokens = re.findall(r"\d+(?:\.\d+)?%?", row["claim"])
+        if numeric_claim_tokens != [str(value) for value in claim_value_tokens]:
+            raise ManuscriptAuditError(f"claim {claim_id} recorded values do not match its binding")
+
+        evidence = binding.get("evidence")
+        if not isinstance(evidence, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has no evidence binding")
+        evidence_kind = evidence.get("kind")
+        if evidence_kind == "csv":
+            evidence_path = str(evidence.get("path", ""))
+            if Path(evidence_path).name not in row["source_artifact"]:
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} source artifact does not match its binding"
+                )
+            _audit_csv_claim_evidence(evidence, project_root=project_root, claim_id=claim_id)
+        elif evidence_kind == "text":
+            evidence_paths = evidence.get("paths", [])
+            if not isinstance(evidence_paths, list) or any(
+                str(path) not in row["source_artifact"] for path in evidence_paths
+            ):
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} source artifact does not match its binding"
+                )
+            _audit_text_claim_evidence(evidence, project_root=project_root, claim_id=claim_id)
+        elif evidence_kind != "references":
+            raise ManuscriptAuditError(f"claim {claim_id} has an unsupported evidence kind")
+
+        source_tokens = binding.get("source_tokens", {})
+        if not isinstance(source_tokens, dict) or not source_tokens:
+            raise ManuscriptAuditError(f"claim {claim_id} has no manuscript source binding")
+        for document, tokens in source_tokens.items():
+            if document not in source_documents or not isinstance(tokens, list) or not tokens:
+                raise ManuscriptAuditError(f"claim {claim_id} has a malformed source binding")
+            if any(str(token) not in source_documents[document] for token in tokens):
+                raise ManuscriptAuditError(f"claim {claim_id} is missing from manuscript source")
+
+        rendered_tokens = binding.get("rendered_tokens", {})
+        if not isinstance(rendered_tokens, dict) or not rendered_tokens:
+            raise ManuscriptAuditError(f"claim {claim_id} has no rendered manuscript binding")
+        for document, tokens in rendered_tokens.items():
+            if document not in source_documents or not isinstance(tokens, list) or not tokens:
+                raise ManuscriptAuditError(f"claim {claim_id} has a malformed rendered binding")
+            if document in rendered_documents and any(
+                str(token) not in rendered_documents[document] for token in tokens
+            ):
+                raise ManuscriptAuditError(f"claim {claim_id} is missing from rendered manuscript")
+
+        bound_references = binding.get("references")
+        expected_support = binding.get("reference_support")
+        if not isinstance(bound_references, list) or not isinstance(expected_support, dict):
+            raise ManuscriptAuditError(f"claim {claim_id} has a malformed reference binding")
+        ledger_reference_numbers = json.loads(row["reference_numbers"])
+        if ledger_reference_numbers != bound_references:
+            raise ManuscriptAuditError(f"claim {claim_id} reference numbers do not match its binding")
+        if any(not isinstance(number, int) or number not in references for number in bound_references):
+            raise ManuscriptAuditError(f"claim {claim_id} references an undefined source")
+        if {str(number) for number in bound_references} != set(expected_support):
+            raise ManuscriptAuditError(f"claim {claim_id} reference support map is incomplete")
+        for number in bound_references:
+            if reference_support[number] != expected_support[str(number)]:
+                raise ManuscriptAuditError(
+                    f"claim {claim_id} reference {number} does not match the evidence ledger"
+                )
+
+
 def _has_active_authorization_guard(text: str) -> bool:
     for chunk in re.findall(r"```\{r[^\n]*\}\n(.*?)```", text, re.DOTALL):
         uncommented = "\n".join(line.split("#", maxsplit=1)[0] for line in chunk.splitlines())
@@ -386,6 +636,7 @@ def audit_manuscript_citations(
     claims_path: Path,
     manifest_path: Path,
     rendered_main_path: Path | None = None,
+    rendered_companion_path: Path | None = None,
 ) -> CitationAuditReport:
     """Fail closed on citation order, evidence ledgers, and AUC placement."""
     main_text = main_path.read_text(encoding="utf-8")
@@ -413,6 +664,23 @@ def audit_manuscript_citations(
         raise ManuscriptAuditError("claim evidence map has missing or duplicate claim IDs")
     if any(not row.get("verification_status", "").startswith("verified") for row in claim_rows):
         raise ManuscriptAuditError("claim evidence map contains an unverified claim")
+    rendered_documents: dict[str, str] = {}
+    if rendered_main_path is not None:
+        rendered_documents["main"] = _normalized_rendered_text(
+            rendered_main_path.read_text(encoding="utf-8")
+        )
+    if rendered_companion_path is not None:
+        rendered_documents["companion"] = _normalized_rendered_text(
+            rendered_companion_path.read_text(encoding="utf-8")
+        )
+    _audit_claim_bindings(
+        claim_rows,
+        claims_path=claims_path,
+        reference_rows=reference_rows,
+        references=references,
+        source_documents={"main": main_text, "companion": companion_text},
+        rendered_documents=rendered_documents,
+    )
     auc_claims = [row for row in claim_rows if row.get("claim_id") == "M09"]
     if len(auc_claims) != 1 or "companion" not in auc_claims[0].get(
         "manuscript_location", ""

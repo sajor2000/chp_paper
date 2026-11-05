@@ -10,7 +10,7 @@ output_dir <- normalizePath(
 )
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-run_citation_audit <- function(rendered_main = NULL) {
+run_citation_audit <- function(rendered_main = NULL, rendered_companion = NULL) {
   audit_args <- c(
     "run",
     "chicagohealthmap",
@@ -23,7 +23,10 @@ run_citation_audit <- function(rendered_main = NULL) {
     "--manifest", "config/manuscript/results_authorization.json"
   )
   if (!is.null(rendered_main)) {
-    audit_args <- c(audit_args, "--rendered-main", rendered_main)
+    audit_args <- c(audit_args, "--rendered-main", shQuote(rendered_main))
+  }
+  if (!is.null(rendered_companion)) {
+    audit_args <- c(audit_args, "--rendered-companion", shQuote(rendered_companion))
   }
   status <- system2("uv", audit_args, stdout = TRUE, stderr = TRUE)
   if (!is.null(attr(status, "status")) && attr(status, "status") != 0) {
@@ -97,6 +100,10 @@ run_citation_audit(
   file.path(
     output_dir,
     "chicago_health_map_jama_health_forum_original_investigation.html"
+  ),
+  file.path(
+    output_dir,
+    "RMD_chm_paper_r_Ashley.html"
   )
 )
 

@@ -495,6 +495,12 @@ def manuscript_citation_audit_command(
         exists=True,
         dir_okay=False,
     ),
+    rendered_companion: Path | None = typer.Option(
+        None,
+        "--rendered-companion",
+        exists=True,
+        dir_okay=False,
+    ),
 ) -> None:
     """Audit manuscript citations and the statistician-companion boundary."""
     try:
@@ -505,6 +511,7 @@ def manuscript_citation_audit_command(
             claims,
             manifest,
             rendered_main,
+            rendered_companion,
         )
     except (ManuscriptAuditError, OSError, ValueError) as error:
         typer.echo(f"Manuscript citation audit failed: {error}", err=True)
